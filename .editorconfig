@@ -1,0 +1,28 @@
+# .editorconfig file helps developers define and maintain
+# consistent coding styles between different editors and IDEs
+# editorconfig.org
+# https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
+root = true
+
+[*]
+indent_style = tab
+indent_size = 2
+tab_width = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 800
+
+[*.neon]
+tab_width = 4
+
+# Minified and empty files shouldn't be changed, unset will ignore previously set properties (in [*]) and totally unset any possible behavior
+[{**.min.{css,js},.empty}]
+indent_style = unset
+insert_final_newline = unset
+
+# 8 tabs (yea it's a lot) is default setting in Markdown (github interpretation), so with 8 tabs you have 1:1 source with compilated file
+[*.{markdown,md}]
+indent_style = tab
+indent_size = 8

@@ -1,0 +1,29 @@
+{
+	"name": "StyleSwitch",
+	"version": "0.1.0",
+	"description": "StyleSwitch library for switching page styles",
+	"main": "styleSwitch.mjs",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/iiic/StyleSwitch.git"
+	},
+	"keywords": [
+		"front-end",
+		"vanilla",
+		"vanilla-js",
+		"javascript",
+		"ecmascript",
+		"js",
+		"dom",
+		"mjs"
+	],
+	"author": "ic <ic.czech+npmjs@gmail.com> (https://iiic.dev/#npmjs)",
+	"license": "CC-BY-SA-4.0",
+	"bugs": {
+		"url": "https://github.com/iiic/StyleSwitch/issues"
+	},
+	"homepage": "https://iiic.dev/styleswitch#npmjs"
+}
