@@ -52,7 +52,7 @@ const StyleSwitchPrivate = class
 	* @public
 	* @type {NodeList}
 	*/
-	styleLinks;
+	styleLinks; // nechat v elementech a selectovat to přes querySelector
 
 	/**
 	* @public
@@ -140,6 +140,7 @@ const StyleSwitchPrivate = class
 			StyleSwitch.CONSOLE.INTEREST_PARAMETER
 		);
 
+		// nechat v elementech a selectovat to přes querySelector
 		this.styleLinks.forEach( ( /** @type {HTMLLinkElement} */ link ) =>
 		{
 			const role = StyleSwitch.getRoleFrom( link );
@@ -362,7 +363,7 @@ const StyleSwitchPrivate = class
 		);
 
 		/** @type {HTMLLinkElement | CSSStyleSheet} */
-		let style = ( this.styleLinks[ positions[ 0 ] ] );
+		let style = ( this.styleLinks[ positions[ 0 ] ] );  // nechat v elementech a selectovat to přes querySelector
 
 		this.setStyleCookieBy( style.href );
 
@@ -371,7 +372,7 @@ const StyleSwitchPrivate = class
 			{
 
 				/** @type {HTMLLinkElement | CSSStyleSheet} */
-				style = ( this.styleLinks[ position ] );
+				style = ( this.styleLinks[ position ] );  // nechat v elementech a selectovat to přes querySelector
 
 				let link = null;
 				//@ts-ignore
@@ -534,12 +535,12 @@ export class StyleSwitch
 	/**
 	 * @returns {NodeList}
 	 */
-	get styleLinks ()
+	get styleLinks ()  // nechat v elementech a selectovat to přes querySelector
 	{
 		return this._private.styleLinks;
 	}
 
-	set styleLinks ( /** @type {NodeList} */ styleLinks )
+	set styleLinks ( /** @type {NodeList} */ styleLinks )  // nechat v elementech a selectovat to přes querySelector
 	{
 		this._private.styleLinks = styleLinks;
 	}
@@ -620,7 +621,7 @@ export class StyleSwitch
 			StyleSwitch.CONSOLE.METHOD_NAME
 		);
 
-		this.styleLinks = document.head.querySelectorAll( this.settings.styleLinksQSA );
+		this.styleLinks = document.head.querySelectorAll( this.settings.styleLinksQSA );  // nechat v elementech a selectovat to přes querySelector
 	}
 
 	getAllPossibleStyles ()
@@ -630,7 +631,7 @@ export class StyleSwitch
 			StyleSwitch.CONSOLE.METHOD_NAME
 		);
 
-		const styleLinksLength = this.styleLinks.length;
+		const styleLinksLength = this.styleLinks.length;  // nechat v elementech a selectovat to přes querySelector
 		const titles = {};
 
 		styleLinksLoop:
@@ -778,7 +779,7 @@ export class StyleSwitch
 		if ( keys[ 1 ] ) {
 			this.settings.styles[ keys[ 1 ] ].positions.forEach( ( /** @type {Number} */ key ) =>
 			{
-				if ( !window.matchMedia( this.styleLinks[ key ].media ).matches ) {
+				if ( !window.matchMedia( this.styleLinks[ key ].media ).matches ) {  // nechat v elementech a selectovat to přes querySelector
 					this.styleLinks[ key ].removeAttribute( StyleSwitchPrivate.MEDIA_ATTR );
 					// @todo : přesunout na data-atribut protože při přepínání stylů na úrovni OS bych nevěděl který je to media atribut.
 				}
@@ -819,12 +820,14 @@ export class StyleSwitch
 
 		console.groupEnd();
 
+		console.log( this.settings );
+
 		return true;
 	}
 
 }
 
 // @ts-ignore
-new StyleSwitch( document.getElementById( 'styleswitch-settings' ) );
+new StyleSwitch( document.getElementById( 'style-switch-settings' ) );
 
 // @todo : při změně stylu je nutné prohodit pozice link type stylesheet, ten s current prefers-color-scheme musí být na vyšší pozici ! při té příležitosti by šlo i přecvakávat selectory, aby byl změna schématu v OS přepnula selector

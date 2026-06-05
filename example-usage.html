@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Dialogic html example</title>
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+	<script>
+		/**
+		 * @description This short script it's not necessary for Dialogic to work, it's only to set correct base path for loading modules when the html file is opened directly in browser (file://...).
+		 */
+
+		/** @type {String} */
+		const pathname = window.location.pathname;
+
+		/** @type {String} */
+		const dir = pathname.substring( 0, pathname.lastIndexOf( '/' ) );
+
+		if ( dir )
+		{
+			const base = document.createElement( 'base' );
+			base.href = dir + '/';
+			document.head.appendChild( base );
+		}
+
+	</script>
+	<link rel="modulepreload" as="script" href="./modules/importWithIntegrity.mjs" integrity="sha256-cfOxrPKw+HRch/o1HAGTjzeo5g+8Ho2VW5Ki75Y6DII=" crossorigin="anonymous">
+	<link rel="icon" type="image/x-icon" href="./favicon.ico">
+	<script src="./content-type-checker.js?v=0.1" type="module" crossorigin="anonymous" data-integrity="sha256-todo"></script>
+
+	<link rel="stylesheet" href="./example-css/light.css" fetchpriority="high" crossorigin="anonymous"><!-- persistent -->
+	<link rel="stylesheet" href="./example-css/dark.css" title="tmavý styl" media="(prefers-color-scheme: dark)" crossorigin="anonymous"><!-- preferred -->
+	<link rel="alternate stylesheet" href="./example-css/light.css" title="světly styl" crossorigin="anonymous">
+	<!-- <link rel="alternate stylesheet" href="./example-css/alternate.css" title="alternativní styl" fetchpriority="low" crossorigin="anonymous"> -->
+	<script>
+		/** @returns {Promise<void>} */
+		async function resetCssStyleSheets (
+			/** @type {CookieListItem} */ cookie = null,
+			/** @type {'changed' | 'deleted'} */ actionType = 'changed'
+		) {
+
+			/** @type {Boolean} */
+			let useNakedStyle = false;
+
+			if ( !cookie )
+			{
+
+				/** @type {CookieListItem} */
+				cookie = await cookieStore.get( 'stylesheets' );
+
+			}
+
+			if ( cookie && actionType === 'deleted' )
+			{
+
+				/** @type {NodeListOf<HTMLLinkElement>} */
+				const allStyleLinkElements = document.querySelectorAll( 'link[rel~=stylesheet]' );
+
+				if ( allStyleLinkElements )
+				{
+
+					allStyleLinkElements.forEach( function ( /** @type {HTMLLinkElement} */ link ) {
+						if ( link.hasAttribute( 'data-alternate' ) )
+						{
+							link.rel = 'alternate stylesheet';
+							link.removeAttribute( 'data-alternate' );
+						}
+						if ( link.hasAttribute( 'data-title' ) )
+						{
+							link.title = link.getAttribute( 'data-title' );
+							link.removeAttribute( 'data-title' );
+						}
+						if ( link.hasAttribute( 'data-media' ) )
+						{
+							link.media = link.getAttribute( 'data-media' );
+							link.removeAttribute( 'data-media' );
+						}
+						if ( !link.rel.match( 'alternate' ) )
+						{
+							link.disabled = false;
+						}
+					} );
+				}
+				return;
+			} else if ( !cookie || !cookie.value )
+			{
+				return;
+			}
+
+			/** @type {Object.<string, {disabled: Boolean}>} */
+			const styles = JSON.parse( cookie.value );
+
+			Object.keys( styles ).forEach( function ( /** @type {String} */ path ) {
+				if ( path === '' && styles[ path ].disabled === false )
+				{
+					useNakedStyle = true;
+				}
+
+				/** @type {HTMLLinkElement|null} */
+				const link = document.querySelector( `link[rel~=stylesheet][href*="${ path }"]` );
+
+				if ( link )
+				{
+
+					/** @type {Boolean} */
+					const isAlternate = link.rel.includes( 'alternate' );
+
+					link.disabled = styles[ path ].disabled;
+					if ( link.disabled )
+					{
+						if ( link.hasAttribute( 'data-alternate' ) )
+						{
+							link.rel = 'alternate stylesheet';
+							link.removeAttribute( 'data-alternate' );
+						}
+						if ( link.hasAttribute( 'data-title' ) )
+						{
+							link.title = link.getAttribute( 'data-title' );
+							link.removeAttribute( 'data-title' );
+						}
+						if ( link.hasAttribute( 'data-media' ) )
+						{
+							link.media = link.getAttribute( 'data-media' );
+							link.removeAttribute( 'data-media' );
+						}
+					} else
+					{ // enabled
+						if ( isAlternate )
+						{
+							link.setAttribute( 'data-alternate', '' );
+							link.rel = 'stylesheet';
+						}
+						if ( link.title )
+						{
+							link.setAttribute( 'data-title', link.title );
+							link.removeAttribute( 'title' );
+						}
+						if ( link.media )
+						{
+							if ( window.matchMedia( link.media ).matches )
+							{
+								if ( link.hasAttribute( 'data-title' ) )
+								{
+									link.title = link.getAttribute( 'data-title' );
+									link.removeAttribute( 'data-title' );
+								}
+							} else
+							{
+								link.setAttribute( 'data-media', link.media );
+								link.removeAttribute( 'media' );
+							}
+						}
+						if ( link.hasAttribute( 'data-media' ) && window.matchMedia( link.media ).matches )
+						{
+							link.setAttribute( 'media', link.getAttribute( 'data-media' ) );
+							link.removeAttribute( 'data-media' );
+						}
+					}
+				}
+			} );
+
+			/** @type {HTMLLinkElement|null} */
+			const persistentStyleSheets = document.querySelectorAll( 'link[rel=stylesheet]:not([title])' );
+
+			if ( !persistentStyleSheets )
+			{
+				return;
+			}
+			persistentStyleSheets.forEach( function ( /** @type {HTMLLinkElement} */ link ) {
+				link.disabled = useNakedStyle;
+			} );
+		}
+		resetCssStyleSheets();
+
+		cookieStore.addEventListener( 'change', function ( /** @type {CookieChangeEvent} */ event ) {
+
+			/** @type {CookieListItem|undefined} */
+			const possibleChangedCookie = event.changed.find( cookie => cookie.name === 'stylesheets' );
+
+			if ( possibleChangedCookie )
+			{
+				return resetCssStyleSheets( possibleChangedCookie, 'changed' );
+			}
+
+			/** @type {CookieListItem|undefined} */
+			const possibleDeletedCookie = event.deleted.find( cookie => cookie.name === 'stylesheets' );
+
+			if ( possibleDeletedCookie )
+			{
+				return resetCssStyleSheets( possibleDeletedCookie, 'deleted' );
+			}
+		} );
+	</script>
+
+	<script type="application/json" id="XX-style-switch-settings">
+		{ "switchStyleTitle": "🌞／🌛" }
+	</script>
+	<!-- <script src="./style-switch.mjs?v=0.2" type="module" crossorigin="anonymous" data-integrity="sha256-todo"></script> -->
+	<!-- <script src="./new-style-switch.mjs?v=0.3" type="module" crossorigin="anonymous" data-integrity="sha256-todo"></script> -->
+	<script type="module">
+
+		/// @todo : otestovat co se děje v případě že není žádná cookie
+
+		// import { StyleSwitch } from './style-switch.mjs';
+
+		const { StyleSwitch, result } = await import( './new-style-switch.mjs?settings=' + JSON.stringify( {
+			autoRun: true,
+			nakedStyle: {
+				use: false,
+			},
+			resultSnippetAppearance: {
+				outputFormat: 'select',
+				switch: {
+					useSwitchIfPossible: true,
+				}
+			}
+		} ) );
+
+		if ( result && result instanceof HTMLElement )
+		{
+			document.getElementById( 'style-switch' ).appendChild( result );
+		}
+
+	</script>
+	<style>
+		:root {
+			--border-radius: 5px;
+			--color-accent: #118bee15;
+			--color-link: #118bee;
+			--color-text: #000;
+			--color-success: green;
+		}
+
+		label.switch {
+			display: block;
+			padding: 4px 4px 6px 6px;
+			border: 0 solid var(--color-link);
+			border-radius: var(--border-radius);
+			width: min-content;
+			white-space: nowrap;
+			cursor: pointer;
+			user-select: none;
+
+			&>:first-child {
+				display: inline-block;
+				padding-right: 1em;
+			}
+
+			&:hover,
+			&:has([role=switch]:focus) {
+				padding: 2px 2px 4px 4px;
+				border-width: 2px;
+				outline: none;
+				background-color: var(--color-accent);
+			}
+
+			.visual {
+				position: relative;
+				top: 2px;
+				display: inline-block;
+				border: 2px solid var(--color-text);
+				width: 2.5em;
+				height: 1.25em;
+				border-radius: 2em;
+				vertical-align: sub;
+
+				&::before {
+					content: "";
+					position: absolute;
+					top: 1px;
+					left: 2px;
+					display: inline-block;
+					border: 2px solid var(--color-text);
+					border-radius: 1em;
+					width: 0.88em;
+					height: 0.88em;
+					background: var(--color-text);
+					opacity: 0.6;
+					transition: left 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+				}
+			}
+
+			.state {
+				display: inline-grid;
+				grid-template-areas: "overlay";
+
+				&>.boolean {
+					grid-area: overlay;
+				}
+			}
+		}
+
+		[role=switch] {
+			opacity: 0;
+			position: absolute;
+
+			&:not(:checked)~.state .on {
+				opacity: 0;
+			}
+
+			&:checked~.state .off {
+				opacity: 0;
+			}
+
+			&:checked~.visual::before {
+				left: 1.25em;
+				border-color: var(--color-success);
+				background: var(--color-success);
+				opacity: 1;
+			}
+		}
+
+	</style>
+</head>
+
+<body>
+
+	<ul id="loaded-styles">
+		<li class="dark.css" hidden>načetl se soubor <em>dark.css</em></li>
+		<li class="light.css" hidden>načetl se soubor <em>light.css</em></li>
+		<li class="alternate.css" hidden>načetl se soubor <em>alternate.css</em></li>
+	</ul>
+
+	<header>
+		<h1>Style switch… vymyslet nový název: něco jako "alternate style polyfill" nebo tak něco</h1>
+		<p>V levém horním rohu je soupis <mark>načtených</mark> stylů. Ze 3 možných se načte vždy 1 (<code>persistent</code>) až 2 (<code>persistent</code> + <code>alternate</code> nebo <code>persistent</code> + <code>preferred</code>)</p>
+		<br>
+		<p><a href="#"><i>Italic Link Button</i></a><a href="#"><b>Bold Link Button &rarr;</b></a></p>
+	</header>
+
+	<main>
+		<hr>
+
+		<section id="section-1">
+			<header>
+				<h2>Section Heading</h2>
+				<fieldset id="style-switch">
+					<legend>dostupné styly</legend>
+				</fieldset>
+			</header>
+			<aside>
+				<h3>Card heading</h3>
+				<p>Card content*</p>
+				<p><small>*with small content</small></p>
+			</aside>
+			<aside>
+				<h3>Card heading</h3>
+				<p>Card content <sup>with notification</sup></p>
+			</aside>
+			<aside>
+				<h3>Card heading</h3>
+				<p>Card content</p>
+			</aside>
+		</section>
+		<hr>
+
+		<section>
+			<blockquote>
+				"Quote"
+				<footer><i>- Attribution</i></footer>
+			</blockquote>
+		</section>
+		<hr>
+
+		<section>
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th>Col A</th>
+						<th>Col B</th>
+						<th>Col C</th>
+					</tr>
+				</thead>
+				<tr>
+					<td>Row 1</td>
+					<td>Cell A1</td>
+					<td>Cell B1</td>
+					<td>Cell C1</td>
+				</tr>
+				<tr>
+					<td>Row 2</td>
+					<td>Cell A2</td>
+					<td>Cell B2</td>
+					<td>Cell C2</td>
+				</tr>
+			</table>
+		</section>
+		<hr>
+		<article>
+			<h2>Left-aligned header</h2>
+			<p>Left-aligned paragraph</p>
+			<aside>
+				<p>Article callout</p>
+			</aside>
+			<ul>
+				<li>List item 1</li>
+				<li>List item 2</li>
+			</ul>
+			<figure>
+				<img alt="Stock photo" src="https://via.placeholder.com/1080x500?text=Amazing+stock+photo">
+				<figcaption><i>Image caption</i></figcaption>
+			</figure>
+		</article>
+		<hr>
+		<div>
+			<details>
+				<summary>Expandable title</summary>
+				<p>Revealed content</p>
+			</details>
+			<details>
+				<summary>Another expandable title</summary>
+				<p>More revealed content</p>
+			</details>
+			<br>
+			<p>Inline <code>code</code> snippets</p>
+			<pre>
+                <code>
+// preformatted code block
+                </code>
+            </pre>
+		</div>
+		<hr>
+
+		<section>
+			<form>
+				<header>
+					<h2>Form title</h2>
+				</header>
+				<label for="input1">Input label:</label>
+				<input type="text" id="input1" name="input1" size="20" placeholder="Input1">
+				<label for="select1">Select label:</label>
+				<select id="select1">
+					<option value="option1">option1</option>
+					<option value="option2">option2</option>
+				</select>
+				<label for="textarea1">Textarea label:</label>
+				<textarea cols="40" rows="5" id="textarea1"></textarea>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+	</main>
+
+	<footer>
+		<hr>
+		<p>
+			<small>Contact info</small>
+		</p>
+	</footer>

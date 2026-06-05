@@ -1,0 +1,7 @@
+#loaded-styles .alternate\.css {
+	display: list-item;
+}
+
+:root {
+	--color-bg: red;
+}
