@@ -33,6 +33,9 @@
 	<link rel="alternate stylesheet" href="./example-css/light.css" title="světly styl" crossorigin="anonymous">
 	<!-- <link rel="alternate stylesheet" href="./example-css/alternate.css" title="alternativní styl" fetchpriority="low" crossorigin="anonymous"> -->
 	<script>
+
+		// v případě windows světlý režim a přepnutí tmavý a následně alternate, selže akce po smazání cookie
+
 		/** @returns {Promise<void>} */
 		async function resetCssStyleSheets (
 			/** @type {CookieListItem} */ cookie = null,
@@ -75,10 +78,7 @@
 							link.media = link.getAttribute( 'data-media' );
 							link.removeAttribute( 'data-media' );
 						}
-						if ( !link.rel.match( 'alternate' ) )
-						{
-							link.disabled = false;
-						}
+						link.disabled = link.rel.match( 'alternate' ); // strange behavior, alternate stylesheets remains enabled, so we need to disable them manually
 					} );
 				}
 				return;
@@ -150,10 +150,10 @@
 								link.removeAttribute( 'media' );
 							}
 						}
-						if ( link.hasAttribute( 'data-media' ) && window.matchMedia( link.media ).matches )
+						if ( link.hasAttribute( 'data-media' ) && window.matchMedia( link.media ).matches ) // @todo : bacha na to, při prázdném link.media je matchMedia vždy true
 						{
-							link.setAttribute( 'media', link.getAttribute( 'data-media' ) );
-							link.removeAttribute( 'data-media' );
+							// link.media = link.getAttribute( 'data-media' );
+							// link.removeAttribute( 'data-media' );
 						}
 					}
 				}
@@ -199,10 +199,6 @@
 	<!-- <script src="./new-style-switch.mjs?v=0.3" type="module" crossorigin="anonymous" data-integrity="sha256-todo"></script> -->
 	<script type="module">
 
-		/// @todo : otestovat co se děje v případě že není žádná cookie
-
-		// import { StyleSwitch } from './style-switch.mjs';
-
 		const { StyleSwitch, result } = await import( './new-style-switch.mjs?settings=' + JSON.stringify( {
 			autoRun: true,
 			nakedStyle: {
@@ -210,6 +206,7 @@
 			},
 			resultSnippetAppearance: {
 				outputFormat: 'select',
+				reverseOrder: true,
 				switch: {
 					useSwitchIfPossible: true,
 				}
