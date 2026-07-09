@@ -2,6 +2,10 @@
 
 //@ts-check
 
+/**
+ * @typedef {String & { interpolate: (data: Object<string,string>) => string }} InterpolatedString
+ */
+
 import { importWithIntegrity } from './modules/importWithIntegrity.mjs';
 
 /**
@@ -16,10 +20,10 @@ const ContentTypeCheckerInternal = class
 	 */
 	#settings = {
 		testingFileExtensions: {
-			js: ContentTypeChecker.WARNING,
-			mjs: ContentTypeChecker.ALERT,
-			css: ContentTypeChecker.WARNING,
-			json: ContentTypeChecker.WARNING,
+			js: ContentTypeChecker.REPORT_TYPE.WARNING,
+			mjs: ContentTypeChecker.REPORT_TYPE.ALERT,
+			css: ContentTypeChecker.REPORT_TYPE.WARNING,
+			json: ContentTypeChecker.REPORT_TYPE.WARNING,
 		},
 		contentTypes: {
 			js: {
@@ -92,6 +96,23 @@ const ContentTypeCheckerInternal = class
 		this.#settings = ContentTypeCheckerInternal.#deepAssign( this.#settings, newSettings );
 	}
 
+	/**
+	 * @type {Array.<{ fileExtension: string, path: string; contentType: string; }>}
+	 */
+	#result = [];
+
+	/**
+	 * @returns {Array.<{ fileExtension: string, path: string; contentType: string; }>}
+	 */
+	getResult ()
+	{
+		return this.#result;
+	}
+	setResult ( /** @type {Array.<{ fileExtension: string, path: string; contentType: string; }>} */ result = [] )
+	{
+		this.#result = result;
+	}
+
 	constructor ( /** @type {String} */ settingsElementId = 'content-type-checker-settings' )
 	{
 		Object.defineProperty( this, 'settings', {
@@ -99,6 +120,13 @@ const ContentTypeCheckerInternal = class
 			enumerable: true,
 			get: this.getSettings,
 			set: this.setSettings
+		} );
+
+		Object.defineProperty( this, 'result', {
+			configurable: false,
+			enumerable: false,
+			get: this.getResult,
+			set: this.setResult
 		} );
 
 		/** @type {URLSearchParams} */
@@ -145,7 +173,7 @@ const ContentTypeCheckerInternal = class
 	}
 
 	/** @returns {void} */
-	propagateReport ( /** @type {{ fileExtension: string, path: string; reportingType?: number; contentType: string; }} */ testingItem, /** @type {String} */ reportResult )
+	propagateReport ( /** @type {{ fileExtension: string, path: string; reportingType?: 'alert' | 'warning' | 'object'; contentType: string; }} */ testingItem, /** @type {String} */ reportResult )
 	{
 
 		/** @type {String} */
@@ -168,15 +196,15 @@ const ContentTypeCheckerInternal = class
 				message = this.settings.texts.universalErrorMimeType;
 			}
 		}
-		message = message.interpolate( { // @todo : zjistit co tu vadí vscode našeptávači
+		message = /** @type {InterpolatedString} */ ( message ).interpolate( { // @todo : zjistit co tu vadí vscode našeptávači
 			fileExtension: testingItem.fileExtension,
 			contentType: testingItem.contentType,
 			pathToFile: testingItem.path,
 			properJsFileType: this.settings.contentTypes.js.supported.join( this.settings.texts.properTypesSeparator ),
 		} );
-		if ( testingItem.reportingType === ContentTypeChecker.ALERT ) {
+		if ( testingItem.reportingType === ContentTypeChecker.REPORT_TYPE.ALERT ) {
 			alert( message );
-		} else if ( testingItem.reportingType === ContentTypeChecker.WARNING ) {
+		} else if ( testingItem.reportingType === ContentTypeChecker.REPORT_TYPE.WARNING ) {
 			console.warn( message );
 		}
 	}
@@ -192,7 +220,7 @@ const ContentTypeCheckerInternal = class
 	}
 
 	/** @returns {void} */
-	reportSingleResult ( /** @type {{ fileExtension: string, path: string; reportingType?: number; contentType: string; }} */ testingItem )
+	reportSingleResult ( /** @type {{ fileExtension: string, path: string; reportingType?: 'alert' | 'warning' | 'object'; contentType: string; }} */ testingItem )
 	{
 
 		/** @type {String} */
@@ -226,16 +254,16 @@ const ContentTypeCheckerInternal = class
 	};
 
 	/** @returns {void|Array.<{ fileExtension: string, path: string; contentType: string; }>} */
-	reportResults ( /** @type {Array.<{ fileExtension: string, path: string; reportingType: number; contentType: string; }>} */ testingResults )
+	reportResults ( /** @type {Array.<{ fileExtension: string, path: string; reportingType: 'alert' | 'warning' | 'object'; contentType: string; }>} */ testingResults )
 	{
 
 		/** @type {Array.<{ fileExtension: string, path: string; contentType: string; }>} */
 		const returnReport = [];
 
 		loopThroughAllResults:
-		testingResults.forEach( ( /** @type {{ fileExtension: string, path: string; reportingType?: number; contentType: string; }} */ testingItem ) =>
+		testingResults.forEach( ( /** @type {{ fileExtension: string, path: string; reportingType?: 'alert' | 'warning' | 'object'; contentType: string; }} */ testingItem ) =>
 		{
-			if ( testingItem.reportingType === ContentTypeChecker.RETURN_OBJECT ) {
+			if ( testingItem.reportingType === ContentTypeChecker.REPORT_TYPE.OBJECT ) {
 				delete testingItem.reportingType;
 				returnReport.push( testingItem );
 			} else {
@@ -256,15 +284,15 @@ const ContentTypeCheckerInternal = class
 		}
 	}
 
-	/** @returns {Promise<Array.<Promise.<{ fileExtension: string, path: string; reportingType: number; contentType: string; }>>>} */
-	static async prepareFetches ( /** @type {Array<{fileExtension: string, path: string, reportingType: number, contentType: string}>} */ testingFileExtensionsObject )
+	/** @returns {Promise<Array.<Promise.<{ fileExtension: string, path: string; reportingType: 'alert' | 'warning' | 'object'; contentType: string; }>>>} */
+	static async prepareFetches ( /** @type {Array<{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}>} */ testingFileExtensionsObject )
 	{
 
-		/** @type {Array.<Promise<{fileExtension: string, path: string; reportingType: number; contentType: string; }>>} */
+		/** @type {Array.<Promise<{fileExtension: string, path: string; reportingType: 'alert' | 'warning' | 'object'; contentType: string; }>>} */
 		const promises = [];
 
 		loopThroughDocumentsFoundPaths:
-		testingFileExtensionsObject.forEach( ( /** @type {{fileExtension: string, path: string, reportingType: number, contentType: string}} */ testingItem ) =>
+		testingFileExtensionsObject.forEach( ( /** @type {{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}} */ testingItem ) =>
 		{
 			promises.push( fetch( testingItem.path, {
 				method: 'HEAD',
@@ -324,17 +352,17 @@ const ContentTypeCheckerInternal = class
 		return null;
 	};
 
-	/** @returns {Array<{fileExtension: string, path: string, reportingType: number, contentType: string}>} */
+	/** @returns {Array<{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}>} */
 	prepareTestingObject ()
 	{
 
-		/** @type {Array<{fileExtension: string, path: string, reportingType: number, contentType: string}>} */
+		/** @type {Array<{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}>} */
 		const testingFileExtensionsObject = [];
 
 		loopThroughPossibleFileExtensions:
 		Object.entries( this.settings.testingFileExtensions ).forEach( ( [
 			/** @type {String} */ fileExtension,
-			/** @type {Number} */ reportingType
+			/** @type {'alert' | 'warning' | 'object'} */ reportingType
 		] ) =>
 		{
 
@@ -390,6 +418,7 @@ const ContentTypeCheckerInternal = class
 
 	updatePathByBase ()
 	{
+
 		/** @type {HTMLBaseElement|null} */
 		const possibleBaseElement = document.head.querySelector( 'base' );
 
@@ -405,13 +434,13 @@ const ContentTypeCheckerInternal = class
 		this.updatePathByBase();
 		await ContentTypeChecker.loadExternalFunctions( this.settings.modulesImportPath );
 
-		/** @type {Array<{fileExtension: string, path: string, reportingType: number, contentType: string}>} */
+		/** @type {Array<{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}>} */
 		const testingObject = this.prepareTestingObject();
 
-		/** @type {Array.<Promise<{ fileExtension: string, path: string; reportingType: number; contentType: string; }>>} */
+		/** @type {Array.<Promise<{ fileExtension: string, path: string; reportingType: 'alert' | 'warning' | 'object'; contentType: string; }>>} */
 		const promises = await ContentTypeCheckerInternal.prepareFetches( testingObject );
 
-		/** @type {Array.<{ fileExtension: string, path: string; reportingType: number; contentType: string; }>} */
+		/** @type {Array.<{ fileExtension: string, path: string; reportingType: 'alert' | 'warning' | 'object'; contentType: string; }>} */
 		const testingResults = await Promise.all( promises );
 
 		return this.reportResults( testingResults );
@@ -430,33 +459,25 @@ class ContentTypeChecker extends ContentTypeCheckerInternal
 	{
 		super( ...arguments );
 		if ( this.settings.autoRun ) {
-			return this.run(); // @todo : zjistit co tu vadí vscode našeptávači
+			this.result = this.run();
 		}
 	}
 };
 
-Object.defineProperty( ContentTypeChecker, 'ALERT', {
-	value: 1,
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
-Object.defineProperty( ContentTypeChecker, 'WARNING', {
-	value: 2,
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
-Object.defineProperty( ContentTypeChecker, 'RETURN_OBJECT', {
-	value: 3,
+Object.defineProperty( ContentTypeChecker, 'REPORT_TYPE', {
+	value: {
+		ALERT: 'alert',
+		WARNING: 'warning',
+		OBJECT: 'object',
+	},
 	configurable: false,
 	enumerable: true,
 	writable: false,
 } );
 
 /** @returns {void|Array.<{ fileExtension: string, path: string; contentType: string; }>} */
-const result = await ( new ContentTypeChecker() );
+const ctc = new ContentTypeChecker();
+
+const result = await ctc.result;
 
 export { ContentTypeChecker, result };

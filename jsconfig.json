@@ -3,6 +3,6 @@
 		"noLib": false,
 		"checkJs": true,
 		"target": "es2022",
-		"module": "es2020"
+		"module": "es2022"
 	}
 }
