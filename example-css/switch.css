@@ -1,0 +1,86 @@
+:root {
+	--border-radius: 5px;
+	--color-accent: #118bee15;
+	--color-link: #118bee;
+	--color-text: #000;
+	--color-success: green;
+}
+
+label.switch {
+	display: block;
+	padding: 4px 4px 6px 6px;
+	border: 0 solid var(--color-link);
+	border-radius: var(--border-radius);
+	width: min-content;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+
+	&>:first-child {
+		display: inline-block;
+		padding-right: 1em;
+	}
+
+	&:hover,
+	&:has([role=switch]:focus) {
+		padding: 2px 2px 4px 4px;
+		border-width: 2px;
+		outline: none;
+		background-color: var(--color-accent);
+	}
+
+	.visual {
+		position: relative;
+		top: 2px;
+		display: inline-block;
+		border: 2px solid var(--color-text);
+		width: 2.5em;
+		height: 1.25em;
+		border-radius: 2em;
+		vertical-align: sub;
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 1px;
+			left: 2px;
+			display: inline-block;
+			border: 2px solid var(--color-text);
+			border-radius: 1em;
+			width: 0.88em;
+			height: 0.88em;
+			background: var(--color-text);
+			opacity: 0.6;
+			transition: left 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+		}
+	}
+
+	.state {
+		display: inline-grid;
+		grid-template-areas: "overlay";
+
+		&>.boolean {
+			grid-area: overlay;
+		}
+	}
+}
+
+[role=switch] {
+	opacity: 0;
+	position: absolute;
+
+	&:not(:checked)~.state .on {
+		opacity: 0;
+	}
+
+	&:checked~.state .off {
+		opacity: 0;
+	}
+
+	&:checked~.visual::before {
+		left: 1.25em;
+		border-color: var(--color-success);
+		background: var(--color-success);
+		opacity: 1;
+	}
+}

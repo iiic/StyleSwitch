@@ -2,11 +2,6 @@
 
 Přepínač různých CSS stylů na webových stránkách.
 
-Použité technologie: ( **@todo : tohle dát asi na konec** )
-Alternative style sheets ( https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet ) ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate )
-Cookie Store API https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent
-Prefers color scheme (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme)
-
 Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dělat další?
 
 No tak začněme chronologicky, první přišel *Alternative style sheets* ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate ) který je podporován všemi prohlížeči, ovšem pouze Firefox má na tohle přepínač, kdy přímo v prohlížeči mám možnost styl přepnout (pokud máte Firefox, jde to pomocí <kbd>ALT</kbd> > `Zobrazit` > `Styl stránky` (poud máte anglické rozhraní tak <kbd>ALT</kbd> > `View` > `Page Style`)). Zápis v html pak vypadá například takto:
@@ -80,7 +75,7 @@ Ano dá se to, jen to chce jeden drobný přídavek. Ukážu na kódu:
 
 Můžete si povšimnout že takto vznikla duplicita, světlý styl `./css/light.css` je zapsán 2x. Jednou jako "persistent", podruhé jako "alternate" s atributem `title` ve kterém je uvedeno to, co bude ve Firefoxu v dropdown menu pod `Zobrazit` > `Styl stránky` (postup popsán výše). Tohle existuje **pouze** kvůli přepínači stylů v kontextové nabídce Firefoxu, a tím že se jedná o možnost která je pouze pro uživatele Firefoxu a pouze pro ty kteří o ní vědí a používají ji … jde tedy o funkci pro zlomky [‰](## "Znak promile: tedy tisícina celku"), proč je vůbec řešíme? No mimo Firefox je tohle chování součástí standardu, a přeci jen nejde o příliš velké obtíže které si touto duplicitou způsobíte. Soubor se znovu nestahuje, nebo něco takového, jde tedy jen o několik desítek [bajt](## "text")ů přenášených dat. Pokud navíc používáte kompresi na úrovni http (`content-encoding: gzip`) snížíte množství duplicitně přenášených dat na úroveň jednotek [bajt](## "text")ů. Vlastně jen ten obsah atributu `title`. Není to nic hrozného a těm 6 uživatelům na světě co to používají to rád dopřeji :) .
 
-Ale to hlavní… teď máme **funkční** kombinaci *Alternative style sheets* a *Prefers color scheme*, bez žádných složitých javascript polyfillů či pluginů do prohlížeče. Tmavý a světlý styl se přepínají automaticky podle nastavení operačního systému a současně je ve Firefoxu možné styly přepínat ručně z kontextové nabídky prohlížeče.
+Ale to hlavní… teď máme **funkční** kombinaci *Alternative style sheets* a *Prefers color scheme*, bez žádných složitých javascript `polyfill`ů či `plugin`ů do prohlížeče. Tmavý a světlý styl se přepínají automaticky podle nastavení operačního systému a současně je ve Firefoxu možné styly přepínat ručně z kontextové nabídky prohlížeče.
 
 ### A nakonec… přepínač.
 
@@ -91,9 +86,16 @@ Firefox umí styly přepnout, ale neumí uchovat zvolenou hodnotu při přechodu
 Script schopný:
 1. Načíst si automaticky styly v dokumentu
 2. Sestavit z nich formulářový prvek sloužící k přepínání různých stylů.
-3. Nastavit výchozí hodnotu podle zvoleného stylu včetně listeneru měnícího živě zvolenou volbu ve formulářovém prvku podle nastavení OS i podle cookie i její hodnoty
+3. Nastavit výchozí hodnotu podle zvoleného stylu včetně `listener`u měnícího živě zvolenou volbu ve formulářovém prvku podle nastavení OS i podle cookie i její hodnoty
 4. Při zvolení formulářovým prvkem nastaví hodnotu v cookie.
 5. Volitelný listener na příslušnou cookie umožňující živě přepnout styl na zvolený. (Je v samostatném javascriptu, není nutné to použít, pokud preferujete řešení pomocí backend strany a nějakého serverového scriptu)
+
+Minimální funkční použití:
+```html
+<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+```
+… a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.
+
 
 Zmiňuji cookie, tak si ji popišme:
 Výchozí jméno cookie je `stylesheets` a je ukládána na rok (tohle všechno se dá změnit v nastavení, jak jméno cookie, tak doba po kterou je uchovávána). Uvnitř cookie je json, který má takovouto jsDoc anotaci:
@@ -226,10 +228,111 @@ Možnost 1 je o něco málo méně náročná na systémové prostředky, ale ro
 (`object`) Veškeré nastavení vzhledu i chování výsledného widgetu který tento script vytvoří a vrátí v proměnné (`object`) `return`. Podrobnosti objektu jsou tyto:
 - (`string`) `idPrefix` prefix `id` výsledného widgetu. Bude doplněn náhodným řetězcem, aby bylo vytvořeno unikátní id a widget mohl být případně v dokumentu vícekrát, pokud by bylo potřeba.
 - (`string`) `defaultResultSnippetElement` typ elementu který bude obalovat výsledný widget.
-- (`string`) `outputFormat` Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody `StyleSwitch.OUTPUT_FORMATS`, možnosti jsou:
-  - `switch` (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý.
-  - `select` (výchozí nastavení)
-  - `radioList` … seznam input type radio položek
-- (`string`) `preferredColorSchemeChangeBehavior` výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody `StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR`. Jsou to:
-  -
-  -
+- (`string`) `outputFormat` Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody `StyleSwitch.OUTPUT_FORMATS`, ![](/readme-screenshots/OUTPUT_FORMATS.png "možnosti z OUTPUT_FORMATS") možnosti jsou:
+  - `switch` (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> ![](/readme-screenshots/switch.png "switch element s náhledem HTML kódu")
+  - `select` (výchozí nastavení) <br> ![](/readme-screenshots/select.png "switch element s náhledem HTML kódu")
+  - `radioList` … seznam input type radio položek <br> ![](/readme-screenshots/radioList.png "radioList element s náhledem HTML kódu")
+- (`string`) `preferredColorSchemeChangeBehavior` výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody `StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR`. Jsou to:  -
+  - `never` nikdy neměnit barevný styl stránky v návaznosti na změnu barevného schématu v operačním systému.
+  - `always` vždy změnit barevný styl stránky při změně barevného schématu operačního systému. Tedy má přednost i před uživatelskou volbou učiněnou dříve! Uživatelem zvolený style se změní.
+  - `onlyWithoutCookie` (výchozí nastavení) při změně barevného schématu OS dojde ke změně stylu stránky **pouze pokud** uživatel zatím **ne**zvolil jaký barevný styl stránky chce používat.
+- (`bool`) `reverseOrder` nalezené styly z hlavičky dokumentu vypsat v opačném pořadí ?
+- (`object`) `switch` Veškerá nastavení widgetu 'switch'
+  - (`bool`) `useSwitchIfPossible` použít switch? Je možné **pouze**, pokud existují přesně 2 možné styly vzhledu stránky (pokud použijete naked style, je počítán také jako jeden ze stylů).
+  - (`bool`) `useRolesAsTitle` Použít jako `atribut` "title" elementu přepínače detekovanou roli css stylu?
+  - (`string`) `labelClassName` Jméno `atribut`u class u obalového elementu výsledného widgetu.
+  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného switch widgetu. Podporovány jsou pouze řádkové elementy, **ne** blokové!
+  - (`string`) `visualSwitchClassName` Jméno `atribut`u class u elementu vizuálního přepínače switche výsledného widgetu.
+  - (`string`) `stateClassName` Jméno `atribut`u class u elementu ve kterém se vypisuje stav switch elementu (výchozí "zapnuto" / "vypnuto"… může být změněn na libovolný text)
+  - (`string`) `statusElementName` Jméno `element`u ve kterém se vypisuje stav switch elementu. Podporovány jsou pouze řádkové elementy, **ne** blokové!
+- (`object`) `select` Veškerá nastavení widgetu 'select'
+  - (`bool`) `useRolesAsTitle` Použít jako `atribut` "title" elementu `option` uvnitř `select`u detekovanou roli css stylu?
+  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného widgetu.
+- (`object`) `radioList` Veškerá nastavení widgetu 'radioList'
+  - (`bool`) `useRoleAsItemTitle` Použít jako `atribut` "title" elementu `input` detekovanou roli css stylu?
+  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného widgetu.
+
+#### `autoRun`
+(`bool`) Spustit script automaticky po importu nebo vložení do dokumentu? Výchozí nastavení je že ano, většinou využijete toto výchozí nastavení, pouze [vlastní sestavení run funkce](#vlastni-sestaveni-run-funkce) je případ, kdy autorun nedává smysl.
+
+### Pokročilé použití
+
+Různé možnosti spíše pro pokročilé uživatele.
+
+#### Vlastní sestavení run funkce
+Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomocí vlastního sestavení, může vypadat například takto:
+```html
+<script type="module">
+
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+		autoRun: false,
+		nakedStyle: {
+			use: true,
+		},
+	} ) );
+
+	const s = new StyleSwitch();
+
+	s.checkRequirements();
+	s.prepareRootElement();
+
+	/** @type {{currentlyActivatedPath: String|null, byNakedDay: Boolean}} */
+	const { currentlyActivatedPath, byNakedDay } = await s.getCurrentlyActivatedStyleSheetsPath();
+
+	/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */
+	const interestStyleSheets = s.getCleanedStyleSheetsObject(); // without duplicates and persistent styleSheets
+
+	s.celebrateNakedDay( interestStyleSheets );
+	s.cancelNakedDay( byNakedDay );
+	s.createSelect( interestStyleSheets, currentlyActivatedPath );
+
+	/** @type {HTMLElement|null} */
+	const customResult = s.rootElement;
+
+	/** @type {HTMLElement|null} */
+	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
+
+	if ( customStyleSwitchElement && customResult && customResult instanceof HTMLElement )
+	{
+		customStyleSwitchElement.appendChild( customResult );
+	}
+</script>
+```
+(Důležitý je tu vypnutí `autoRun` a následně vlastní sestavení vychází z původní metody `run()`, jen je osekané o různé metody které pro vlastní sestavení nepotřebuji. Z ukázky je taky patrné, že nějak nevyužívám vrácenou proměnnou `result`, v tomto konkrétním případě je zbytečná.)
+
+## javascript reagující na změnu cookie
+
+Jak bylo zmíněno výše, výsledkem widgetu je uložení cookie do prohlížeče. Na cookie musí něco reagovat, součástí scriptu je ukázkový javascript, který podle cookie přepne styly, vypadat může třeba takto:
+
+```html
+<script src="./style-switch-cookie-listener-example.js?v=1.0" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script>
+```
+(tento javascript najdete v souboru `style-switch-cookie-listener-example.js`)
+
+Alternativně je možné použít bezpočet serverových scriptů, ty součástí ukázky nejsou, budete si je muset případně napsat sami.
+
+#### K čemu jsou tam ty další soubory?
+
+Již zmíněný `style-switch-cookie-listener-example.js` je tedy jasný. Listener odpovídající na změny cookie souboru a podle toho volící aktivní css stylesheet stránky. Tady se dá ještě bavit o tom jestli je nutný či není. Vhodné je ho mít, ale alternativně můžete použít vlastní backend řešení serverovými scripty. Ostatní soubory, ale zcela jistě **nejsou potřeba** pro StyleSwitch, slouží jen jako nějaká ukázka, pomůcka, či kontrola nastavení. Můžete je s klidem smazat, nemusíte je nějak připojovat k projektu ve kterém StyleSwitch použijete.
+
+Dále jsou tam:
+- `example-usage.html` příklad použití StyleSwitch.
+- `content-type-checker.js`, prověřuje nastavení serveru, jestli všechny přípony souborů mají nastavený odpovídající mime type. Typický problém je s příponou .mjs, která nemá běžně nastaven odpovídající mime type `'text/javascript'`. Pokud k tomuto problému dojde dá se řešit 2 různými způsoby. Buďto přejmenování přípony souboru z .mjs na .js (a také přepsání cest k souboru, týká se například souboru `example-usage.html` ve kterém je tento soubor vkládán) a nebo druhý způsob řešení spočívá ve změně nastavení webového serveru a přiřazení příponě .mjs odpovídajíc mime type `'text/javascript'`.
+- `modules/string/interpolate.mjs`, je použito pouze pro `content-type-checker.js`, umožňuje vkládat proměnné do textových řetězců a jejich následný výpis.
+- `modules/importWithIntegrity.mjs` script umožňující dynamický `import` modulů spolu s kontrolou integrity souboru. Taktéž využívá pouze `content-type-checker.js`.
+- složka `readme-screenshots`, screenshoty, většinou z konzole prohlížeče.
+- složka `example-css` css styly použité pro `example-usage.html`. Vychází z [MVP.css](https://andybrewer.github.io/mvp/)
+- `README.md` popis knihovny, v `Markdown`u
+- `README.html` ten samý popis ale v HTML formátu
+
+### Použité technologie:
+
+Alternative style sheets ( https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet ) ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate )
+
+Cookie Store API https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent
+
+Prefers color scheme (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme)
+
+### Pokračujte:
+1. [MVP.css](https://andybrewer.github.io/mvp/)
+2. [CSS naked day](https://css-naked-day.org/)

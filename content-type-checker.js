@@ -196,7 +196,7 @@ const ContentTypeCheckerInternal = class
 				message = this.settings.texts.universalErrorMimeType;
 			}
 		}
-		message = /** @type {InterpolatedString} */ ( message ).interpolate( { // @todo : zjistit co tu vadí vscode našeptávači
+		message = /** @type {InterpolatedString} */ ( message ).interpolate( {
 			fileExtension: testingItem.fileExtension,
 			contentType: testingItem.contentType,
 			pathToFile: testingItem.path,
