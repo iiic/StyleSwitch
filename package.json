@@ -1,8 +1,8 @@
 {
 	"name": "StyleSwitch",
-	"version": "0.1.0",
-	"description": "StyleSwitch library for switching page styles",
-	"main": "styleSwitch.mjs",
+	"version": "1.0.0",
+	"description": "StyleSwitch library for switching between document style sheets.",
+	"main": "style-switch.mjs",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -25,5 +25,5 @@
 	"bugs": {
 		"url": "https://github.com/iiic/StyleSwitch/issues"
 	},
-	"homepage": "https://iiic.dev/styleswitch#npmjs"
+	"homepage": "https://iiic.dev/styles-witch#npmjs"
 }

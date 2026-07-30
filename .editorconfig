@@ -22,7 +22,7 @@ tab_width = 4
 indent_style = unset
 insert_final_newline = unset
 
-# 8 tabs (yea it's a lot) is default setting in Markdown (github interpretation), so with 8 tabs you have 1:1 source with compilated file
+# 8 tabs (yea it's a lot) is default setting in Markdown (github interpretation), so with 8 tabs you have 1:1 source with compiled file
 [*.{markdown,md}]
 indent_style = tab
 indent_size = 8

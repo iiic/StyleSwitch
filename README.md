@@ -1,110 +1,108 @@
 # StyleSwitch
 
-Přepínač různých CSS stylů na webových stránkách.
+A switch for different CSS styles on web pages.
 
-Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dělat další?
+There are plenty of light/dark theme style switchers, so why make another one?
 
-No tak začněme chronologicky, první přišel *Alternative style sheets* ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate ) který je podporován všemi prohlížeči, ovšem pouze Firefox má na tohle přepínač, kdy přímo v prohlížeči mám možnost styl přepnout (pokud máte Firefox, jde to pomocí <kbd>ALT</kbd> > `Zobrazit` > `Styl stránky` (poud máte anglické rozhraní tak <kbd>ALT</kbd> > `View` > `Page Style`)). Zápis v html pak vypadá například takto:
-
-```html
-<link rel="stylesheet" href="./css/light.css" fetchpriority="high"><!-- persistent -->
-<link rel="stylesheet" href="./css/dark.css" title="tmavý styl"><!-- preferred -->
-<link rel="alternate stylesheet" href="./css/alternate.css" title="alternativní styl" fetchpriority="low"><!-- alternate -->
-```
-
-Příklad je doplněn o moderní `fetchpriority` atributy, ale dost tu pomůžou, protože "persistent" styly se načítají vždy a vždy jsou potřeba, naopak "alternate" se vůbec nepoužijí (pokud nemáte Firefox a nepoužijete integrovaný přepínač, nebo pokud neuděláte nějakou magii v javascriptu, k tomu se dostaneme později), takže stačí `fetchpriority="low"`. Stahují se všechny styly, dokonce i ty, které se nepoužijí "alternate" a tak. Je tedy lepší mít 1 soubor "persistent" a v ostatních ho upravovat. Než více samostatných souborů ve kterých budou veškeré styly. Čistě z důvodu úspory dat… není nutné aby uživatel stahoval zbytečně data i dnes v době rychlého internetu a neomezených dat, i tak je lepší šetřit.
-
-A tohle jednoduché řešení je dostatečné na přepínání stylů ve Firefoxu, podpora jednoho jediného prohlížeče ale není poslední problém na který narazíte. Další nevýhodou je že při přechodu na jinou stránku se nějak neukládá jaký styl byl zvolený a znovu se načte ten výchozí. Ve zkratce, tohle řešení je samo o sobě prakticky nepoužitelné, bude potřeba pokračovat.
-
-Druhá možnost jak přepínat styly přišla s *Media Queries Level 5*, *Prefers color scheme*  ( https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme ). A velice příjemná a snadná možnost. V zásadě bere hodnotu z operačního systému, jestli je použit tmavý nebo světlý režim, tuhle hodnotu předává prohlížeči a ten na základě toho použije tmavý nebo světlý režim a nakonec prohlížeč tuhle hodnotu předá stránce a ta podle ní udělá nějakou magii. Pozor ale na to, že v prohlížeči se dá změnit styl rozdílně od operačního systému. Změna stylu v OS pak není poděděná prohlížečem a ten nepředá změnu stránce. Nicméně výchozí nastavení je podědění barevného stylu z OS.
-Potenciálních využití je více, ale v příkladu uvedu jednoduchou a celkem snadno spravovatelnou možnost:
-federace
+Let's start chronologically: first there was *Alternative style sheets* (https://html.spec.whatwg.org/multipage/links.html#rel-alternate), which is supported by all browsers, but only Firefox has a built-in switch for it where you can change the style directly in the browser (if you have Firefox, use <kbd>ALT</kbd> > `View` > `Page Style`). The HTML markup looks like this:
 
 ```html
 <link rel="stylesheet" href="./css/light.css" fetchpriority="high"><!-- persistent -->
-<link rel="stylesheet" href="./css/dark.css" title="tmavý styl" media="(prefers-color-scheme: dark)"><!-- preferred -->
+<link rel="stylesheet" href="./css/dark.css" title="dark style"><!-- preferred -->
+<link rel="alternate stylesheet" href="./css/alternate.css" title="alternative style" fetchpriority="low"><!-- alternate -->
 ```
 
-Příklad v praxi funguje takto, styl `./css/light.css` se stáhne a použije vždy, druhý styl `./css/dark.css` se pak použije pouze v případě splněné podmínky uvedené v media, tedy nastavený tmavý styl. A v jednotlivých souborech ideálně využijete proměnné. Soubor `light.css`:
+The example includes modern `fetchpriority` attributes, which help here because "persistent" styles are always loaded and always needed, while "alternate" styles are not used at all (unless you have Firefox and use the built-in switch, or unless you do some magic in JavaScript, which we will get to later), so `fetchpriority="low"` is enough. All styles are downloaded, even those that are not used, including alternate ones. Therefore it is better to have one "persistent" file and modify it in the others, instead of several separate files containing all the styles. Purely for saving data... users do not need to download unnecessary data even today, and it is still better to save bandwidth.
+
+This simple solution is sufficient for style switching in Firefox, but support in only one browser is not the last problem you will encounter. Another drawback is that when navigating to another page, the chosen style is not preserved and the default style is loaded again. In short, this solution is practically unusable on its own, and further work is needed.
+
+The second way to switch styles came with *Media Queries Level 5*, *prefers-color-scheme* (https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme). It is a very pleasant and easy option. Essentially it takes the value from the operating system, whether dark or light mode is used, passes that value to the browser, which then applies dark or light mode accordingly, and finally the browser passes that value to the page, which does something with it. Note, however, that the browser can set a theme different from the operating system. A change in the OS theme is not necessarily inherited by the browser, and the browser will not pass the change to the page. Nevertheless, the default behavior is to inherit the color scheme from the OS.
+There are many possible uses, but I will show a simple and fairly manageable option:
+
+```html
+<link rel="stylesheet" href="./css/light.css" fetchpriority="high"><!-- persistent -->
+<link rel="stylesheet" href="./css/dark.css" title="dark style" media="(prefers-color-scheme: dark)"><!-- preferred -->
+```
+
+The example works like this in practice: `./css/light.css` is downloaded and used always, while `./css/dark.css` is used only when the media condition is met, that is, when dark mode is enabled. In the individual files you ideally use variables. File `light.css`:
 
 ```css
 :root {
  --color-accent: #118bee15;
  --color-secondary-accent: #920de90b;
- /* … a další  */
+ /* ... and more */
 }
 
 article aside {
  background: var(--color-secondary-accent);
- /* … a další  */
+ /* ... and more */
 }
 
-/* … a tak dále, veškeré css pravidla zde */
+/* ... and so on, all CSS rules are here */
 ```
 
-a soubor dark.css:
+and file `dark.css`:
 
 ```css
 :root {
  --color-accent: #0097fc4f;
  --color-secondary-accent: #e20de94f;
- /* … a další  */
+ /* ... and more */
 }
-/* konec souboru, nic více než root tu není potřeba */
+/* end of file, nothing more than root is needed */
 ```
 
-V tomto případě budou mít proměnné z root druhého souboru (`./css/dark.css`) přednost před proměnnými z prvního souboru a tak jednoduše jste dosáhli jiných barev pro tmavý režim stránek. Jak jsme již zmiňoval, je mnoho způsobů, jak `prefers-color-scheme` použít. Já si oblíbil tento, je velice jednoduchý, nemá tolik redundantních dat, a hodnoty pro tmavý styl jsou uložené ve vlastním souboru. V mém příkladu je výchozí styl světlý a volitelný tmavý, pochopitelně to jde i opačně. Není potřeba nikam ukládat zvolenou hodnotu, uživatel se rozhodne o tom, jestli chce světlý, nebo tmavý styl už svým nastavením operačního systému. No a s tím přichází i ten spojený problém.
+In this case, the variables from the root in the second file (`./css/dark.css`) will take precedence over the variables from the first file, and thus you easily achieve different colors for the site's dark mode. As mentioned, there are many ways to use `prefers-color-scheme`. I like this one; it is very simple, not too redundant, and the values for the dark style are stored in their own file. In my example the default style is light and dark is optional, but of course it can also work the other way around. There is no need to store the chosen value anywhere; the user decides whether they want a light or dark style through their operating system settings. And that brings the related problem.
 
-### Co v hypotetickém scénáři, kdy uživatel chce mít nastavenou jinou barvu ve svém OS a jinou na webu?
+### What about the hypothetical scenario where the user wants a different color in their OS than on the website?
 
-Pak už je potřeba uživatelovu volbu uložit a tato uložená volba musí mít přednost před vyhodnocením výrazu `media="(prefers-color-scheme: …)"`. Typicky se používá cookie, dokonce je možné takovouto provozní cookie uložit i když nemáte souhlas uživatele s ukládáním marketingových a analytických cookie, protože taková cookie nemůže sloužit ke sledování uživatele. Samozřejmě když všechno uděláte dobře, není možné použít session, není možné použít žádné náhodné data v názvu ani obsahu, všechno transparentně aby bylo zřejmé že není možné obsah použít ke sledování uživatele.
+Then the user's choice must be stored, and this stored choice must take precedence over the evaluation of `media="(prefers-color-scheme: ...)"`. Typically a cookie is used, and in fact it is possible to store this kind of operational cookie even if you do not have the user's consent for marketing and analytics cookies, because such a cookie cannot be used to track the user. Of course, if you do everything correctly, you cannot use session data, you cannot use any random data in the name or content, and everything must be transparent so it is clear that the content cannot be used for tracking the user.
 
-A v případě že je pak nějaká cookie aktivní, třeba je v ní uvedené že uživatel chce tmavý styl, je potřeba tmavý styl povolit a nebrat přitom ohled na hodnotu `media="(prefers-color-scheme: …)"`, tedy tento atribut musí pryč. Stejně tak ale i atribut title, to je důležité, tím se "preferred" styl změní na "persistent" a stahuje se vždy, tím že je v kódu umístěn po stylu light, bude mít vždy přednost a vždy bude výsledkem tmavý vzhled stránek.
-Nebylo by potřeba odebírat naprosto nic, pokud by se vyhodnocením výrazu vyhodnotil `media="(prefers-color-scheme: …)"` jako splněný, jenže to bych už musel detekovat jestli se tak stane nebo ne. Na úrovni serverové to nejde a na úrovni klienta už může být pozdě, respektive dá se udělat javascriptem, ale rychlejší a snazší je nic nezjišťovat a atributy media a title odebrat vždy.
+And if a cookie is active, for example stating that the user wants dark style, dark style needs to be enabled and the `media="(prefers-color-scheme: ...)"` condition ignored, therefore that attribute must be removed. The same goes for the `title` attribute; that is important, because it changes the "preferred" style into "persistent" and it is loaded always. Since it is placed in the code after the light style, it will always take precedence and the result will always be dark.
+Nothing would need to be removed at all if the `media="..."` evaluation happened to be true, but then I would have to detect whether that is the case or not. That cannot be done on the server side, and on the client side it may already be too late; it can be done in JavaScript, but faster and easier is to not detect anything and simply remove the `media` and `title` attributes always.
 
-### Tak a teď to zkombinovat… použití *Alternative style sheets* a *Prefers color scheme* dohromady, dá se to?
+### Now combine it… using *Alternative style sheets* and *prefers-color-scheme* together, is it possible?
 
-Ano dá se to, jen to chce jeden drobný přídavek. Ukážu na kódu:
+Yes, it is possible, it only requires one small addition. I will show it in code:
 
 ```html
 <link rel="stylesheet" href="./css/light.css" fetchpriority="high"><!-- persistent -->
-<link rel="stylesheet" href="./css/dark.css" title="tmavý styl" media="(prefers-color-scheme: dark)"><!-- preferred -->
-<link rel="alternate stylesheet" href="./css/alternate.css" title="alternativní styl" fetchpriority="low"><!-- alternate -->
-<link rel="alternate stylesheet" href="./css/light.css" title="hlavní světlý styl"><!-- alternate -->
+<link rel="stylesheet" href="./css/dark.css" title="dark style" media="(prefers-color-scheme: dark)"><!-- preferred -->
+<link rel="alternate stylesheet" href="./css/alternate.css" title="alternative style" fetchpriority="low"><!-- alternate -->
+<link rel="alternate stylesheet" href="./css/light.css" title="main light style"><!-- alternate -->
 ```
 
-Můžete si povšimnout že takto vznikla duplicita, světlý styl `./css/light.css` je zapsán 2x. Jednou jako "persistent", podruhé jako "alternate" s atributem `title` ve kterém je uvedeno to, co bude ve Firefoxu v dropdown menu pod `Zobrazit` > `Styl stránky` (postup popsán výše). Tohle existuje **pouze** kvůli přepínači stylů v kontextové nabídce Firefoxu, a tím že se jedná o možnost která je pouze pro uživatele Firefoxu a pouze pro ty kteří o ní vědí a používají ji … jde tedy o funkci pro zlomky [‰](## "Znak promile: tedy tisícina celku"), proč je vůbec řešíme? No mimo Firefox je tohle chování součástí standardu, a přeci jen nejde o příliš velké obtíže které si touto duplicitou způsobíte. Soubor se znovu nestahuje, nebo něco takového, jde tedy jen o několik desítek [bajt](## "text")ů přenášených dat. Pokud navíc používáte kompresi na úrovni http (`content-encoding: gzip`) snížíte množství duplicitně přenášených dat na úroveň jednotek [bajt](## "text")ů. Vlastně jen ten obsah atributu `title`. Není to nic hrozného a těm 6 uživatelům na světě co to používají to rád dopřeji :) .
+You can notice that this creates duplication: the light style `./css/light.css` is written twice. Once as "persistent", and again as "alternate" with a `title` attribute containing what will appear in Firefox's dropdown menu under View > Page Style (described above). This exists **only** because of the style switcher in Firefox's context menu, and since it is a feature only for Firefox users and only for those who know and use it... it is therefore a feature for fractions of a per mille. Why bother with it at all? Well, outside Firefox this behavior is part of the standard, and it is not too much trouble to deal with this duplication. The file is not downloaded again or anything like that; it is only a few dozen bytes of transferred text. If you also use HTTP compression (`content-encoding: gzip`), you reduce the duplicate transferred data to just a few bytes. It is really only the content of the `title` attribute. It's not a big deal, and I am happy to provide it to the six users in the world who use it :) .
 
-Ale to hlavní… teď máme **funkční** kombinaci *Alternative style sheets* a *Prefers color scheme*, bez žádných složitých javascript `polyfill`ů či `plugin`ů do prohlížeče. Tmavý a světlý styl se přepínají automaticky podle nastavení operačního systému a současně je ve Firefoxu možné styly přepínat ručně z kontextové nabídky prohlížeče.
+But the main thing is... now we have a **working** combination of *Alternative style sheets* and *prefers-color-scheme*, without any complicated JavaScript polyfills or browser plugins. Dark and light styles switch automatically according to the operating system setting, and at the same time Firefox users can manually switch styles from the browser context menu.
 
-### A nakonec… přepínač.
+### And finally... the switch.
 
-Firefox umí styly přepnout, ale neumí uchovat zvolenou hodnotu při přechodu mezi různými stránkami. Operační systém umí volbu přepnout, ale podporuje jen 2 volby, světlý a tmavý styl. Taktéž pomocí OS není možné mít jiný barevný styl pro stránku a jiný pro OS samotný. Tohle už chce přepínač jako nějaký prvek webové stránky. Dá se udělat přepínač jako formulář co zašle hodnotu do backendu kde serverový script změní styl stránky, ale vyžaduje to reload stránky. Proto raději volím javascript řešení, které umožní přebarvit stránku bez nutnosti reloadu (přenačtení) stránky.
+Firefox can switch styles, but it cannot remember the chosen value when navigating between different pages. The operating system can switch the choice, but it supports only two options, light and dark. Also, using the OS alone it is not possible to have a different color style for the page than for the OS itself. This already requires a switch element on the web page. You can make a switch as a form that sends the value to a backend where a server script changes the page style, but that requires a page reload. I therefore prefer a JavaScript solution, which allows recoloring the page without reloading it.
 
-## Proto vznikl **StyleSwitch**
+## That's why **StyleSwitch** was created
 
-Script schopný:
-1. Načíst si automaticky styly v dokumentu
-2. Sestavit z nich formulářový prvek sloužící k přepínání různých stylů.
-3. Nastavit výchozí hodnotu podle zvoleného stylu včetně `listener`u měnícího živě zvolenou volbu ve formulářovém prvku podle nastavení OS i podle cookie i její hodnoty
-4. Při zvolení formulářovým prvkem nastaví hodnotu v cookie.
-5. Volitelný listener na příslušnou cookie umožňující živě přepnout styl na zvolený. (Je v samostatném javascriptu, není nutné to použít, pokud preferujete řešení pomocí backend strany a nějakého serverového scriptu)
+A script capable of:
+1. Automatically loading styles from the document
+2. Building a form control from them for switching between different styles
+3. Setting the default value based on the chosen style including a listener that dynamically updates the chosen form control value based on OS settings and cookie value
+4. Storing the value in a cookie when selected through the form control
+5. Optional listener for the appropriate cookie allowing live switching to the chosen style (this is in a separate JavaScript file and is not required if you prefer a backend solution with a server-side script)
 
-Minimální funkční použití:
+Minimal working usage:
 ```html
 <script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
 ```
-… a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.
+... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.
 
-
-Zmiňuji cookie, tak si ji popišme:
-Výchozí jméno cookie je `stylesheets` a je ukládána na rok (tohle všechno se dá změnit v nastavení, jak jméno cookie, tak doba po kterou je uchovávána). Uvnitř cookie je json, který má takovouto jsDoc anotaci:
+I mentioned cookies, so let's describe it:
+The default cookie name is `stylesheets` and it is stored for one year (all of this can be changed in settings, both the cookie name and how long it is retained). Inside the cookie is JSON, which has the following jsDoc annotation:
 
 ```javascript
 /** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */
 ```
 
-kde se následně Object převede na JSON text objekt, ten s konkrétními hodnotami může vypadat například takto:
+The object is then converted to a JSON string, and with concrete values it may look like this:
 
 ```json
 {
@@ -114,10 +112,10 @@ kde se následně Object převede na JSON text objekt, ten s konkrétními hodno
 }
 ```
 
-Tedy jsou tam cesty k souboru, zapsané přesně tak jak jsou uvedeny v html dokumentu (tedy script nepřevádí cesty na absolutní, relativní, či jakkoliv, zůstanou tak, jak jsou v `href` atributu elementu `link`).
-A co to znamená je celkem zřejmé, `disabled` je tu použito stejně jako kdyby šlo o atribut `disabled` na elementu `link`. Tedy true znamená disabled a styl se **ne**aplikuje a opačně `disabled: false` znamená že styl je aktivní a použije se.
+So there are file paths exactly as they are written in the HTML document (the script does not convert paths to absolute, relative, or anything else; they stay as they appear in the `href` attribute of the `link` element).
+And what it means is quite clear: `disabled` is used the same way as the `disabled` attribute on a `link` element. So `true` means disabled and the style is not applied, while `disabled: false` means the style is active and used.
 
-případně:
+Alternatively:
 ```json
 {
 	"": { "disabled": false, "byNakedDay": true },
@@ -125,7 +123,7 @@ případně:
 }
 ```
 
-Což je speciální případ cookie říkající že jsou všechny styly stránky vypnuté a stránka se zobrazuje bez CSS. A automaticky se tohle vypne po skončení eventu [Css Naked Day](https://css-naked-day.org/), tedy 9. dubna každého roku. Tohle je ve StyleSwitch ve výchozím stavu vypnuté, pokud to ručně nezapnete, nemusíte tuhle část vůbec řešit. Pokud to ale chcete zapnout a nechat si automaticky vypínat všechny CSS soubory a 9. dubna předvést svůj web nahý, dá se to zapnout pomocí volby:
+This is a special cookie case indicating that all page styles are turned off and the page is displayed without CSS. This automatically turns off after the Css Naked Day event ends, that is April 9 every year. This is disabled by default in StyleSwitch; if you do not enable it manually, you do not have to deal with this part at all. But if you want to enable it and have all CSS files automatically disabled on April 9 to show your site naked, it can be turned on with the option:
 
 ```javascript
 nakedStyle: {
@@ -136,19 +134,19 @@ nakedStyle: {
 },
 ```
 
-pojďme se nyní podívat na to, jak takové nastavení knihovny StyleSwitch udělat konkrétně:
+Let's now look at how to configure the StyleSwitch library concretely:
 
-### Jak nastavit StyleSwitch?
+### How to configure StyleSwitch?
 
-Existují 2 možnosti, pro obě platí to shodné, že vyplňujete jen ty části nastavení, které chcete změnit, pokud je nezmíníte použijí se ty z výchozího nastavení. Jaké je výchozí nastavení zjistíte ze statické read-only metody `StyleSwitch.DEFAULT_SETTINGS`. Pro jistotu ještě zdůrazním že v této proměnné je výchozí nastavení, ne aktuální nastavení pro instanci.
+There are 2 options, and for both the same applies: you only fill in the parts of the settings you want to change; if you do not mention them, the default settings are used. You can find the default settings from the static read-only method `StyleSwitch.DEFAULT_SETTINGS`. For clarity, that variable contains the default settings, not the current instance settings.
 
-#### 1. Nastavení přes json element.
+#### 1. Configure via a JSON element.
 
-Co jaký json element? To je zjednodušené označení pro `script type="application/json"`, případně `script type="text/json"` (přestože tento zápis je označen jako zastaralý (deprecated), zatím stále funguje). Důležité je vědět že `script type="application/json"` je prohlížečem vyhodnocován jako běžný text, ne jako `script`! To znamená že se nezastavuje vykreslování stránky dokud se script neprovede, naopak na vykreslování stránky to nemá žádný vliv.
+What JSON element? This is a simplified term for `script type="application/json"`, or `script type="text/json"` (even though this syntax is deprecated, it still works). It is important to know that `script type="application/json"` is treated by the browser as ordinary text, not as executable script! That means it does not block page rendering while the script runs; on the contrary, it has no effect on page rendering.
 
-Důležitý je tady atribut `id` s hodnotou "style-switch-settings". Element s tímto `id` je hledaný scriptem. Tím že script samotný je modul (atribut `type="module"`) je jedno, kde ve stránce bude json element umístěn, tedy jestli třeba v hlavičce stránky, na konci html body, úplně jedno.
+The important attribute here is `id` with the value `style-switch-settings`. The script looks for the element with that `id`. Since the script itself is a module (`type="module"`), it does not matter where in the page the JSON element is placed, whether in the header or at the end of the body.
 
-příklad:
+Example:
 ```html
 <script type="application/json" id="style-switch-settings">
 {
@@ -156,21 +154,21 @@ příklad:
 		"use": true
 	},
 	"texts": {
-		"caption": "Chose a style for website"
+		"caption": "Choose a style for website"
 	}
 }
 </script>
 <script src="./style-switch.mjs?v=1.0" type="module" crossorigin="anonymous" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
 ```
-(V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z `StyleSwitch.DEFAULT_SETTINGS`)
+(In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
-#### 2. Inject nastavení skrz http GET parametr.
+#### 2. Inject settings via an HTTP GET parameter.
 
-Druhou možností je vložení do http GET parametru jménem `settings`. (Zjistit název použitého parametru je možné ze statické read-only metody `StyleSwitch.SETTINGS_URL_PARAMETER`). Hodnota musí být `escape`ovaná pomocí `json`u. Například javascriptovou metodou `JSON.stringify()`.
+The second option is to place them in the HTTP GET parameter named `settings`. (You can find the parameter name from the static read-only method `StyleSwitch.SETTINGS_URL_PARAMETER`.) The value must be JSON-escaped, for example with `JSON.stringify()`.
 
-Důležitá je návratová hodnota v proměnné `result`. V této proměnné je buďto `null` (pokud se nevytvořil widget… například když stránka neobsahuje žádné styly), nebo `HTMLElement`, ten je pak možné vložit do libovolné části stránky, jak ukazuje příklad níže. Funkce je asynchronní, takže si na result musíte počkat, buďto `await` ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await ) nebo `Promise` ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )
+The important return value is stored in the `result` variable. That variable is either `null` (if the widget was not created, for example when the page contains no styles) or an `HTMLElement`, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using `await` or `Promise`.
 
-příklad:
+Example:
 ```html
 <script type="module">
 	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
@@ -198,69 +196,69 @@ příklad:
 	}
 </script>
 ```
-(Nastavení podobné jako v předchozím případě, navíc nějaké změny ve zobrazení vzhledu widgetu… konkrétně, že se použije swap (`input type="checkbox"`) pokud jsou jen 2 styly mezi kterými je možné přepínat, jinak select.)
+(The settings are similar to the previous case, plus some changes in the appearance of the widget... specifically, a swap (`input type="checkbox"`) is used if there are only two styles to switch between, otherwise a select is used.)
 
-Možnost 1 je o něco málo méně náročná na systémové prostředky, ale rozdíl je minimální. Obě možnosti nastavení scriptu není možné vzájemně kombinovat, zvolte si jednu, nebo druhou.
+Option 1 is slightly less resource-intensive, but the difference is minimal. The two configuration methods cannot be combined; choose one or the other.
 
-### Podrobně možná nastavení:
+### Detailed possible settings:
 
 #### `styleLinksQSA`
-(`string`) Hodnota pro `document.querySelectorAll()` pomocí které se načtou styly. Pravděpodobně nebudete potřebovat jakkoliv měnit výchozí nastavení.
+(`string`) The value for `document.querySelectorAll()` used to load styles. You probably will not need to change the default.
 
 #### `rootElementQS`
-(`string`) Hodnota pro `document.querySelector()`, element do kterého se nakonec vloží výsledný widget vytvořený tímto scriptem.
+(`string`) The value for `document.querySelector()` returning the element into which the widget created by this script will be inserted.
 
 #### `cookie`
-(`object`) Nastavení cookie, která se použije pro uložení uživatelem zvoleného stylu stránek.
+(`object`) Settings for the cookie used to store the user-selected site style.
 
 #### `texts`
-(`object`) Veškeré textové popisky widgetu.
+(`object`) All text labels for the widget.
 
 #### `nakedStyle`
-(`object`) Kterým je možné přidat jako jeden z použitelných stylů vzhledu stránky i styl bez css, takzvaný naked. Podrobnosti objektu jsou tyto:
-- (`bool`) `use` použít / nepoužít naked style.
+(`object`) Allows you to add a CSS-free style as one of the usable page display styles, the so-called naked style. The object details are:
+- (`bool`) `use` use or do not use the naked style.
 - (`object`) `celebrateNakedDay`:
-  - (`bool`) `switchAutomatically` automaticky zapínat a pak vypínat naked style v konkrétní datum zadané následujícími čísly
-  - (`number`) `monthNumber` číslo měsíce ve kterém je naked day (měsíce začínají číslem 0, tedy měsíc leden je 0)
-  - (`number`) `dayNumber` číslo dne v měsíci.
+  - (`bool`) `switchAutomatically` automatically enable and then disable the naked style on the specified date.
+  - (`number`) `monthNumber` the month number of Naked Day (months start at 0, so January is 0)
+  - (`number`) `dayNumber` the day number within the month.
 
 #### `resultSnippetAppearance`
-(`object`) Veškeré nastavení vzhledu i chování výsledného widgetu který tento script vytvoří a vrátí v proměnné (`object`) `return`. Podrobnosti objektu jsou tyto:
-- (`string`) `idPrefix` prefix `id` výsledného widgetu. Bude doplněn náhodným řetězcem, aby bylo vytvořeno unikátní id a widget mohl být případně v dokumentu vícekrát, pokud by bylo potřeba.
-- (`string`) `defaultResultSnippetElement` typ elementu který bude obalovat výsledný widget.
-- (`string`) `outputFormat` Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody `StyleSwitch.OUTPUT_FORMATS`, ![](/readme-screenshots/OUTPUT_FORMATS.png "možnosti z OUTPUT_FORMATS") možnosti jsou:
-  - `switch` (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> ![](/readme-screenshots/switch.png "switch element s náhledem HTML kódu")
-  - `select` (výchozí nastavení) <br> ![](/readme-screenshots/select.png "switch element s náhledem HTML kódu")
-  - `radioList` … seznam input type radio položek <br> ![](/readme-screenshots/radioList.png "radioList element s náhledem HTML kódu")
-- (`string`) `preferredColorSchemeChangeBehavior` výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody `StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR`. Jsou to:  -
-  - `never` nikdy neměnit barevný styl stránky v návaznosti na změnu barevného schématu v operačním systému.
-  - `always` vždy změnit barevný styl stránky při změně barevného schématu operačního systému. Tedy má přednost i před uživatelskou volbou učiněnou dříve! Uživatelem zvolený style se změní.
-  - `onlyWithoutCookie` (výchozí nastavení) při změně barevného schématu OS dojde ke změně stylu stránky **pouze pokud** uživatel zatím **ne**zvolil jaký barevný styl stránky chce používat.
-- (`bool`) `reverseOrder` nalezené styly z hlavičky dokumentu vypsat v opačném pořadí ?
-- (`object`) `switch` Veškerá nastavení widgetu 'switch'
-  - (`bool`) `useSwitchIfPossible` použít switch? Je možné **pouze**, pokud existují přesně 2 možné styly vzhledu stránky (pokud použijete naked style, je počítán také jako jeden ze stylů).
-  - (`bool`) `useRolesAsTitle` Použít jako `atribut` "title" elementu přepínače detekovanou roli css stylu?
-  - (`string`) `labelClassName` Jméno `atribut`u class u obalového elementu výsledného widgetu.
-  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného switch widgetu. Podporovány jsou pouze řádkové elementy, **ne** blokové!
-  - (`string`) `visualSwitchClassName` Jméno `atribut`u class u elementu vizuálního přepínače switche výsledného widgetu.
-  - (`string`) `stateClassName` Jméno `atribut`u class u elementu ve kterém se vypisuje stav switch elementu (výchozí "zapnuto" / "vypnuto"… může být změněn na libovolný text)
-  - (`string`) `statusElementName` Jméno `element`u ve kterém se vypisuje stav switch elementu. Podporovány jsou pouze řádkové elementy, **ne** blokové!
-- (`object`) `select` Veškerá nastavení widgetu 'select'
-  - (`bool`) `useRolesAsTitle` Použít jako `atribut` "title" elementu `option` uvnitř `select`u detekovanou roli css stylu?
-  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného widgetu.
-- (`object`) `radioList` Veškerá nastavení widgetu 'radioList'
-  - (`bool`) `useRoleAsItemTitle` Použít jako `atribut` "title" elementu `input` detekovanou roli css stylu?
-  - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného widgetu.
+(`object`) All settings for the appearance and behavior of the resulting widget that this script creates and returns in the `return` object. Details are:
+- (`string`) `idPrefix` prefix for the widget's `id`. A random string is appended so the id becomes unique and the widget can be used more than once in the document if needed.
+- (`string`) `defaultResultSnippetElement` type of element that will wrap the resulting widget.
+- (`string`) `outputFormat` list of possible form controls that the script will create as output. This list can be obtained from the static read-only method `StyleSwitch.OUTPUT_FORMATS`, ![](/readme-screenshots/OUTPUT_FORMATS.png "options from OUTPUT_FORMATS") the options are:
+  - `switch` (`input type=checkbox`), possible only if there are exactly two possible page styles, for example dark and light. <br> ![](/readme-screenshots/switch.png "switch element with HTML preview")
+  - `select` (default) <br> ![](/readme-screenshots/select.png "select element with HTML preview")
+  - `radioList` … a list of `input type=radio` items <br> ![](/readme-screenshots/radioList.png "radioList element with HTML preview")
+- (`string`) `preferredColorSchemeChangeBehavior` default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method `StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR`. They are:
+  - `never` never change the page style in response to an OS color scheme change.
+  - `always` always change the page style when the OS color scheme changes. In other words, it takes precedence even over a previously chosen user style! The user-chosen style will change.
+  - `onlyWithoutCookie` (default) when the OS color scheme changes, the page style changes **only if** the user has not yet chosen which page color style to use.
+- (`bool`) `reverseOrder` output the styles found in the document head in reverse order?
+- (`object`) `switch` all settings for the 'switch' widget
+  - (`bool`) `useSwitchIfPossible` use a switch? This is possible **only** if there are exactly two possible page styles (if you use naked style, it is counted as one of the styles).
+  - (`bool`) `useRolesAsTitle` use the detected style role as the `title` attribute of the switch control?
+  - (`string`) `labelClassName` class name attribute for the wrapper element of the resulting widget.
+  - (`string`) `captionElementName` element name for the title of the resulting switch widget. Only inline elements are supported, **not** block elements!
+  - (`string`) `visualSwitchClassName` class name attribute for the visual switch element of the resulting widget.
+  - (`string`) `stateClassName` class name attribute for the element displaying the switch state (default "on" / "off" ... can be changed to any text)
+  - (`string`) `statusElementName` element name for the element displaying the switch state. Only inline elements are supported, **not** block elements!
+- (`object`) `select` all settings for the 'select' widget
+  - (`bool`) `useRolesAsTitle` use the detected style role as the `title` attribute for the `option` inside the `select`?
+  - (`string`) `captionElementName` element name for the title of the resulting select widget.
+- (`object`) `radioList` all settings for the 'radioList' widget
+  - (`bool`) `useRoleAsItemTitle` use the detected style role as the `title` attribute for the `input`?
+  - (`string`) `captionElementName` element name for the title of the resulting radio list widget.
 
 #### `autoRun`
-(`bool`) Spustit script automaticky po importu nebo vložení do dokumentu? Výchozí nastavení je že ano, většinou využijete toto výchozí nastavení, pouze [vlastní sestavení run funkce](#vlastni-sestaveni-run-funkce) je případ, kdy autorun nedává smysl.
+(`bool`) Run the script automatically after import or insertion into the document? The default setting is yes, and you will usually use this default. Only the [custom run function assembly](#custom-run-function-assembly) use case makes autorun not make sense.
 
-### Pokročilé použití
+### Advanced usage
 
-Různé možnosti spíše pro pokročilé uživatele.
+Various options mostly for advanced users.
 
-#### Vlastní sestavení run funkce
-Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomocí vlastního sestavení, může vypadat například takto:
+#### Custom run function assembly
+If you want to make more extensive modifications to the class, it is possible using a custom assembly, which can look like this:
 ```html
 <script type="module">
 
@@ -298,41 +296,42 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 	}
 </script>
 ```
-(Důležitý je tu vypnutí `autoRun` a následně vlastní sestavení vychází z původní metody `run()`, jen je osekané o různé metody které pro vlastní sestavení nepotřebuji. Z ukázky je taky patrné, že nějak nevyužívám vrácenou proměnnou `result`, v tomto konkrétním případě je zbytečná.)
+(The important part here is disabling `autoRun`. The custom assembly then follows the original `run()` method, but trimmed down to only the methods needed for the custom build. The example also shows that I do not use the returned `result`; in this particular case it is unnecessary.)
 
-## javascript reagující na změnu cookie
+## Javascript reacting to cookie changes
 
-Jak bylo zmíněno výše, výsledkem widgetu je uložení cookie do prohlížeče. Na cookie musí něco reagovat, součástí scriptu je ukázkový javascript, který podle cookie přepne styly, vypadat může třeba takto:
+As mentioned above, the widget result is the storage of a cookie in the browser. Something must react to the cookie, and the script includes example Javascript that switches styles based on the cookie, which may look like this:
 
 ```html
 <script src="./style-switch-cookie-listener-example.js?v=1.0" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script>
 ```
-(tento javascript najdete v souboru `style-switch-cookie-listener-example.js`)
 
-Alternativně je možné použít bezpočet serverových scriptů, ty součástí ukázky nejsou, budete si je muset případně napsat sami.
+(This Javascript can be found in the file `style-switch-cookie-listener-example.js`.)
 
-#### K čemu jsou tam ty další soubory?
+Alternatively, it is possible to use countless server-side scripts; they are not included in the example, and you would need to write them yourself if required.
 
-Již zmíněný `style-switch-cookie-listener-example.js` je tedy jasný. Listener odpovídající na změny cookie souboru a podle toho volící aktivní css stylesheet stránky. Tady se dá ještě bavit o tom jestli je nutný či není. Vhodné je ho mít, ale alternativně můžete použít vlastní backend řešení serverovými scripty. Ostatní soubory, ale zcela jistě **nejsou potřeba** pro StyleSwitch, slouží jen jako nějaká ukázka, pomůcka, či kontrola nastavení. Můžete je s klidem smazat, nemusíte je nějak připojovat k projektu ve kterém StyleSwitch použijete.
+#### What are the other files for?
 
-Dále jsou tam:
-- `example-usage.html` příklad použití StyleSwitch.
-- `content-type-checker.js`, prověřuje nastavení serveru, jestli všechny přípony souborů mají nastavený odpovídající mime type. Typický problém je s příponou .mjs, která nemá běžně nastaven odpovídající mime type `'text/javascript'`. Pokud k tomuto problému dojde dá se řešit 2 různými způsoby. Buďto přejmenování přípony souboru z .mjs na .js (a také přepsání cest k souboru, týká se například souboru `example-usage.html` ve kterém je tento soubor vkládán) a nebo druhý způsob řešení spočívá ve změně nastavení webového serveru a přiřazení příponě .mjs odpovídajíc mime type `'text/javascript'`.
-- `modules/string/interpolate.mjs`, je použito pouze pro `content-type-checker.js`, umožňuje vkládat proměnné do textových řetězců a jejich následný výpis.
-- `modules/importWithIntegrity.mjs` script umožňující dynamický `import` modulů spolu s kontrolou integrity souboru. Taktéž využívá pouze `content-type-checker.js`.
-- složka `readme-screenshots`, screenshoty, většinou z konzole prohlížeče.
-- složka `example-css` css styly použité pro `example-usage.html`. Vychází z [MVP.css](https://andybrewer.github.io/mvp/)
-- `README.md` popis knihovny, v `Markdown`u
-- `README.html` ten samý popis ale v HTML formátu
+The already mentioned `style-switch-cookie-listener-example.js` is clear. A listener that responds to cookie changes and selects the active CSS stylesheet for the page accordingly. You can still discuss whether it is necessary or not. It is appropriate to have it, but alternatively you can use your own backend solution with server scripts. The other files are certainly **not needed** for StyleSwitch; they only serve as examples, helpers, or setup checks. You can safely delete them; you do not have to include them in a project where you use StyleSwitch.
 
-### Použité technologie:
+Also included are:
+- `example-usage.html` example usage of StyleSwitch.
+- `content-type-checker.js`, checks the server configuration to see if all file extensions have the appropriate MIME type. A typical problem is the .mjs extension, which does not usually have the corresponding MIME type `'text/javascript'`. If this problem occurs, it can be solved in two different ways. Either rename the file extension from .mjs to .js (and also update the file paths, for example in `example-usage.html` where this file is referenced), or the second way is to change your web server configuration and assign the `.mjs` extension the MIME type `'text/javascript'`.
+- `modules/string/interpolate.mjs`, used only by `content-type-checker.js`, enables inserting variables into text strings and printing them.
+- `modules/importWithIntegrity.mjs`, a script that enables dynamic import of modules with file integrity checking. It is also used only by `content-type-checker.js`.
+- folder `readme-screenshots`, screenshots, mostly from the browser console.
+- folder `example-css`, CSS styles used by `example-usage.html`. Based on [MVP.css](https://andybrewer.github.io/mvp/)
+- `README.md` library description in Markdown
+- `README.html` the same description in HTML format
 
-Alternative style sheets ( https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet ) ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate )
+### Used technologies:
+
+Alternative style sheets (https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet) (https://html.spec.whatwg.org/multipage/links.html#rel-alternate)
 
 Cookie Store API https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent
 
-Prefers color scheme (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme)
+Prefers color scheme https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme
 
-### Pokračujte:
+### Continue:
 1. [MVP.css](https://andybrewer.github.io/mvp/)
 2. [CSS naked day](https://css-naked-day.org/)
