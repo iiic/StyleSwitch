@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 	<script>
 		/**
-		 * @description This short script it's not necessary for example to work, it's only to set correct base path for loading modules when the html file is opened directly in browser (file://...).
+		 * @description This short script is not necessary for the example to work, it only sets the correct base path for loading modules when the HTML file is opened directly in the browser (file://...).
 		 */
 
 		/** @type {String} */
@@ -31,8 +31,8 @@
 	<link rel="stylesheet" href="./example-css/dark.css" title="Dark style" media="(prefers-color-scheme: dark)" crossorigin="anonymous"><!-- preferred -->
 	<link rel="alternate stylesheet" href="./example-css/light.css" title="Light style" crossorigin="anonymous"><!-- alternate -->
 	<link rel="alternate stylesheet" href="./example-css/alternate.css" title="Alternate style" fetchpriority="low" crossorigin="anonymous"><!-- alternate -->
-	<script src="./style-switch-cookie-listener-example.js?v=1.0" crossorigin="anonymous" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script><!-- Possible listeners for cookie change (and delete) to switch css style sheets. It's not required for StyleSwitch (but it's to see live changes without page reload), you can also use server side logic (not in this example) -->
-	<!-- Possible settings for StyleSwitch 1. method: json in element identified with id -->
+	<script src="./style-switch-cookie-listener-example.js?v=1.0" crossorigin="anonymous" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script><!-- Possible listener for cookie changes (and deletion) to switch CSS style sheets. It is not required for StyleSwitch (but it is useful to see live changes without page reload). You can also use server-side logic (not shown in this example) -->
+	<!-- Possible StyleSwitch settings using method 1: JSON in an element identified by id -->
 	<!-- <script type="application/json" id="style-switch-settings">
 	{
 		"nakedStyle": {
@@ -117,61 +117,60 @@
 <body>
 
 	<ul id="loaded-styles">
-		<li class="dark.css" hidden>načetl se soubor <em>dark.css</em></li>
-		<li class="light.css" hidden>načetl se soubor <em>light.css</em></li>
-		<li class="alternate.css" hidden>načetl se soubor <em>alternate.css</em></li>
+		<li class="dark.css" hidden>loaded file <em>dark.css</em></li>
+		<li class="light.css" hidden>loaded file <em>light.css</em></li>
+		<li class="alternate.css" hidden>loaded file <em>alternate.css</em></li>
 	</ul>
 
 	<header>
 		<nav>
 			<ul>
-				<li>Home</li>
-				<li><a href="#docs">Docs</a></li>
-				<li><a href="#faq">FAQ</a></li>
+				<li><a href="./example-usage.html#live-demo">Live Demo!</a></li>
+				<li><a href="./example-usage.html#faq">FAQ</a></li>
 				<li><a href="https://github.com/iiic/StyleSwitch" rel="noopener">GitHub ↗️</a></li>
 			</ul>
 		</nav>
 
 		<h1>Style switch… Alternative style sheets polyfill</h1>
-		<strong>Script schopný:</strong>
+		<strong>Script capable of:</strong>
 		<ol style="text-align: left;">
-			<li>Načíst si automaticky styly v dokumentu</li>
-			<li>Sestavit z nich formulářový prvek sloužící k přepínání různých stylů.</li>
-			<li>Nastavit výchozí hodnotu podle zvoleného stylu včetně listeneru měnícího živě zvolenou volbu ve formulářovém prvku podle nastavení OS i podle cookie i její hodnoty</li>
-			<li>Při zvolení formulářovým prvkem nastaví hodnotu v cookie.</li>
-			<li>Volitelný listener na příslušnou cookie umožňující živě přepnout styl na zvolený. (Je v samostatném javascriptu, není nutné to použít, pokud preferujete řešení pomocí backend strany a nějakého serverového scriptu)</li>
+			<li>Automatically loading styles from the document</li>
+			<li>Building a form control that lets you switch between different styles</li>
+			<li>Setting the default selection based on the chosen style, including a listener that updates the form control live based on OS settings and cookie value</li>
+			<li>Saving the selected style to a cookie when changed via the form control</li>
+			<li>An optional listener for the cookie that allows live style switching to the chosen style. (It is in a separate JavaScript file and is not required if you prefer a backend/server-side solution)</li>
 		</ol>
 		<br>
-		<p>V levém horním rohu je soupis <mark>načtených</mark> stylů. Ze 3 možných se načte vždy 1 (<code>persistent</code>) až 2 (<code>persistent</code> + <code>alternate</code> nebo <code>persistent</code> + <code>preferred</code>)</p>
+		<p>In the upper-left corner there is a list of <mark>loaded</mark> styles. Out of the 3 possible sheets, either 1 (<code>persistent</code>) or 2 (<code>persistent</code> + <code>alternate</code> or <code>persistent</code> + <code>preferred</code>) are loaded.</p>
 		<br>
 	</header>
 
 	<main>
 		<hr>
 
-		<section id="section-1">
+		<section id="live-demo">
 			<header>
-				<h2>Živá ukázka fungování scriptu</h2>
+				<h2>Live demonstration of the script</h2>
 				<fieldset id="style-switch">
-					<legend>Dostupné styly… výběrem ze selectu přepnete styl stránky</legend>
+					<legend>Available styles… choose from the select to switch the page style</legend>
 				</fieldset>
 				<div id="custom-style-switch"></div>
 			</header>
-			<p>Výstupní snippet nemusí nutně vypadat takto, na výběr je ze 3 možných vzhledů:</p>
+			<p>The resulting snippet does not have to look like this; there are 3 possible appearances to choose from:</p>
 			<aside>
 				<h3>switch</h3>
-				<p>(input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý.</p>
+				<p>(input type checkbox), possible only when there are exactly 2 available styles, for example dark and light.</p>
 				<p>(<code>StyleSwitch.OUTPUT_FORMATS.SWITCH</code>)</p>
 			</aside>
 			<aside>
 				<h3>select</h3>
-				<p>select se styly vypsanými jako option, přepnutí stylu při kliku</p>
-				<p><small>(výchozí nastavení)</small></p>
+				<p>A select element with styles listed as options, switching the style on click.</p>
+				<p><small>(default setting)</small></p>
 				<p>(<code>StyleSwitch.OUTPUT_FORMATS.SELECT</code>)</p>
 			</aside>
 			<aside>
 				<h3>radioList</h3>
-				<p>seznam input type radio položek</p>
+				<p>A list of radio input items.</p>
 				<p>(<code>StyleSwitch.OUTPUT_FORMATS.RADIOS</code>)</p>
 			</aside>
 		</section>
@@ -179,18 +178,18 @@
 
 		<section>
 			<blockquote>
-				Všechno najdete popsané v přiloženém souboru <a href="README.md">README.md</a> .
+				Everything is described in the attached file <a href="README.md">README.md</a>.
 				<footer>
-					<i>Tento soubor je online náhled, ne samotná dokumentace</i>
+					<i>This file is an online preview, not the actual documentation</i>
 				</footer>
 			</blockquote>
 		</section>
 		<hr>
 
-		<div>
+		<div id="faq">
 			<details>
-				<summary>Minimální funkční sestava</summary>
-				<p>Script umožňuje mnoho různých typů nastavení a úprav aby splnil všemožné požadavky. Pokud ale úpravy nepotřebujete, základní funkce scriptu vyžaduje vložit kamkoliv do dokumentu jediný řádek javascriptu:</p>
+				<summary>Minimal working setup</summary>
+				<p>The script supports many types of configuration and customization to meet a wide range of requirements. If you do not need customization, the basic script only requires inserting one line of JavaScript into the document:</p>
 				<pre>
 					<code>
 &lt;script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="&gt;&lt;/script&gt;
@@ -198,8 +197,8 @@
 				</pre>
 			</details>
 			<details>
-				<summary>Něco navíc… listener na změnu cookie</summary>
-				<p>Výsledkem práce tohoto scriptu je uložení cookie souboru v prohlížeči. Na obsah této cookie je možné reagovat více způsoby, typicky na straně serveru, nebo například javascriptem. Pokud volíte možnost javascriptu, jedno řešení je připravené jako součást tohoto projektu:</p>
+				<summary>Something extra… cookie change listener</summary>
+				<p>The result of this script is storing a cookie in the browser. You can respond to this cookie value in several ways, typically on the server side or with JavaScript. If you choose JavaScript, one solution is provided as part of this project:</p>
 				<pre>
 					<code>
 &lt;script src="./style-switch-cookie-listener-example.js?v=1.0" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="&gt;&lt;/script&gt;
@@ -207,92 +206,92 @@
 				</pre>
 			</details>
 			<details>
-				<summary>Možné problémy?</summary>
-				<p>Typický problém je s příponou .mjs, která nemá běžně nastaven odpovídající mime type 'text/javascript'. Pokud k tomuto problému dojde dá se řešit 2 různými způsoby. Buďto přejmenování přípony souboru z .mjs na .js (a také přepsání cest k souboru, týká se například souboru example-usage.html ve kterém je tento soubor vkládán) a nebo druhý způsob řešení spočívá ve změně nastavení webového serveru a přiřazení příponě .mjs odpovídajíc mime type 'text/javascript'.</p>
+				<summary>Possible problems?</summary>
+				<p>A common issue is the .mjs file extension, which does not usually have the correct MIME type 'text/javascript' configured. If this occurs, there are two solutions. Either rename the file extension from .mjs to .js (and update the paths referencing the file, such as in example-usage.html), or adjust the web server configuration to assign the MIME type 'text/javascript' to .mjs files.</p>
 			</details>
 			<details>
-				<summary>K čemu jsou tam ty další soubory?</summary>
-				<p>Již zmíněný <code>style-switch-cookie-listener-example.js</code> je tedy jasný. Listener odpovídající na změny cookie souboru a podle toho volící aktivní css stylesheet stránky. Tady se dá ještě bavit o tom jestli je nutný či není. Vhodné je ho mít, ale alternativně můžete použít vlastní backend řešení serverovými scripty. Ostatní soubory, ale zcela jistě <strong>nejsou potřeba</strong> pro StyleSwitch, slouží jen jako nějaká ukázka, pomůcka, či kontrola nastavení. Můžete je s klidem smazat, nemusíte je nějak připojovat k projektu ve kterém StyleSwitch použijete.</p>
-				<p>Dále jsou tam:</p>
+				<summary>What are the other files for?</summary>
+				<p>The already mentioned <code>style-switch-cookie-listener-example.js</code> is clear: it listens for cookie changes and switches the active CSS stylesheet accordingly. Whether you need it depends on your setup. It is useful to have, but you can alternatively use your own backend/server-side solution. The other files are <strong>not required</strong> for StyleSwitch; they are only examples, helpers, or configuration checks. You can safely delete them if you do not need them and you do not have to include them in the project where you use StyleSwitch.</p>
+				<p>The files included are:</p>
 				<ul>
-					<li><code>example-usage.html</code> příklad použití StyleSwitch.</li>
-					<li><code>content-type-checker.js</code>, prověřuje nastavení serveru, jestli všechny přípony souborů mají nastavený odpovídající mime type. Typický problém je s příponou .mjs, která nemá běžně nastaven odpovídající mime type <code>'text/javascript'</code>. Pokud k tomuto problému dojde dá se řešit 2 různými způsoby. Buďto přejmenování přípony souboru z .mjs na .js (a také přepsání cest k souboru, týká se například souboru <code>example-usage.html</code> ve kterém je tento soubor vkládán) a nebo druhý způsob řešení spočívá ve změně nastavení webového serveru a přiřazení příponě .mjs odpovídajíc mime type <code>'text/javascript'</code>.</li>
-					<li><code>modules/string/interpolate.mjs</code>, je použito pouze pro <code>content-type-checker.js</code>, umožňuje vkládat proměnné do textových řetězců a jejich následný výpis.</li>
-					<li><code>modules/importWithIntegrity.mjs</code> script umožňující dynamický <code>import</code> modulů spolu s kontrolou integrity souboru. Taktéž využívá pouze <code>content-type-checker.js</code>.</li>
-					<li>složka <code>readme-screenshots</code>, screenshoty, většinou z konzole prohlížeče.</li>
-					<li>složka <code>example-css</code> css styly použité pro <code>example-usage.html</code>. Vychází z <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
-					<li><code>README.md</code> popis knihovny, v <code>Markdown</code>u</li>
-					<li><code>README.html</code> ten samý popis ale v HTML formátu</li>
+					<li><code>example-usage.html</code> an example of using StyleSwitch.</li>
+					<li><code>content-type-checker.js</code>, checks server configuration to ensure all file extensions have the correct MIME type. A common problem is the .mjs extension missing the correct MIME type <code>'text/javascript'</code>. If this happens, you can either rename the extension from .mjs to .js (and update file paths, such as in <code>example-usage.html</code>) or configure the web server to assign the MIME type <code>'text/javascript'</code> to .mjs files.</li>
+					<li><code>modules/string/interpolate.mjs</code>, used only by <code>content-type-checker.js</code>, it allows inserting variables into text strings and outputting them.</li>
+					<li><code>modules/importWithIntegrity.mjs</code>, a script enabling dynamic module <code>import</code> with file integrity checking. It is also used only by <code>content-type-checker.js</code>.</li>
+					<li><code>readme-screenshots</code> folder, screenshots mostly from the browser console.</li>
+					<li><code>example-css</code> folder, CSS styles used for <code>example-usage.html</code>. Based on <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
+					<li><code>README.md</code> library description in <code>Markdown</code></li>
+					<li><code>README.html</code> the same description in HTML format</li>
 				</ul>
 			</details>
 			<details>
-				<summary>Podrobně možná nastavení:</summary>
+				<summary>Detailed possible settings:</summary>
 				<h4 id="stylelinksqsa"><code>styleLinksQSA</code></h4>
-				<p>(<code>string</code>) Hodnota pro <code>document.querySelectorAll()</code> pomocí které se načtou styly. Pravděpodobně nebudete potřebovat jakkoliv měnit výchozí nastavení.</p>
+				<p>(<code>string</code>) Value for <code>document.querySelectorAll()</code> used to load styles. You will probably not need to change the default setting.</p>
 				<h4 id="rootelementqs"><code>rootElementQS</code></h4>
-				<p>(<code>string</code>) Hodnota pro <code>document.querySelector()</code>, element do kterého se nakonec vloží výsledný widget vytvořený tímto scriptem.</p>
+				<p>(<code>string</code>) Value for <code>document.querySelector()</code>, the element into which the resulting widget created by this script will be inserted.</p>
 				<h4 id="cookie"><code>cookie</code></h4>
-				<p>(<code>object</code>) Nastavení cookie, která se použije pro uložení uživatelem zvoleného stylu stránek.</p>
+				<p>(<code>object</code>) Cookie settings used to store the user's chosen page style.</p>
 				<h4 id="texts"><code>texts</code></h4>
-				<p>(<code>object</code>) Veškeré textové popisky widgetu.</p>
+				<p>(<code>object</code>) All text labels for the widget.</p>
 				<h4 id="nakedstyle"><code>nakedStyle</code></h4>
-				<p>(<code>object</code>) Kterým je možné přidat jako jeden z použitelných stylů vzhledu stránky i styl bez css, takzvaný naked. Podrobnosti objektu jsou tyto:</p>
+				<p>(<code>object</code>) Allows adding a style without CSS as one of the available page appearance options, called naked style. The object details are:</p>
 				<ul>
-					<li>(<code>bool</code>) <code>use</code> použít / nepoužít naked style.</li>
+					<li>(<code>bool</code>) <code>use</code> whether to use the naked style.</li>
 					<li>(<code>object</code>) <code>celebrateNakedDay</code>:
 						<ul>
-							<li>(<code>bool</code>) <code>switchAutomatically</code> automaticky zapínat a pak vypínat naked style v konkrétní datum zadané následujícími čísly</li>
-							<li>(<code>number</code>) <code>monthNumber</code> číslo měsíce ve kterém je naked day (měsíce začínají číslem 0, tedy měsíc leden je 0)</li>
-							<li>(<code>number</code>) <code>dayNumber</code> číslo dne v měsíci.</li>
+							<li>(<code>bool</code>) <code>switchAutomatically</code> automatically enable and disable the naked style on the specific date defined by the following values</li>
+							<li>(<code>number</code>) <code>monthNumber</code> month number for naked day (months start at 0, so January is 0)</li>
+							<li>(<code>number</code>) <code>dayNumber</code> day number within the month.</li>
 						</ul>
 					</li>
 				</ul>
 				<h4 id="resultsnippetappearance"><code>resultSnippetAppearance</code></h4>
-				<p>(<code>object</code>) Veškeré nastavení vzhledu i chování výsledného widgetu který tento script vytvoří a vrátí v proměnné (<code>object</code>) <code>return</code>. Podrobnosti objektu jsou tyto:</p>
+				<p>(<code>object</code>) All appearance and behavior settings for the resulting widget that this script creates and returns in the (<code>object</code>) <code>return</code> value. The object details are:</p>
 				<ul>
-					<li>(<code>string</code>) <code>idPrefix</code> prefix <code>id</code> výsledného widgetu. Bude doplněn náhodným řetězcem, aby bylo vytvořeno unikátní id a widget mohl být případně v dokumentu vícekrát, pokud by bylo potřeba.</li>
-					<li>(<code>string</code>) <code>defaultResultSnippetElement</code> typ elementu který bude obalovat výsledný widget.</li>
-					<li>(<code>string</code>) <code>outputFormat</code> Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="file:////readme-screenshots/OUTPUT_FORMATS.png" alt="" title="možnosti z OUTPUT_FORMATS"> možnosti jsou:
+					<li>(<code>string</code>) <code>idPrefix</code> prefix for the resulting widget's <code>id</code>. A random string is added so the id is unique and the widget can appear multiple times in the document if needed.</li>
+					<li>(<code>string</code>) <code>defaultResultSnippetElement</code> type of element that will wrap the resulting widget.</li>
+					<li>(<code>string</code>) <code>outputFormat</code> The form control type the script creates as output. You can get this list from the static read-only method <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="./readme-screenshots/OUTPUT_FORMATS.png" alt="" title="options from OUTPUT_FORMATS"> the options are:
 						<ul>
-							<li><code>switch</code> (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> <img src="file:////readme-screenshots/switch.png" alt="" title="switch element s náhledem HTML kódu"></li>
-							<li><code>select</code> (výchozí nastavení) <br> <img src="file:////readme-screenshots/select.png" alt="" title="switch element s náhledem HTML kódu"></li>
-							<li><code>radioList</code> … seznam input type radio položek <br> <img src="file:////readme-screenshots/radioList.png" alt="" title="radioList element s náhledem HTML kódu"></li>
+							<li><code>switch</code> (input type checkbox), possible only when you have exactly 2 available appearance styles, for example dark and light. <br> <img src="./readme-screenshots/switch.png" alt="" title="switch element preview"></li>
+							<li><code>select</code> (default setting) <br> <img src="./readme-screenshots/select.png" alt="" title="select element preview"></li>
+							<li><code>radioList</code> … a list of radio input items <br> <img src="./readme-screenshots/radioList.png" alt="" title="radioList element preview"></li>
 						</ul>
 					</li>
-					<li>(<code>string</code>) <code>preferredColorSchemeChangeBehavior</code> výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody <code>StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR</code>. Jsou to: -
+					<li>(<code>string</code>) <code>preferredColorSchemeChangeBehavior</code> default behavior of the widget when the operating system color scheme changes. The widget can dynamically switch the page style immediately on OS change if desired. For example, if the user has already chosen a page style, they probably do not want it to change automatically. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not chosen a page style yet. You can get all options from the static read-only method <code>StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR</code>. They are:
 						<ul>
-							<li><code>never</code> nikdy neměnit barevný styl stránky v návaznosti na změnu barevného schématu v operačním systému.</li>
-							<li><code>always</code> vždy změnit barevný styl stránky při změně barevného schématu operačního systému. Tedy má přednost i před uživatelskou volbou učiněnou dříve! Uživatelem zvolený style se změní.</li>
-							<li><code>onlyWithoutCookie</code> (výchozí nastavení) při změně barevného schématu OS dojde ke změně stylu stránky <strong>pouze pokud</strong> uživatel zatím <strong>ne</strong>zvolil jaký barevný styl stránky chce používat.</li>
+							<li><code>never</code> never change the page style in response to OS color scheme changes.</li>
+							<li><code>always</code> always change the page style when the OS color scheme changes. This can override a previously chosen user preference.</li>
+							<li><code>onlyWithoutCookie</code> (default) change the page style on OS color scheme change <strong>only if</strong> the user has not yet chosen which page style to use.</li>
 						</ul>
 					</li>
-					<li>(<code>bool</code>) <code>reverseOrder</code> nalezené styly z hlavičky dokumentu vypsat v opačném pořadí ?</li>
-					<li>(<code>object</code>) <code>switch</code> Veškerá nastavení widgetu 'switch'
+					<li>(<code>bool</code>) <code>reverseOrder</code> list found styles from the document head in reverse order?</li>
+					<li>(<code>object</code>) <code>switch</code> All settings for the 'switch' widget
 						<ul>
-							<li>(<code>bool</code>) <code>useSwitchIfPossible</code> použít switch? Je možné <strong>pouze</strong>, pokud existují přesně 2 možné styly vzhledu stránky (pokud použijete naked style, je počítán také jako jeden ze stylů).</li>
-							<li>(<code>bool</code>) <code>useRolesAsTitle</code> Použít jako <code>atribut</code> &quot;title&quot; elementu přepínače detekovanou roli css stylu?</li>
-							<li>(<code>string</code>) <code>labelClassName</code> Jméno <code>atribut</code>u class u obalového elementu výsledného widgetu.</li>
-							<li>(<code>string</code>) <code>captionElementName</code> Jméno <code>element</code>u pro nadpis výsledného switch widgetu. Podporovány jsou pouze řádkové elementy, <strong>ne</strong> blokové!</li>
-							<li>(<code>string</code>) <code>visualSwitchClassName</code> Jméno <code>atribut</code>u class u elementu vizuálního přepínače switche výsledného widgetu.</li>
-							<li>(<code>string</code>) <code>stateClassName</code> Jméno <code>atribut</code>u class u elementu ve kterém se vypisuje stav switch elementu (výchozí &quot;zapnuto&quot; / &quot;vypnuto&quot;… může být změněn na libovolný text)</li>
-							<li>(<code>string</code>) <code>statusElementName</code> Jméno <code>element</code>u ve kterém se vypisuje stav switch elementu. Podporovány jsou pouze řádkové elementy, <strong>ne</strong> blokové!</li>
+							<li>(<code>bool</code>) <code>useSwitchIfPossible</code> use the switch? This is only possible if there are exactly 2 available page styles (if you include naked style, it counts as one of the styles).</li>
+							<li>(<code>bool</code>) <code>useRolesAsTitle</code> Use the detected CSS style role as the <code>title</code> attribute for the switch element?</li>
+							<li>(<code>string</code>) <code>labelClassName</code> class attribute name for the wrapper element of the resulting widget.</li>
+							<li>(<code>string</code>) <code>captionElementName</code> element name for the switch widget caption. Only inline elements are supported, not block elements!</li>
+							<li>(<code>string</code>) <code>visualSwitchClassName</code> class attribute name for the visual switch element of the resulting widget.</li>
+							<li>(<code>string</code>) <code>stateClassName</code> class attribute name for the element that displays the switch state (default "on" / "off"… can be changed to any text)</li>
+							<li>(<code>string</code>) <code>statusElementName</code> element name for the element that displays the switch state. Only inline elements are supported, not block elements!</li>
 						</ul>
 					</li>
-					<li>(<code>object</code>) <code>select</code> Veškerá nastavení widgetu 'select'
+					<li>(<code>object</code>) <code>select</code> All settings for the 'select' widget
 						<ul>
-							<li>(<code>bool</code>) <code>useRolesAsTitle</code> Použít jako <code>atribut</code> &quot;title&quot; elementu <code>option</code> uvnitř <code>select</code>u detekovanou roli css stylu?</li>
-							<li>(<code>string</code>) <code>captionElementName</code> Jméno <code>element</code>u pro nadpis výsledného widgetu.</li>
+							<li>(<code>bool</code>) <code>useRolesAsTitle</code> Use the detected CSS style role as the <code>title</code> attribute for the <code>option</code> element inside the <code>select</code>?</li>
+							<li>(<code>string</code>) <code>captionElementName</code> element name for the caption of the resulting widget.</li>
 						</ul>
 					</li>
-					<li>(<code>object</code>) <code>radioList</code> Veškerá nastavení widgetu 'radioList'
+					<li>(<code>object</code>) <code>radioList</code> All settings for the 'radioList' widget
 						<ul>
-							<li>(<code>bool</code>) <code>useRoleAsItemTitle</code> Použít jako <code>atribut</code> &quot;title&quot; elementu <code>input</code> detekovanou roli css stylu?</li>
-							<li>(<code>string</code>) <code>captionElementName</code> Jméno <code>element</code>u pro nadpis výsledného widgetu.</li>
+							<li>(<code>bool</code>) <code>useRoleAsItemTitle</code> Use the detected CSS style role as the <code>title</code> attribute for the <code>input</code> element?</li>
+							<li>(<code>string</code>) <code>captionElementName</code> element name for the caption of the resulting widget.</li>
 						</ul>
 					</li>
 				</ul>
 				<h4 id="autorun"><code>autoRun</code></h4>
-				<p>(<code>bool</code>) Spustit script automaticky po importu nebo vložení do dokumentu? Výchozí nastavení je že ano, většinou využijete toto výchozí nastavení, pouze <a href="#vlastni-sestaveni-run-funkce">vlastní sestavení run funkce</a> je případ, kdy autorun nedává smysl.</p>
+				<p>(<code>bool</code>) Run the script automatically after import or insertion into the document? The default is yes, which is usually what you want. Only <a href="#vlastni-sestaveni-run-funkce">custom run function setup</a> is a case where autoRun does not make sense.</p>
 			</details>
 		</div>
 	</main>

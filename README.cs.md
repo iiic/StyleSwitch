@@ -4,6 +4,30 @@ Přepínač různých CSS stylů na webových stránkách.
 
 Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dělat další?
 
+## Rychlý start
+
+Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:
+
+```html
+<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+```
+
+To už stačí pro základní funkčnost:
+- najde dostupné styly na stránce,
+- vytvoří z nich přepínač,
+- uloží volbu uživatele do cookie.
+
+> Samotný widget ukládá jen preference. Aby se zvolený styl použil i po obnově stránky nebo na dalších stránkách, je potřeba ještě listener na cookie nebo serverová implementace.
+
+## Jaký problém StyleSwitch řeší?
+
+StyleSwitch kombinuje tři běžné přístupy:
+- nativní alternativní styly v prohlížeči,
+- automatické rozpoznání systému pomocí `prefers-color-scheme`,
+- trvalou volbu uživatele uloženou v cookie.
+
+Díky tomu je možné přepínat styly bez plného reloadu stránky a uchovat výběr i mezi stránkami.
+
 No tak začněme chronologicky, první přišel *Alternative style sheets* ( https://html.spec.whatwg.org/multipage/links.html#rel-alternate ) který je podporován všemi prohlížeči, ovšem pouze Firefox má na tohle přepínač, kdy přímo v prohlížeči mám možnost styl přepnout (pokud máte Firefox, jde to pomocí <kbd>ALT</kbd> > `Zobrazit` > `Styl stránky` (poud máte anglické rozhraní tak <kbd>ALT</kbd> > `View` > `Page Style`)). Zápis v html pak vypadá například takto:
 
 ```html
@@ -18,8 +42,6 @@ A tohle jednoduché řešení je dostatečné na přepínání stylů ve Firefox
 
 Druhá možnost jak přepínat styly přišla s *Media Queries Level 5*, *Prefers color scheme*  ( https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme ). A velice příjemná a snadná možnost. V zásadě bere hodnotu z operačního systému, jestli je použit tmavý nebo světlý režim, tuhle hodnotu předává prohlížeči a ten na základě toho použije tmavý nebo světlý režim a nakonec prohlížeč tuhle hodnotu předá stránce a ta podle ní udělá nějakou magii. Pozor ale na to, že v prohlížeči se dá změnit styl rozdílně od operačního systému. Změna stylu v OS pak není poděděná prohlížečem a ten nepředá změnu stránce. Nicméně výchozí nastavení je podědění barevného stylu z OS.
 Potenciálních využití je více, ale v příkladu uvedu jednoduchou a celkem snadno spravovatelnou možnost:
-federace
-
 ```html
 <link rel="stylesheet" href="./css/light.css" fetchpriority="high"><!-- persistent -->
 <link rel="stylesheet" href="./css/dark.css" title="tmavý styl" media="(prefers-color-scheme: dark)"><!-- preferred -->
@@ -324,6 +346,19 @@ Dále jsou tam:
 - složka `example-css` css styly použité pro `example-usage.html`. Vychází z [MVP.css](https://andybrewer.github.io/mvp/)
 - `README.md` popis knihovny, v `Markdown`u
 - `README.html` ten samý popis ale v HTML formátu
+
+## Časté úskalí
+
+- Widget se vkládá do elementu, který odpovídá selektoru `#style-switch`. Pokud chceš jiný kontejner, změň nastavení `rootElementQS`.
+- Listener na cookie je pro samotný widget nepovinný, ale je potřeba, pokud chceš, aby se vybraný styl použil automaticky po obnově stránky nebo na dalších stránkách.
+- Soubor `.mjs` musí být serverem poskytován s MIME typem JavaScriptu. Pokud importy selžou, zkontroluj konfiguraci serveru.
+- Pokud stránka neobsahuje žádné odkazy na styly, widget se nevytvoří.
+
+### Služby:
+
+Unpkg: https://unpkg.com/style-switch
+
+NPM: https://www.npmjs.com/package/style-switch
 
 ### Použité technologie:
 

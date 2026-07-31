@@ -256,6 +256,27 @@
 	<h1 id="styleswitch">StyleSwitch</h1>
 	<p>Přepínač různých CSS stylů na webových stránkách.</p>
 	<p>Přepínačů stylů stránky typu &quot;světlý / tmavý vzhled&quot; je plno, proč dělat další?</p>
+	<h2 id="rychlý-start">Rychlý start</h2>
+	<p>Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:</p>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.0&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+	<p>To už stačí pro základní funkčnost:</p>
+	<ul>
+		<li>najde dostupné styly na stránce,</li>
+		<li>vytvoří z nich přepínač,</li>
+		<li>uloží volbu uživatele do cookie.</li>
+	</ul>
+	<blockquote>
+		<p>Samotný widget ukládá jen preference. Aby se zvolený styl použil i po obnově stránky nebo na dalších stránkách, je potřeba ještě listener na cookie nebo serverová implementace.</p>
+	</blockquote>
+	<h2 id="jaký-problém-styleswitch-řeší">Jaký problém StyleSwitch řeší?</h2>
+	<p>StyleSwitch kombinuje tři běžné přístupy:</p>
+	<ul>
+		<li>nativní alternativní styly v prohlížeči,</li>
+		<li>automatické rozpoznání systému pomocí <code>prefers-color-scheme</code>,</li>
+		<li>trvalou volbu uživatele uloženou v cookie.</li>
+	</ul>
+	<p>Díky tomu je možné přepínat styly bez plného reloadu stránky a uchovat výběr i mezi stránkami.</p>
 	<p>No tak začněme chronologicky, první přišel <em>Alternative style sheets</em> ( <a href="https://html.spec.whatwg.org/multipage/links.html#rel-alternate">https://html.spec.whatwg.org/multipage/links.html#rel-alternate</a> ) který je podporován všemi prohlížeči, ovšem pouze Firefox má na tohle přepínač, kdy přímo v prohlížeči mám možnost styl přepnout (pokud máte Firefox, jde to pomocí <kbd>ALT</kbd> &gt; <code>Zobrazit</code> &gt; <code>Styl stránky</code> (poud máte anglické rozhraní tak <kbd>ALT</kbd> &gt; <code>View</code> &gt; <code>Page Style</code>)). Zápis v html pak vypadá například takto:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/light.css&quot;</span> <span class="hljs-attr">fetchpriority</span>=<span class="hljs-string">&quot;high&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- persistent --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/dark.css&quot;</span> <span class="hljs-attr">title</span>=<span class="hljs-string">&quot;tmavý styl&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- preferred --&gt;</span>
@@ -264,8 +285,7 @@
 	<p>Příklad je doplněn o moderní <code>fetchpriority</code> atributy, ale dost tu pomůžou, protože &quot;persistent&quot; styly se načítají vždy a vždy jsou potřeba, naopak &quot;alternate&quot; se vůbec nepoužijí (pokud nemáte Firefox a nepoužijete integrovaný přepínač, nebo pokud neuděláte nějakou magii v javascriptu, k tomu se dostaneme později), takže stačí <code>fetchpriority=&quot;low&quot;</code>. Stahují se všechny styly, dokonce i ty, které se nepoužijí &quot;alternate&quot; a tak. Je tedy lepší mít 1 soubor &quot;persistent&quot; a v ostatních ho upravovat. Než více samostatných souborů ve kterých budou veškeré styly. Čistě z důvodu úspory dat… není nutné aby uživatel stahoval zbytečně data i dnes v době rychlého internetu a neomezených dat, i tak je lepší šetřit.</p>
 	<p>A tohle jednoduché řešení je dostatečné na přepínání stylů ve Firefoxu, podpora jednoho jediného prohlížeče ale není poslední problém na který narazíte. Další nevýhodou je že při přechodu na jinou stránku se nějak neukládá jaký styl byl zvolený a znovu se načte ten výchozí. Ve zkratce, tohle řešení je samo o sobě prakticky nepoužitelné, bude potřeba pokračovat.</p>
 	<p>Druhá možnost jak přepínat styly přišla s <em>Media Queries Level 5</em>, <em>Prefers color scheme</em> ( <a href="https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme">https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme</a> ). A velice příjemná a snadná možnost. V zásadě bere hodnotu z operačního systému, jestli je použit tmavý nebo světlý režim, tuhle hodnotu předává prohlížeči a ten na základě toho použije tmavý nebo světlý režim a nakonec prohlížeč tuhle hodnotu předá stránce a ta podle ní udělá nějakou magii. Pozor ale na to, že v prohlížeči se dá změnit styl rozdílně od operačního systému. Změna stylu v OS pak není poděděná prohlížečem a ten nepředá změnu stránce. Nicméně výchozí nastavení je podědění barevného stylu z OS.
-		Potenciálních využití je více, ale v příkladu uvedu jednoduchou a celkem snadno spravovatelnou možnost:
-		federace</p>
+		Potenciálních využití je více, ale v příkladu uvedu jednoduchou a celkem snadno spravovatelnou možnost:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/light.css&quot;</span> <span class="hljs-attr">fetchpriority</span>=<span class="hljs-string">&quot;high&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- persistent --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/dark.css&quot;</span> <span class="hljs-attr">title</span>=<span class="hljs-string">&quot;tmavý styl&quot;</span> <span class="hljs-attr">media</span>=<span class="hljs-string">&quot;(prefers-color-scheme: dark)&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- preferred --&gt;</span>
 </code></pre>
@@ -361,7 +381,7 @@
 		<span class="hljs-string">&quot;use&quot;</span>: <span class="hljs-literal">true</span>
 	},
 	<span class="hljs-string">&quot;texts&quot;</span>: {
-		<span class="hljs-string">&quot;caption&quot;</span>: <span class="hljs-string">&quot;Chose a style for website&quot;</span>
+		<span class="hljs-string">&quot;caption&quot;</span>: <span class="hljs-string">&quot;Choose a style for website&quot;</span>
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
@@ -426,11 +446,11 @@
 	<ul>
 		<li>(<code>string</code>) <code>idPrefix</code> prefix <code>id</code> výsledného widgetu. Bude doplněn náhodným řetězcem, aby bylo vytvořeno unikátní id a widget mohl být případně v dokumentu vícekrát, pokud by bylo potřeba.</li>
 		<li>(<code>string</code>) <code>defaultResultSnippetElement</code> typ elementu který bude obalovat výsledný widget.</li>
-		<li>(<code>string</code>) <code>outputFormat</code> Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="file:////readme-screenshots/OUTPUT_FORMATS.png" alt="" title="možnosti z OUTPUT_FORMATS"> možnosti jsou:
+		<li>(<code>string</code>) <code>outputFormat</code> Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="./readme-screenshots/OUTPUT_FORMATS.png" alt="" title="možnosti z OUTPUT_FORMATS"> možnosti jsou:
 			<ul>
-				<li><code>switch</code> (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> <img src="file:////readme-screenshots/switch.png" alt="" title="switch element s náhledem HTML kódu"></li>
-				<li><code>select</code> (výchozí nastavení) <br> <img src="file:////readme-screenshots/select.png" alt="" title="switch element s náhledem HTML kódu"></li>
-				<li><code>radioList</code> … seznam input type radio položek <br> <img src="file:////readme-screenshots/radioList.png" alt="" title="radioList element s náhledem HTML kódu"></li>
+				<li><code>switch</code> (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> <img src="./readme-screenshots/switch.png" alt="" title="switch element s náhledem HTML kódu"></li>
+				<li><code>select</code> (výchozí nastavení) <br> <img src="./readme-screenshots/select.png" alt="" title="switch element s náhledem HTML kódu"></li>
+				<li><code>radioList</code> … seznam input type radio položek <br> <img src="./readme-screenshots/radioList.png" alt="" title="radioList element s náhledem HTML kódu"></li>
 			</ul>
 		</li>
 		<li>(<code>string</code>) <code>preferredColorSchemeChangeBehavior</code> výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody <code>StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR</code>. Jsou to: -
@@ -508,7 +528,7 @@
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(Důležitý je tu vypnutí <code>autoRun</code> a následně vlastní sestavení vychází z původní metody <code>run()</code>, jen je osekané o různé metody které pro vlastní sestavení nepotřebuji. Z ukázky je taky patrné, že nějak nevyužívám vrácenou proměnnou <code>result</code>, v tomto konkrétním případě je zbytečná.)</p>
-	<h2 id="javascript-reagující-na-změnu-cookie">javascript reagující na změnu cookie</h2>
+	<h2 id="javascript-reagující-na-změnu-cookie">Javascript reagující na změnu cookie</h2>
 	<p>Jak bylo zmíněno výše, výsledkem widgetu je uložení cookie do prohlížeče. Na cookie musí něco reagovat, součástí scriptu je ukázkový javascript, který podle cookie přepne styly, vypadat může třeba takto:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch-cookie-listener-example.js?v=1.0&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
@@ -527,6 +547,13 @@
 		<li><code>README.md</code> popis knihovny, v <code>Markdown</code>u</li>
 		<li><code>README.html</code> ten samý popis ale v HTML formátu</li>
 	</ul>
+	<h2 id="časté-úskalí">Časté úskalí</h2>
+	<ul>
+		<li>Widget se vkládá do elementu, který odpovídá selektoru <code>#style-switch</code>. Pokud chceš jiný kontejner, změň nastavení <code>rootElementQS</code>.</li>
+		<li>Listener na cookie je pro samotný widget nepovinný, ale je potřeba, pokud chceš, aby se vybraný styl použil automaticky po obnově stránky nebo na dalších stránkách.</li>
+		<li>Soubor <code>.mjs</code> musí být serverem poskytován s MIME typem JavaScriptu. Pokud importy selžou, zkontroluj konfiguraci serveru.</li>
+		<li>Pokud stránka neobsahuje žádné odkazy na styly, widget se nevytvoří.</li>
+	</ul>
 	<h3 id="použité-technologie">Použité technologie:</h3>
 	<p>Alternative style sheets ( <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet</a> ) ( <a href="https://html.spec.whatwg.org/multipage/links.html#rel-alternate">https://html.spec.whatwg.org/multipage/links.html#rel-alternate</a> )</p>
 	<p>Cookie Store API <a href="https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent">https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent</a></p>
@@ -536,6 +563,7 @@
 		<li><a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
 		<li><a href="https://css-naked-day.org/">CSS naked day</a></li>
 	</ol>
+
 
 </body>
 

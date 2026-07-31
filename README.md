@@ -4,6 +4,30 @@ A switch for different CSS styles on web pages.
 
 There are plenty of light/dark theme style switchers, so why make another one?
 
+## Quick start
+
+If you want the fastest possible setup, add a container for the widget and include the module:
+
+```html
+<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+```
+
+This already does the core work:
+- discovers the available styles on the page,
+- creates a switch UI,
+- stores the user's choice in a cookie.
+
+> The widget itself only stores the preference. To apply the chosen style after reloads or on other pages, you also need a cookie listener or a server-side implementation.
+
+## What problem does StyleSwitch solve?
+
+StyleSwitch combines three common approaches:
+- browser-native alternative stylesheets,
+- automatic OS-based theme detection with `prefers-color-scheme`,
+- a persistent user choice stored in a cookie.
+
+That combination makes it possible to switch styles without a full page reload and to keep the selection across pages.
+
 Let's start chronologically: first there was *Alternative style sheets* (https://html.spec.whatwg.org/multipage/links.html#rel-alternate), which is supported by all browsers, but only Firefox has a built-in switch for it where you can change the style directly in the browser (if you have Firefox, use <kbd>ALT</kbd> > `View` > `Page Style`). The HTML markup looks like this:
 
 ```html
@@ -323,6 +347,19 @@ Also included are:
 - folder `example-css`, CSS styles used by `example-usage.html`. Based on [MVP.css](https://andybrewer.github.io/mvp/)
 - `README.md` library description in Markdown
 - `README.html` the same description in HTML format
+
+## Common gotchas
+
+- The widget is inserted into the element matched by `#style-switch` by default. If you want a different container, change the `rootElementQS` setting.
+- The cookie listener is optional for the widget itself, but it is required if you want the selected style to be applied automatically after page reloads or on other pages.
+- The `.mjs` file must be served with a JavaScript MIME type. If imports fail, check your server configuration.
+- If the page contains no stylesheet links, the widget will not be created.
+
+### Services:
+
+Unpkg: https://unpkg.com/style-switch
+
+NPM: https://www.npmjs.com/package/style-switch
 
 ### Used technologies:
 

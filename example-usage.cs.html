@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 	<script>
 		/**
-		 * @description This short script it's not necessary for example to work, it's only to set correct base path for loading modules when the html file is opened directly in browser (file://...).
+		 * @description This short script is not necessary for the example to work, it only sets the correct base path for loading modules when the HTML file is opened directly in the browser (file://...).
 		 */
 
 		/** @type {String} */
@@ -31,8 +31,8 @@
 	<link rel="stylesheet" href="./example-css/dark.css" title="Dark style" media="(prefers-color-scheme: dark)" crossorigin="anonymous"><!-- preferred -->
 	<link rel="alternate stylesheet" href="./example-css/light.css" title="Light style" crossorigin="anonymous"><!-- alternate -->
 	<link rel="alternate stylesheet" href="./example-css/alternate.css" title="Alternate style" fetchpriority="low" crossorigin="anonymous"><!-- alternate -->
-	<script src="./style-switch-cookie-listener-example.js?v=1.0" crossorigin="anonymous" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script><!-- Possible listeners for cookie change (and delete) to switch css style sheets. It's not required for StyleSwitch (but it's to see live changes without page reload), you can also use server side logic (not in this example) -->
-	<!-- Possible settings for StyleSwitch 1. method: json in element identified with id -->
+	<script src="./style-switch-cookie-listener-example.js?v=1.0" crossorigin="anonymous" integrity="sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE="></script><!-- Possible listener for cookie changes (and deletion) to switch CSS style sheets. It is not required for StyleSwitch (but it is useful to see live changes without page reload). You can also use server-side logic (not shown in this example) -->
+	<!-- Possible StyleSwitch settings using method 1: JSON in an element identified by id -->
 	<!-- <script type="application/json" id="style-switch-settings">
 	{
 		"nakedStyle": {
@@ -125,9 +125,8 @@
 	<header>
 		<nav>
 			<ul>
-				<li>Home</li>
-				<li><a href="#docs">Docs</a></li>
-				<li><a href="#faq">FAQ</a></li>
+				<li><a href="./example-usage.cs.html#live-demo">Živá ukázka!</a></li>
+				<li><a href="./example-usage.cs.html#faq">FAQ</a></li>
 				<li><a href="https://github.com/iiic/StyleSwitch" rel="noopener">GitHub ↗️</a></li>
 			</ul>
 		</nav>
@@ -149,7 +148,7 @@
 	<main>
 		<hr>
 
-		<section id="section-1">
+		<section id="live-demo">
 			<header>
 				<h2>Živá ukázka fungování scriptu</h2>
 				<fieldset id="style-switch">
@@ -187,7 +186,7 @@
 		</section>
 		<hr>
 
-		<div>
+		<div id="faq">
 			<details>
 				<summary>Minimální funkční sestava</summary>
 				<p>Script umožňuje mnoho různých typů nastavení a úprav aby splnil všemožné požadavky. Pokud ale úpravy nepotřebujete, základní funkce scriptu vyžaduje vložit kamkoliv do dokumentu jediný řádek javascriptu:</p>
@@ -252,11 +251,11 @@
 				<ul>
 					<li>(<code>string</code>) <code>idPrefix</code> prefix <code>id</code> výsledného widgetu. Bude doplněn náhodným řetězcem, aby bylo vytvořeno unikátní id a widget mohl být případně v dokumentu vícekrát, pokud by bylo potřeba.</li>
 					<li>(<code>string</code>) <code>defaultResultSnippetElement</code> typ elementu který bude obalovat výsledný widget.</li>
-					<li>(<code>string</code>) <code>outputFormat</code> Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="file:////readme-screenshots/OUTPUT_FORMATS.png" alt="" title="možnosti z OUTPUT_FORMATS"> možnosti jsou:
+					<li>(<code>string</code>) <code>outputFormat</code> Seznam možných formulářových prvků, které script vytvoří jako výsledek. Tento seznam můžete získat ze statické read-only metody <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="./readme-screenshots/OUTPUT_FORMATS.png" alt="" title="možnosti z OUTPUT_FORMATS"> možnosti jsou:
 						<ul>
-							<li><code>switch</code> (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> <img src="file:////readme-screenshots/switch.png" alt="" title="switch element s náhledem HTML kódu"></li>
-							<li><code>select</code> (výchozí nastavení) <br> <img src="file:////readme-screenshots/select.png" alt="" title="switch element s náhledem HTML kódu"></li>
-							<li><code>radioList</code> … seznam input type radio položek <br> <img src="file:////readme-screenshots/radioList.png" alt="" title="radioList element s náhledem HTML kódu"></li>
+							<li><code>switch</code> (input type checkbox), možný pouze pokud máte přesně 2 možné vzhledy. Například tmavý a světlý. <br> <img src="./readme-screenshots/switch.png" alt="" title="switch element s náhledem HTML kódu"></li>
+							<li><code>select</code> (výchozí nastavení) <br> <img src="./readme-screenshots/select.png" alt="" title="switch element s náhledem HTML kódu"></li>
+							<li><code>radioList</code> … seznam input type radio položek <br> <img src="./readme-screenshots/radioList.png" alt="" title="radioList element s náhledem HTML kódu"></li>
 						</ul>
 					</li>
 					<li>(<code>string</code>) <code>preferredColorSchemeChangeBehavior</code> výchozí chování widgetu při změně barevného schématu operačního systému. Widget může dynamicky měnit styl stránky okamžitě při změně této hodnoty v OS, ovšem pokud je tohle žádoucí. Například když už si uživatel svůj styl stránky zvolil, nejspíše by o změnu jím zvolené hodnoty nestál. Proto výchozí chování je měnit dynamicky pouze pokud není cookie a tedy uživatel si styl stránky nezvolil. Všechny možnosti lze získat ze statické read-only metody <code>StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR</code>. Jsou to: -

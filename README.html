@@ -256,6 +256,27 @@
 	<h1 id="styleswitch">StyleSwitch</h1>
 	<p>A switch for different CSS styles on web pages.</p>
 	<p>There are plenty of light/dark theme style switchers, so why make another one?</p>
+	<h2 id="quick-start">Quick start</h2>
+	<p>If you want the fastest possible setup, add a container for the widget and include the module:</p>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.0&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+	<p>This already does the core work:</p>
+	<ul>
+		<li>discovers the available styles on the page,</li>
+		<li>creates a switch UI,</li>
+		<li>stores the user's choice in a cookie.</li>
+	</ul>
+	<blockquote>
+		<p>The widget itself only stores the preference. To apply the chosen style after reloads or on other pages, you also need a cookie listener or a server-side implementation.</p>
+	</blockquote>
+	<h2 id="what-problem-does-styleswitch-solve">What problem does StyleSwitch solve?</h2>
+	<p>StyleSwitch combines three common approaches:</p>
+	<ul>
+		<li>browser-native alternative stylesheets,</li>
+		<li>automatic OS-based theme detection with <code>prefers-color-scheme</code>,</li>
+		<li>a persistent user choice stored in a cookie.</li>
+	</ul>
+	<p>That combination makes it possible to switch styles without a full page reload and to keep the selection across pages.</p>
 	<p>Let's start chronologically: first there was <em>Alternative style sheets</em> (<a href="https://html.spec.whatwg.org/multipage/links.html#rel-alternate">https://html.spec.whatwg.org/multipage/links.html#rel-alternate</a>), which is supported by all browsers, but only Firefox has a built-in switch for it where you can change the style directly in the browser (if you have Firefox, use <kbd>ALT</kbd> &gt; <code>View</code> &gt; <code>Page Style</code>). The HTML markup looks like this:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/light.css&quot;</span> <span class="hljs-attr">fetchpriority</span>=<span class="hljs-string">&quot;high&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- persistent --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;./css/dark.css&quot;</span> <span class="hljs-attr">title</span>=<span class="hljs-string">&quot;dark style&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- preferred --&gt;</span>
@@ -426,11 +447,11 @@
 	<ul>
 		<li>(<code>string</code>) <code>idPrefix</code> prefix for the widget's <code>id</code>. A random string is appended so the id becomes unique and the widget can be used more than once in the document if needed.</li>
 		<li>(<code>string</code>) <code>defaultResultSnippetElement</code> type of element that will wrap the resulting widget.</li>
-		<li>(<code>string</code>) <code>outputFormat</code> list of possible form controls that the script will create as output. This list can be obtained from the static read-only method <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="file:////readme-screenshots/OUTPUT_FORMATS.png" alt="" title="options from OUTPUT_FORMATS"> the options are:
+		<li>(<code>string</code>) <code>outputFormat</code> list of possible form controls that the script will create as output. This list can be obtained from the static read-only method <code>StyleSwitch.OUTPUT_FORMATS</code>, <img src="./readme-screenshots/OUTPUT_FORMATS.png" alt="" title="options from OUTPUT_FORMATS"> the options are:
 			<ul>
-				<li><code>switch</code> (<code>input type=checkbox</code>), possible only if there are exactly two possible page styles, for example dark and light. <br> <img src="file:////readme-screenshots/switch.png" alt="" title="switch element with HTML preview"></li>
-				<li><code>select</code> (default) <br> <img src="file:////readme-screenshots/select.png" alt="" title="select element with HTML preview"></li>
-				<li><code>radioList</code> … a list of <code>input type=radio</code> items <br> <img src="file:////readme-screenshots/radioList.png" alt="" title="radioList element with HTML preview"></li>
+				<li><code>switch</code> (<code>input type=checkbox</code>), possible only if there are exactly two possible page styles, for example dark and light. <br> <img src="./readme-screenshots/switch.png" alt="" title="switch element with HTML preview"></li>
+				<li><code>select</code> (default) <br> <img src="./readme-screenshots/select.png" alt="" title="select element with HTML preview"></li>
+				<li><code>radioList</code> … a list of <code>input type=radio</code> items <br> <img src="./readme-screenshots/radioList.png" alt="" title="radioList element with HTML preview"></li>
 			</ul>
 		</li>
 		<li>(<code>string</code>) <code>preferredColorSchemeChangeBehavior</code> default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method <code>StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR</code>. They are:
@@ -527,6 +548,13 @@
 		<li><code>README.md</code> library description in Markdown</li>
 		<li><code>README.html</code> the same description in HTML format</li>
 	</ul>
+	<h2 id="common-gotchas">Common gotchas</h2>
+	<ul>
+		<li>The widget is inserted into the element matched by <code>#style-switch</code> by default. If you want a different container, change the <code>rootElementQS</code> setting.</li>
+		<li>The cookie listener is optional for the widget itself, but it is required if you want the selected style to be applied automatically after page reloads or on other pages.</li>
+		<li>The <code>.mjs</code> file must be served with a JavaScript MIME type. If imports fail, check your server configuration.</li>
+		<li>If the page contains no stylesheet links, the widget will not be created.</li>
+	</ul>
 	<h3 id="used-technologies">Used technologies:</h3>
 	<p>Alternative style sheets (<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet</a>) (<a href="https://html.spec.whatwg.org/multipage/links.html#rel-alternate">https://html.spec.whatwg.org/multipage/links.html#rel-alternate</a>)</p>
 	<p>Cookie Store API <a href="https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent">https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent</a></p>
@@ -536,6 +564,7 @@
 		<li><a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
 		<li><a href="https://css-naked-day.org/">CSS naked day</a></li>
 	</ol>
+
 
 </body>
 
