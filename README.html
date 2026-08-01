@@ -258,7 +258,7 @@
 	<p>There are plenty of light/dark theme style switchers, so why make another one?</p>
 	<h2 id="quick-start">Quick start</h2>
 	<p>If you want the fastest possible setup, add a container for the widget and include the module:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.0&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>This already does the core work:</p>
 	<ul>
@@ -339,7 +339,7 @@
 		<li>Optional listener for the appropriate cookie allowing live switching to the chosen style (this is in a separate JavaScript file and is not required if you prefer a backend solution with a server-side script)</li>
 	</ol>
 	<p>Minimal working usage:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.0&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.</p>
 	<p>I mentioned cookies, so let's describe it:
@@ -386,7 +386,7 @@
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.0&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-A34iibpo+7LaVdaxO1fj+N6DQGYQSjwmREDnt8Q6oms=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in <code>StyleSwitch.DEFAULT_SETTINGS</code>.)</p>
 	<h4 id="2-inject-settings-via-an-http-get-parameter">2. Inject settings via an HTTP GET parameter.</h4>
@@ -394,7 +394,7 @@
 	<p>The important return value is stored in the <code>result</code> variable. That variable is either <code>null</code> (if the widget was not created, for example when the page contains no styles) or an <code>HTMLElement</code>, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using <code>await</code> or <code>Promise</code>.</p>
 	<p>Example:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.0&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
 		},
@@ -494,7 +494,7 @@
 	<p>If you want to make more extensive modifications to the class, it is possible using a custom assembly, which can look like this:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
 
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.0&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">autoRun</span>: <span class="hljs-literal">false</span>,
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,

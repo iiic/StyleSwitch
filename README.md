@@ -9,7 +9,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 
 This already does the core work:
@@ -115,7 +115,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 ... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.
 
@@ -182,7 +182,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.0" type="module" crossorigin="anonymous" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -195,7 +195,7 @@ The important return value is stored in the `result` variable. That variable is 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -286,7 +286,7 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,

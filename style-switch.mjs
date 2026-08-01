@@ -6,7 +6,7 @@
  * @class
  * @description internal class, not accessible from outside the script
  */
-const StyleSwitchInternal = class
+class StyleSwitchInternal
 {
 
 	/**
@@ -44,57 +44,6 @@ const StyleSwitchInternal = class
 			this.#rootElement = rootElement;
 		} else {
 			throw new Error( 'Not a valid HTMLElement' );
-		}
-	}
-
-	constructor ( /** @type {String} */ settingsElementId = 'style-switch-settings' )
-	{
-
-		/**
-		 * @property {HTMLElement|null} rootElement
-		 * @name StyleSwitch#rootElement
-		 * @default null
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'rootElement', {
-			get: this.getRootElement,
-			set: this.setRootElement,
-			configurable: false,
-			enumerable: true,
-		} );
-
-		/**
-		 * @property {Object} settings
-		 * @name StyleSwitch#settings
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'settings', {
-			get: this.getSettings,
-			set: this.setSettings,
-			configurable: true,
-			enumerable: true,
-		} );
-
-		Object.defineProperty( StyleSwitch.prototype, 'getDefaultSettings', {
-			value: () => { return this.#settings },
-			configurable: true,
-			enumerable: true,
-		} );
-
-		/** @type {URLSearchParams} */
-		const searchParams = new URL( import.meta.url ).searchParams;
-
-		if ( searchParams.has( StyleSwitch.SETTINGS_URL_PARAMETER ) ) {
-			const jsonInString = /** @type {String} */ ( searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER ) );
-			this.settings = JSON.parse( jsonInString );
-		}
-
-		/** @type {HTMLElement | null} */
-		const settingsElement = document.getElementById( settingsElementId );
-
-		if ( settingsElement && settingsElement instanceof HTMLScriptElement ) {
-			const jsonInElement = /** @type {HTMLScriptElement} */ ( settingsElement );
-			this.settings = JSON.parse( jsonInElement.text );
 		}
 	}
 
@@ -238,80 +187,6 @@ const StyleSwitchInternal = class
 			path: cookieSettings.path,
 			sameSite: cookieSettings.sameSite,
 		} );
-	}
-
-	/** @returns {{caption: String, title: String}} */
-	getCaptionAndTitleForSwitch ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
-	{
-
-		/** @type {Array.<String>} */
-		const caption = [];
-
-		/** @type {Array.<String>} */
-		const title = [];
-
-		/** @type {String} */
-		const divider = this.settings.texts.switch.versusDividerForRadio;
-
-		loopThroughStyleSheetsWithRoles:
-		interestStyleSheets.forEach( ( { /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role, /** @type {HTMLLinkElement|null} */ reference } ) =>
-		{
-			title.push( role );
-			if ( reference ) {
-
-				/** @type {String|null} */
-				const possibleDataTitle = reference.getAttribute( 'data-title' );
-
-				if ( reference.title ) {
-					caption.push( reference.title );
-				} else if ( possibleDataTitle ) {
-					caption.push( possibleDataTitle );
-				}
-			} else { // not reference element means naked style
-				caption.push( this.settings.texts.nakedStyleCaption );
-			}
-		} );
-		if ( this.settings.texts.switch.caption ) {
-			caption.length = 0;
-			caption.push( this.settings.texts.switch.caption );
-		}
-		if ( this.settings.texts.switch.title ) {
-			caption.length = 0;
-			caption.push( this.settings.texts.switch.title );
-		} else if ( this.settings.texts.caption ) {
-			caption.length = 0;
-			caption.push( this.settings.texts.caption );
-		}
-		return { caption: caption.join( divider ), title: title.join( divider ) };
-	}
-
-	/** @returns {String} */
-	getCaptionForStyleSheet ( /** @type {HTMLLinkElement|null} */ possibleLinkElement )
-	{
-		if ( !possibleLinkElement ) {
-			return this.settings.texts.nakedStyleCaption;
-		}
-		const linkElement = /** @type {HTMLLinkElement} */ ( possibleLinkElement );
-		if ( linkElement.title && linkElement.title !== '' ) {
-			return linkElement.title;
-		}
-
-		/** @type {String|null} */
-		const possibleDataTitle = linkElement.getAttribute( 'data-title' );
-
-		if ( possibleDataTitle ) {
-			return possibleDataTitle;
-		}
-		return '';
-	}
-
-	/** @returns { 'preferred' | 'alternate' | 'alternate (clone of persistent)' | '' } */
-	getTitleForStyleSheet ( /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role )
-	{
-		if ( this.settings.resultSnippetAppearance.select.useRoleAsOptionTitle ) {
-			return role;
-		}
-		return '';
 	}
 
 	/** @returns {void} */
@@ -579,13 +454,138 @@ const StyleSwitchInternal = class
 			StyleSwitch.setDefaultOnResultElement( outputFormat, rootElement, interestStyleSheets );
 		}
 	}
+
+	constructor ( /** @type {String} */ settingsElementId = 'style-switch-settings' )
+	{
+
+		/**
+		 * @property {HTMLElement|null} rootElement
+		 * @name StyleSwitch#rootElement
+		 * @default null
+		 * @readonly
+		 */
+		Object.defineProperty( this, 'rootElement', {
+			get: this.getRootElement,
+			set: this.setRootElement,
+			configurable: false,
+			enumerable: true,
+		} );
+
+		/**
+		 * @property {Object} settings
+		 * @name StyleSwitch#settings
+		 * @readonly
+		 */
+		Object.defineProperty( this, 'settings', {
+			get: this.getSettings,
+			set: this.setSettings,
+			configurable: true,
+			enumerable: true,
+		} );
+
+		Object.defineProperty( StyleSwitch.prototype, 'getDefaultSettings', {
+			value: () => { return this.#settings },
+			configurable: true,
+			enumerable: true,
+		} );
+
+		/** @type {URLSearchParams} */
+		const searchParams = new URL( import.meta.url ).searchParams;
+
+		if ( searchParams.has( StyleSwitch.SETTINGS_URL_PARAMETER ) ) {
+			const jsonInString = /** @type {String} */ ( searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER ) );
+			this.settings = JSON.parse( jsonInString );
+		}
+
+		/** @type {HTMLElement | null} */
+		const settingsElement = document.getElementById( settingsElementId );
+
+		if ( settingsElement && settingsElement instanceof HTMLScriptElement ) {
+			const jsonInElement = /** @type {HTMLScriptElement} */ ( settingsElement );
+			this.settings = JSON.parse( jsonInElement.text );
+		}
+	}
+
+	/** @returns {{caption: String, title: String}} */
+	getCaptionAndTitleForSwitch ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
+	{
+
+		/** @type {Array.<String>} */
+		const caption = [];
+
+		/** @type {Array.<String>} */
+		const title = [];
+
+		/** @type {String} */
+		const divider = this.settings.texts.switch.versusDividerForRadio;
+
+		loopThroughStyleSheetsWithRoles:
+		interestStyleSheets.forEach( ( { /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role, /** @type {HTMLLinkElement|null} */ reference } ) =>
+		{
+			title.push( role );
+			if ( reference ) {
+
+				/** @type {String|null} */
+				const possibleDataTitle = reference.getAttribute( 'data-title' );
+
+				if ( reference.title ) {
+					caption.push( reference.title );
+				} else if ( possibleDataTitle ) {
+					caption.push( possibleDataTitle );
+				}
+			} else { // not reference element means naked style
+				caption.push( this.settings.texts.nakedStyleCaption );
+			}
+		} );
+		if ( this.settings.texts.switch.caption ) {
+			caption.length = 0;
+			caption.push( this.settings.texts.switch.caption );
+		}
+		if ( this.settings.texts.switch.title ) {
+			caption.length = 0;
+			caption.push( this.settings.texts.switch.title );
+		} else if ( this.settings.texts.caption ) {
+			caption.length = 0;
+			caption.push( this.settings.texts.caption );
+		}
+		return { caption: caption.join( divider ), title: title.join( divider ) };
+	}
+
+	/** @returns {String} */
+	getCaptionForStyleSheet ( /** @type {HTMLLinkElement|null} */ possibleLinkElement )
+	{
+		if ( !possibleLinkElement ) {
+			return this.settings.texts.nakedStyleCaption;
+		}
+		const linkElement = /** @type {HTMLLinkElement} */ ( possibleLinkElement );
+		if ( linkElement.title && linkElement.title !== '' ) {
+			return linkElement.title;
+		}
+
+		/** @type {String|null} */
+		const possibleDataTitle = linkElement.getAttribute( 'data-title' );
+
+		if ( possibleDataTitle ) {
+			return possibleDataTitle;
+		}
+		return '';
+	}
+
+	/** @returns { 'preferred' | 'alternate' | 'alternate (clone of persistent)' | '' } */
+	getTitleForStyleSheet ( /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role )
+	{
+		if ( this.settings.resultSnippetAppearance.select.useRoleAsOptionTitle ) {
+			return role;
+		}
+		return '';
+	}
 }
 
 /**
  * @class
  * @description public exportable part
  * @extends StyleSwitchInternal
- * @version 1.0
+ * @version 1.1
  * @author ic<ic.czech+style-switch@gmail.com>
  * @see {@link https://github.com/iiic/StyleSwitch|GitHub}
  * @see {@link https://iiic.dev/style-switch#github|homepage}
@@ -593,6 +593,40 @@ const StyleSwitchInternal = class
  */
 class StyleSwitch extends StyleSwitchInternal
 {
+
+	static get PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR ()
+	{
+		return {
+			NEVER: 'never',
+			ALWAYS: 'always',
+			ONLY_WITHOUT_COOKIE: 'onlyWithoutCookie',
+		};
+	}
+
+	static get OUTPUT_FORMATS ()
+	{
+		return {
+			SWITCH: 'switch',
+			SELECT: 'select',
+			RADIOS: 'radioList',
+		};
+	}
+
+	static get ROLE ()
+	{
+		return {
+			PERSISTENT: 'persistent',
+			PREFERRED: 'preferred',
+			ALTERNATE: 'alternate',
+			ALTERNATE_CLONE: 'alternate (clone of persistent)',
+		};
+	}
+
+	static get SETTINGS_URL_PARAMETER ()
+	{
+		return 'settings';
+	}
+
 	constructor ( /** @type {String} */ settingsElementId = 'style-switch-settings' )
 	{
 		super( ...arguments );
@@ -1114,114 +1148,75 @@ class StyleSwitch extends StyleSwitchInternal
 	}
 };
 
-Object.defineProperty( StyleSwitch, 'ROLE', {
-	value: {
-		PERSISTENT: 'persistent',
-		PREFERRED: 'preferred',
-		ALTERNATE: 'alternate',
-		ALTERNATE_CLONE: 'alternate (clone of persistent)',
-	},
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
-Object.defineProperty( StyleSwitch, 'SETTINGS_URL_PARAMETER', {
-	value: 'settings',
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
-Object.defineProperty( StyleSwitch, 'OUTPUT_FORMATS', {
-	value: {
-		SWITCH: 'switch',
-		SELECT: 'select',
-		RADIOS: 'radioList',
-	},
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
-Object.defineProperty( StyleSwitch, 'PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR', {
-	value: {
-		NEVER: 'never',
-		ALWAYS: 'always',
-		ONLY_WITHOUT_COOKIE: 'onlyWithoutCookie',
-	},
-	configurable: false,
-	enumerable: true,
-	writable: false,
-} );
-
 Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
-	value: {
-		styleLinksQSA: 'link[rel~=stylesheet]', // match rel="stylesheet" and also rel="alternate stylesheet"
-		rootElementQS: '#style-switch',
-		cookie: {
-			name: 'stylesheets',
-			timeBeforeExpire: 365 * 24 * 60 * 60 * 1000, // year
-			partitioned: true,
-			path: '/',
-			sameSite: 'strict', // CookieSameSite (means one of 'strict' | 'lax' | 'none')
-		},
-		texts: {
-			caption: 'Style switch',
-			nakedStyleCaption: 'Without style (naked HTML)',
-			switch: {
-				caption: '',
-				title: '',
-				versusDividerForRadio: ' / ',
-				stateOnCaption: 'on',
-				stateOffCaption: 'off',
+	get: function ()
+	{
+		return {
+			styleLinksQSA: 'link[rel~=stylesheet]', // match rel="stylesheet" and also rel="alternate stylesheet"
+			rootElementQS: '#style-switch',
+			cookie: {
+				name: 'stylesheets',
+				timeBeforeExpire: 365 * 24 * 60 * 60 * 1000, // year
+				partitioned: true,
+				path: '/',
+				sameSite: 'strict', // CookieSameSite (means one of 'strict' | 'lax' | 'none')
 			},
-			select: {
-				caption: '',
-				optGroupLabelForStyles: '',
-				otpGroupLabelForNaked: '',
+			texts: {
+				caption: 'Style switch',
+				nakedStyleCaption: 'Without style (naked HTML)',
+				switch: {
+					caption: '',
+					title: '',
+					versusDividerForRadio: ' / ',
+					stateOnCaption: 'on',
+					stateOffCaption: 'off',
+				},
+				select: {
+					caption: '',
+					optGroupLabelForStyles: '',
+					otpGroupLabelForNaked: '',
+				},
+				radioList: {
+					caption: '',
+				}
 			},
-			radioList: {
-				caption: '',
-			}
-		},
-		nakedStyle: {
-			use: false,
-			celebrateNakedDay: {
-				switchAutomatically: false, // if true naked style is set and unset automatically at event
-				monthNumber: 3, // month numbers starts with 0, so April is number 3
-				dayNumber: 9
-			}
-		},
-		resultSnippetAppearance: {
-			idPrefix: 'style-switch-result-', // will be appended by random string
-			defaultResultSnippetElement: 'div',
-			outputFormat: StyleSwitch.OUTPUT_FORMATS.SELECT,
-			preferredColorSchemeChangeBehavior: StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.ONLY_WITHOUT_COOKIE,
-			reverseOrder: false, // order of style sheets, should be reversed?
-			switch: {
-				useSwitchIfPossible: false, // if there are only 2 possible css styleSheets create input type=checkbox styled as switch
-				useRolesAsTitle: true,
-				labelClassName: 'switch',
-				captionElementName: 'strong', // only line elements supported, no block elements here
-				visualSwitchClassName: 'visual',
-				stateClassName: 'state',
-				statusElementName: 'small', // only line elements supported, no block elements here
+			nakedStyle: {
+				use: false,
+				celebrateNakedDay: {
+					switchAutomatically: false, // if true naked style is set and unset automatically at event
+					monthNumber: 3, // month numbers starts with 0, so April is number 3
+					dayNumber: 9
+				}
 			},
-			select: {
-				useRoleAsOptionTitle: true,
-				captionElementName: 'strong',
+			resultSnippetAppearance: {
+				idPrefix: 'style-switch-result-', // will be appended by random string
+				defaultResultSnippetElement: 'div',
+				outputFormat: StyleSwitch.OUTPUT_FORMATS.SELECT,
+				preferredColorSchemeChangeBehavior: StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.ONLY_WITHOUT_COOKIE,
+				reverseOrder: false, // order of style sheets, should be reversed?
+				switch: {
+					useSwitchIfPossible: false, // if there are only 2 possible css styleSheets create input type=checkbox styled as switch
+					useRolesAsTitle: true,
+					labelClassName: 'switch',
+					captionElementName: 'strong', // only line elements supported, no block elements here
+					visualSwitchClassName: 'visual',
+					stateClassName: 'state',
+					statusElementName: 'small', // only line elements supported, no block elements here
+				},
+				select: {
+					useRoleAsOptionTitle: true,
+					captionElementName: 'strong',
+				},
+				radioList: {
+					captionElementName: 'h3',
+					useRoleAsItemTitle: true,
+				},
 			},
-			radioList: {
-				captionElementName: 'h3',
-				useRoleAsItemTitle: true,
-			},
-		},
-		autoRun: true,
+			autoRun: true,
+		};
 	},
 	configurable: false,
 	enumerable: true,
-	writable: false,
 } );
 
 /** @type {StyleSwitch.prototype} */

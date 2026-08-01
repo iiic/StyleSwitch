@@ -9,7 +9,7 @@ Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dě
 Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:
 
 ```html
-<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 
 To už stačí pro základní funkčnost:
@@ -114,7 +114,7 @@ Script schopný:
 
 Minimální funkční použití:
 ```html
-<script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 … a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.
 
@@ -182,7 +182,7 @@ příklad:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.0" type="module" crossorigin="anonymous" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script>
+<script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
 ```
 (V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z `StyleSwitch.DEFAULT_SETTINGS`)
 
@@ -195,7 +195,7 @@ Důležitá je návratová hodnota v proměnné `result`. V této proměnné je 
 příklad:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -286,7 +286,7 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,

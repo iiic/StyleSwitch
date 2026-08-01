@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Dialogic html example</title>
+	<title>StyleSwitch html example</title>
 	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 	<script>
 		/**
@@ -25,7 +25,7 @@
 	</script>
 	<link rel="modulepreload" as="script" href="./modules/importWithIntegrity.mjs" integrity="sha256-cfOxrPKw+HRch/o1HAGTjzeo5g+8Ho2VW5Ki75Y6DII=" crossorigin="anonymous">
 	<link rel="icon" type="image/x-icon" href="./favicon.ico">
-	<script src="./content-type-checker.js?v=0.1" type="module" crossorigin="anonymous" integrity="sha256-UpcxLfSO8BVMfKJpgWrvm14VatierAsXgW6FiYBslQQ="></script>
+	<script src="./content-type-checker.js?v=0.1" type="module" crossorigin="anonymous" integrity="sha256-A34iibpo+7LaVdaxO1fj+N6DQGYQSjwmREDnt8Q6oms="></script>
 	<link rel="stylesheet" href="./example-css/switch.css" crossorigin="anonymous"><!-- (persistent) example style for snippet element Switch -->
 	<link rel="stylesheet" href="./example-css/light.css" fetchpriority="high" crossorigin="anonymous"><!-- persistent -->
 	<link rel="stylesheet" href="./example-css/dark.css" title="Dark style" media="(prefers-color-scheme: dark)" crossorigin="anonymous"><!-- preferred -->
@@ -43,13 +43,13 @@
 		}
 	}
 	</script> -->
-	<!-- <script src="./style-switch.mjs?v=1.0" type="module" crossorigin="anonymous" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="></script><!-- default usage, with default settings -->
+	<!-- <script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script><!-- default usage, with default settings -->
 
 	<script type="module">
 
 		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter */
 
-		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 			nakedStyle: {
 				use: true,
 			},
@@ -79,7 +79,7 @@
 
 		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter, but without 'autorun' and with custom build of script */
 
-		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.0&settings=' + JSON.stringify( {
+		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
 			autoRun: false,
 			nakedStyle: {
 				use: true,
@@ -192,7 +192,7 @@
 				<p>The script supports many types of configuration and customization to meet a wide range of requirements. If you do not need customization, the basic script only requires inserting one line of JavaScript into the document:</p>
 				<pre>
 					<code>
-&lt;script src="./style-switch.mjs?v=1.0" type="module" integrity="sha256-n06EtXgbhG4A71ozlM7XoNLcHk08TfttEMDpmLjiEM8="&gt;&lt;/script&gt;
+&lt;script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="&gt;&lt;/script&gt;
 					</code>
 				</pre>
 			</details>
