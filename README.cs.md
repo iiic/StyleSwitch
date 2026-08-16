@@ -9,7 +9,7 @@ Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dě
 Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:
 
 ```html
-<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 
 To už stačí pro základní funkčnost:
@@ -114,7 +114,7 @@ Script schopný:
 
 Minimální funkční použití:
 ```html
-<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 … a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.
 
@@ -182,7 +182,7 @@ příklad:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" crossorigin="anonymous" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 (V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z `StyleSwitch.DEFAULT_SETTINGS`)
 
@@ -195,7 +195,7 @@ Důležitá je návratová hodnota v proměnné `result`. V této proměnné je 
 příklad:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -204,14 +204,11 @@ příklad:
 		},
 		resultSnippetAppearance: {
 			outputFormat: 'select',
-			reverseOrder: true,
-			switch: {
-				useSwitchIfPossible: true,
-			}
+			reverseOrder: true
 		}
 	} ) );
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 	if ( customStyleSwitchElement && result && result instanceof HTMLElement )
@@ -260,7 +257,6 @@ Možnost 1 je o něco málo méně náročná na systémové prostředky, ale ro
   - `onlyWithoutCookie` (výchozí nastavení) při změně barevného schématu OS dojde ke změně stylu stránky **pouze pokud** uživatel zatím **ne**zvolil jaký barevný styl stránky chce používat.
 - (`bool`) `reverseOrder` nalezené styly z hlavičky dokumentu vypsat v opačném pořadí ?
 - (`object`) `switch` Veškerá nastavení widgetu 'switch'
-  - (`bool`) `useSwitchIfPossible` použít switch? Je možné **pouze**, pokud existují přesně 2 možné styly vzhledu stránky (pokud použijete naked style, je počítán také jako jeden ze stylů).
   - (`bool`) `useRolesAsTitle` Použít jako `atribut` "title" elementu přepínače detekovanou roli css stylu?
   - (`string`) `labelClassName` Jméno `atribut`u class u obalového elementu výsledného widgetu.
   - (`string`) `captionElementName` Jméno `element`u pro nadpis výsledného switch widgetu. Podporovány jsou pouze řádkové elementy, **ne** blokové!
@@ -286,7 +282,7 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
@@ -308,10 +304,10 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 	s.cancelNakedDay( byNakedDay );
 	s.createSelect( interestStyleSheets, currentlyActivatedPath );
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customResult = s.rootElement;
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 	if ( customStyleSwitchElement && customResult && customResult instanceof HTMLElement )

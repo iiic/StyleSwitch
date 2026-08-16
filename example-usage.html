@@ -43,13 +43,13 @@
 		}
 	}
 	</script> -->
-	<!-- <script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script><!-- default usage, with default settings -->
+	<!-- <script src="./style-switch.mjs?v=1.2" type="module" crossorigin="anonymous" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script><!-- default usage, with default settings -->
 
 	<script type="module">
 
 		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter */
 
-		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 			nakedStyle: {
 				use: true,
 			},
@@ -59,13 +59,12 @@
 			resultSnippetAppearance: {
 				outputFormat: 'select',
 				reverseOrder: true,
-				switch: {
-					useSwitchIfPossible: true,
-				}
 			}
 		} ) );
 
-		/** @type {HTMLElement|null} */
+		window.StyleSwitch = StyleSwitch;
+
+		/** @type {?HTMLElement} */
 		const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 		if ( customStyleSwitchElement && result && result instanceof HTMLElement )
@@ -79,7 +78,7 @@
 
 		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter, but without 'autorun' and with custom build of script */
 
-		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+		const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 			autoRun: false,
 			nakedStyle: {
 				use: true,
@@ -101,10 +100,10 @@
 		s.cancelNakedDay( byNakedDay );
 		s.createSelect( interestStyleSheets, currentlyActivatedPath );
 
-		/** @type {HTMLElement|null} */
+		/** @type {?HTMLElement} */
 		const customResult = s.rootElement;
 
-		/** @type {HTMLElement|null} */
+		/** @type {?HTMLElement} */
 		const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 		if ( customStyleSwitchElement && customResult && customResult instanceof HTMLElement )
@@ -192,7 +191,7 @@
 				<p>The script supports many types of configuration and customization to meet a wide range of requirements. If you do not need customization, the basic script only requires inserting one line of JavaScript into the document:</p>
 				<pre>
 					<code>
-&lt;script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="&gt;&lt;/script&gt;
+&lt;script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="&gt;&lt;/script&gt;
 					</code>
 				</pre>
 			</details>
@@ -268,7 +267,6 @@
 					<li>(<code>bool</code>) <code>reverseOrder</code> list found styles from the document head in reverse order?</li>
 					<li>(<code>object</code>) <code>switch</code> All settings for the 'switch' widget
 						<ul>
-							<li>(<code>bool</code>) <code>useSwitchIfPossible</code> use the switch? This is only possible if there are exactly 2 available page styles (if you include naked style, it counts as one of the styles).</li>
 							<li>(<code>bool</code>) <code>useRolesAsTitle</code> Use the detected CSS style role as the <code>title</code> attribute for the switch element?</li>
 							<li>(<code>string</code>) <code>labelClassName</code> class attribute name for the wrapper element of the resulting widget.</li>
 							<li>(<code>string</code>) <code>captionElementName</code> element name for the switch widget caption. Only inline elements are supported, not block elements!</li>

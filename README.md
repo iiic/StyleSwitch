@@ -9,7 +9,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 
 This already does the core work:
@@ -115,7 +115,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.1" type="module" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 ... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.
 
@@ -182,7 +182,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.1" type="module" crossorigin="anonymous" integrity="sha256-+KdQ4GwQS2cVE6xUp5/sSPhjS8pY2nzp4jr8Gunr75o="></script>
+<script src="./style-switch.mjs?v=1.2" type="module" crossorigin="anonymous" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -195,7 +195,7 @@ The important return value is stored in the `result` variable. That variable is 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -204,14 +204,11 @@ Example:
 		},
 		resultSnippetAppearance: {
 			outputFormat: 'select',
-			reverseOrder: true,
-			switch: {
-				useSwitchIfPossible: true,
-			}
+			reverseOrder: true
 		}
 	} ) );
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 	if ( customStyleSwitchElement && result && result instanceof HTMLElement )
@@ -260,7 +257,6 @@ Option 1 is slightly less resource-intensive, but the difference is minimal. The
   - `onlyWithoutCookie` (default) when the OS color scheme changes, the page style changes **only if** the user has not yet chosen which page color style to use.
 - (`bool`) `reverseOrder` output the styles found in the document head in reverse order?
 - (`object`) `switch` all settings for the 'switch' widget
-  - (`bool`) `useSwitchIfPossible` use a switch? This is possible **only** if there are exactly two possible page styles (if you use naked style, it is counted as one of the styles).
   - (`bool`) `useRolesAsTitle` use the detected style role as the `title` attribute of the switch control?
   - (`string`) `labelClassName` class name attribute for the wrapper element of the resulting widget.
   - (`string`) `captionElementName` element name for the title of the resulting switch widget. Only inline elements are supported, **not** block elements!
@@ -286,7 +282,7 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.1&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
@@ -308,10 +304,10 @@ If you want to make more extensive modifications to the class, it is possible us
 	s.cancelNakedDay( byNakedDay );
 	s.createSelect( interestStyleSheets, currentlyActivatedPath );
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customResult = s.rootElement;
 
-	/** @type {HTMLElement|null} */
+	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
 
 	if ( customStyleSwitchElement && customResult && customResult instanceof HTMLElement )

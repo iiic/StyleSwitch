@@ -4,110 +4,96 @@
 
 /**
  * @class
- * @description internal class, not accessible from outside the script
+ * @file style-switch.mjs
+ * @implements {Classes.StyleSwitchInternal}
  */
 class StyleSwitchInternal
 {
 
-	/**
-	 * @type {Object}
-	 */
+	/** @type {Types.Settings} */
 	#settings = StyleSwitch.DEFAULT_SETTINGS;
 
-	/**
-	 * @returns {Object}
-	 */
-	getSettings ()
+	/** @type {Classes.StyleSwitchInternal['settings']} */
+	get settings ()
 	{
 		return this.#settings;
 	}
-	setSettings ( /** @type {Object} */ newSettings )
+	set settings ( /** @type {Partial<Types.Settings>} */ newSettings )
 	{
-		this.#settings = StyleSwitchInternal.#deepAssign( this.#settings, newSettings );
+		this.#settings = /** @type {Types.Settings} */ ( StyleSwitchInternal.#deepAssign( this.#settings, newSettings ) );
 	}
 
-	/**
-	 * @type {HTMLElement|null}
-	 */
-	#rootElement = null;
+	/** @type {HTMLElement} */
+	#rootElement = HTMLElement.prototype;
 
-	/**
-	 * @returns {HTMLElement|null}
-	 */
-	getRootElement ()
+	/** @type {Classes.StyleSwitchInternal['rootElement']} */
+	get rootElement ()
 	{
 		return this.#rootElement;
 	}
-	setRootElement ( /** @type {HTMLElement} */ rootElement )
+	/** @type {Classes.StyleSwitchInternal['rootElement']} */
+	set rootElement ( /** @type {HTMLElement} */ rootElement )
 	{
-		if ( rootElement && 'nodeType' in rootElement && rootElement.nodeType === Node.ELEMENT_NODE ) {
+		if ( rootElement && rootElement instanceof HTMLElement ) {
 			this.#rootElement = rootElement;
 		} else {
 			throw new Error( 'Not a valid HTMLElement' );
 		}
 	}
 
+	/**
+	 * @template T
+	 * @param {...T} customArgs
+	 * @returns {T}
+	 */
 	static #deepAssign ( /** @type {Array.<any>} */ ...customArgs )
 	{
 
-		/** @type {Object<string, any>} */
-		let currentLevel = {};
+		/** @type {T & Object<string, any>} */
+		let currentLevel = /** @type {T & Object<string, any>} */ ( {} );
 
 		loopThroughAllCustomArgs:
 		customArgs.forEach( ( /** @type {Object} */ source ) =>
 		{
 			if ( source instanceof Array ) {
-				currentLevel = source;
+				currentLevel = /** @type {T & Object<string, any>} */ ( source );
 			} else if ( source !== null ) {
 				loopThroughKeyValPairsObject:
-				Object.entries( source ).forEach( ( [ /** @type {String} */ key, /** @type {any} */ value ] ) =>
+				Object.entries( source ).forEach( ( [ key, value ] ) =>
 				{
 					if ( value instanceof Object && key in currentLevel ) {
 						value = StyleSwitchInternal.#deepAssign( currentLevel[ key ], value );
 					}
-					currentLevel = { ...currentLevel, [ key ]: value };
+					currentLevel = /** @type {T & Object<string, any>} */ ( { ...currentLevel, [ key ]: value } );
 				} );
 			}
 		} );
 
-		return currentLevel;
+		return /** @type {T} */ ( currentLevel );
 	}
 
-	/** @returns { 'persistent' | 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */
-	static getRoleFrom ( /** @type {HTMLLinkElement} */ styleLink )
+	/** @type {Classes.StyleSwitchInternal.getRoleFrom} */
+	static getRoleFrom ( styleLink )
 	{
-
-		/** @type {Array.<String>} */
 		const rel = styleLink.rel.split( ' ' );
-
-		/** @type {Boolean} */
 		const hasAlternate = rel.includes( StyleSwitch.ROLE.ALTERNATE ) || styleLink.hasAttribute( 'data-' + StyleSwitch.ROLE.ALTERNATE );
-
-		/** @type {Boolean} */
 		const hasTitle = ( ( 'title' in styleLink ) && styleLink.title !== '' ) || ( styleLink.hasAttribute( 'data-title' ) && styleLink.getAttribute( 'data-title' ) !== '' );
 
 		if ( hasAlternate && hasTitle ) {
-
-			/** @type {HTMLLinkElement|null} */
 			const possibleCloneOfPersistent = document.querySelector( `link[rel=stylesheet][href*="${ StyleSwitch.getOriginalHrefAttribute( styleLink ) }"]:not([title])` );
-
-			return possibleCloneOfPersistent ? /** @type { 'alternate (clone of persistent)'} */ ( StyleSwitch.ROLE.ALTERNATE_CLONE ) : /** @type { 'alternate' } */ ( StyleSwitch.ROLE.ALTERNATE );
+			return possibleCloneOfPersistent ? StyleSwitch.ROLE.ALTERNATE_CLONE : StyleSwitch.ROLE.ALTERNATE;
 		} else if ( !hasAlternate && hasTitle ) {
-			return /** @type { 'preferred' } */ ( StyleSwitch.ROLE.PREFERRED );
+			return StyleSwitch.ROLE.PREFERRED;
 		}
-		return /** @type { 'persistent' } */ ( StyleSwitch.ROLE.PERSISTENT );
+		return StyleSwitch.ROLE.PERSISTENT;
 	}
 
-	/** @returns {String} */
-	static getOriginalHrefAttribute ( /** @type { HTMLLinkElement | HTMLOptionElement | HTMLInputElement | null } */ possibleElement )
+	/** @type {Classes.StyleSwitchInternal.getOriginalHrefAttribute} */
+	static getOriginalHrefAttribute ( possibleElement )
 	{
 		if ( possibleElement ) {
 			if ( possibleElement instanceof HTMLLinkElement ) {
-
-				/** @type {NamedNodeMap} */
 				const attributes = possibleElement.attributes;
-
-				/** @type {Attr|null} */
 				const possibleHref = attributes.getNamedItem( 'href' );
 
 				if ( possibleHref ) {
@@ -120,53 +106,46 @@ class StyleSwitchInternal
 		return '';
 	}
 
-	/** @returns {String|null} */
-	static getSelectedPath (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {Event} */ transferredEvent
-	)
+	/** @type {Classes.StyleSwitchInternal.getSelectedPath} */
+	static getSelectedPath ( interestStyleSheets, transferredEvent )
 	{
+		const eventTarget = /** @type {Types.PossibleOutputElement} */ ( transferredEvent.target );
 
-		if ( !( transferredEvent.target && 'value' in transferredEvent.target ) ) {
+		if ( !eventTarget ) {
 			return null;
 		}
 
-		if ( 'type' in transferredEvent.target && transferredEvent.target.type === 'checkbox' && interestStyleSheets.length === 2 ) {
-			if ( 'checked' in transferredEvent.target && transferredEvent.target.checked ) {
+		if ( 'type' in eventTarget && eventTarget.type === 'checkbox' && interestStyleSheets.length === 2 ) {
+			if ( eventTarget.checked ) {
 				return StyleSwitch.getOriginalHrefAttribute( interestStyleSheets[ 1 ].reference );
 			} else {
 				return StyleSwitch.getOriginalHrefAttribute( interestStyleSheets[ 0 ].reference );
 			}
 		} else { // select or radioList
-			return /** @type {String} */ ( transferredEvent.target.value );
+			return eventTarget.value;
 		}
 	}
 
-	static async switchStyleEvent (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {{name: string, timeBeforeExpire: number, partitioned: boolean, path: string, sameSite: CookieSameSite }} */ cookieSettings,
-		/** @type {Event} */ event
-	)
+	/** @type {Classes.StyleSwitchInternal.switchStyleEvent} */
+	static async switchStyleEvent ( interestStyleSheets, cookieSettings, event )
 	{
 		if ( !( event.target && 'value' in event.target ) ) {
 			return;
 		}
 
-		/** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */
+		/** @type {Types.ResultCookieObject} */
 		const cookieObject = {};
 
-		/** @type {String|null} */
 		const selectedPath = StyleSwitch.getSelectedPath( interestStyleSheets, event );
 
 		loopThroughLinkElements:
-		interestStyleSheets.forEach( function ( { /** @type {HTMLLinkElement|null} */ reference } )
+		interestStyleSheets.forEach( function ( { reference } )
 		{
-
-			/** @type {String} */
-			const currentPath = StyleSwitch.getOriginalHrefAttribute( reference );
 
 			/** @type {{disabled: boolean, byNakedDay?: boolean}} */
 			const currentObject = {};
+
+			const currentPath = StyleSwitch.getOriginalHrefAttribute( reference );
 
 			currentObject.disabled = selectedPath === currentPath ? false : true;
 			if (
@@ -189,30 +168,18 @@ class StyleSwitchInternal
 		} );
 	}
 
-	/** @returns {void} */
-	static setValueOnResultElementBy (
-		/** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */ cookieObject,
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {HTMLElement} */ rootElement
-	)
+	/** @type {Classes.StyleSwitchInternal.setValueOnResultElementBy} */
+	static setValueOnResultElementBy ( cookieObject, outputFormat, rootElement )
 	{
-
-		/** @type {Array.<String>} */
 		const paths = Object.keys( cookieObject );
-
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
-
-			/** @type {String} */
 			let checkedSideStyleSheet = paths[ 0 ];
-
 			if ( checkedSideStyleSheet ) {
 
-				/** @type {HTMLInputElement|null} */
+				/** @type {?HTMLInputElement} */
 				const possibleCheckboxElement = rootElement.querySelector( 'input[type=checkbox]' );
 
-				/** @type {Boolean} */
 				const isChecked = cookieObject[ checkedSideStyleSheet ].disabled;
-
 				if ( possibleCheckboxElement ) {
 					possibleCheckboxElement.checked = isChecked;
 				}
@@ -220,14 +187,11 @@ class StyleSwitchInternal
 			return;
 		}
 		loopThroughStyleSheetsPaths:
-		for ( const /** @type {String} */ path of paths ) {
-
-			/** @type {Boolean} */
+		for ( const path of paths ) {
 			const isDisabled = cookieObject[ path ].disabled;
-
 			if ( isDisabled === false ) {
 
-				/** @type { HTMLOptionElement | HTMLInputElement | null | undefined } */
+				/** @type { Types.PossibleOutputElement } */
 				const possibleElement = rootElement.querySelector( `[value*="${ path }"]` );
 
 				StyleSwitch.setCurrentSelection( possibleElement );
@@ -235,15 +199,8 @@ class StyleSwitchInternal
 		}
 	}
 
-	/**
-	 * @description: Set input[type=checkbox] checked or not checked by currentlyActivatedPath (if presented) or to default style
-	 * @returns {void}
-	 */
-	static setCurrentChecked (
-		/** @type {HTMLElement} */ rootElement,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {String|null} */ currentlyActivatedPath = null
-	)
+	/** @type {Classes.StyleSwitchInternal.setCurrentChecked} */
+	static setCurrentChecked ( rootElement, interestStyleSheets, currentlyActivatedPath = null )
 	{
 
 		/** @type {HTMLInputElement|null} */
@@ -252,28 +209,23 @@ class StyleSwitchInternal
 		if ( inputCheckboxElement === null ) {
 			return;
 		}
-
 		if ( interestStyleSheets.length === 1 ) { // one stylesheet and naked style
 			if ( interestStyleSheets[ 0 ].reference ) {
 				inputCheckboxElement.checked === true;
 			}
 			return;
 		}
-
-		/** @type {Number} */
 		let positionOfDefaultStyleSheet = 0; // default 0 means input.checked = false
-
 		if ( currentlyActivatedPath === null ) { // use autodetect therefore
 			positionOfDefaultStyleSheet = StyleSwitch.findCurrentSelectionPosition( interestStyleSheets ); // in this case returns 0 or 1 only (because switch = only 2 possible styles)
 		} else {
 			positionOfDefaultStyleSheet = StyleSwitch.findCurrentSelectionByPath( interestStyleSheets, currentlyActivatedPath ); // in this case returns 0 or 1 only (because switch = only 2 possible styles)
 		}
-
 		inputCheckboxElement.checked = positionOfDefaultStyleSheet ? true : false;
 	}
 
-	/** @returns {void} */
-	static setCurrentSelection ( /** @type { HTMLOptionElement | HTMLInputElement | null | undefined } */ possibleElement )
+	/** @type {Classes.StyleSwitchInternal.setCurrentSelection} */
+	static setCurrentSelection ( possibleElement )
 	{
 		if ( possibleElement ) {
 			if ( possibleElement instanceof HTMLOptionElement ) { // StyleSwitch.OUTPUT_FORMATS.SELECT
@@ -284,34 +236,31 @@ class StyleSwitchInternal
 		}
 	}
 
-	/** @returns { HTMLOptionElement | HTMLInputElement | null } */
-	static findDefaultSelection ( /** @type {HTMLElement} */ rootElement )
+	/** @type { Classes.StyleSwitchInternal.findDefaultSelection } */
+	static findDefaultSelection ( rootElement )
 	{
 
-		/** @type { HTMLOptionElement | HTMLInputElement | null } */
+		/** @type { Types.PossibleOutputElement } */
 		let lastMediaPath = null;
 
-		/** @type { HTMLOptionElement | HTMLInputElement | null } */
+		/** @type { Types.PossibleOutputElement } */
 		let lastAlternateCloneOfPersistent = null;
 
 		/** @type { NodeListOf<HTMLOptionElement | HTMLInputElement> } */
 		const allPossibleChoices = rootElement.querySelectorAll( '[value]' );
 
 		loopThroughCreatedFormElements:
-		allPossibleChoices.forEach( ( /** @type { HTMLOptionElement | HTMLInputElement } */ element ) =>
+		allPossibleChoices.forEach( ( element ) =>
 		{
 
-			/** @type { HTMLLinkElement | null } */
+			/** @type { ?HTMLLinkElement } */
 			const possibleLinkElement = document.querySelector( `link[rel~=stylesheet][href*="${ StyleSwitch.getOriginalHrefAttribute( element ) }"][title]` );
 
 			if ( possibleLinkElement ) {
 				if ( possibleLinkElement.media && window.matchMedia( possibleLinkElement.media ).matches ) {
 					lastMediaPath = element;
 				} else {
-
-					/** @type { 'persistent' | 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */
 					const role = StyleSwitch.getRoleFrom( possibleLinkElement );
-
 					if ( role === StyleSwitch.ROLE.ALTERNATE_CLONE ) {
 						lastAlternateCloneOfPersistent = element;
 					}
@@ -322,28 +271,19 @@ class StyleSwitchInternal
 		return lastMediaPath ? lastMediaPath : lastAlternateCloneOfPersistent;
 	}
 
-	/**
-	 * @description Returns number of current StyleSheet position (array begins with 0)
-	 * @returns {Number}
-	 */
-	static findCurrentSelectionPosition ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
+	/** @type {Classes.StyleSwitchInternal.findCurrentSelectionPosition} */
+	static findCurrentSelectionPosition ( interestStyleSheets )
 	{
 
-		/** @type { Number | null } */
+		/** @type { ?Number } */
 		let lastMediaPathPosition = null;
 
-		/** @type { Number } */
 		let lastAlternateCloneOfPersistentPosition = 0;
-
-		/** @type { Number } */
 		const interestStyleSheetsLength = interestStyleSheets.length;
 
 		loopThroughStyleSheetsWithRoles:
 		for ( let i = 0; i < interestStyleSheetsLength; i++ ) {
-
-			/** @type { HTMLLinkElement | null } */
 			const possibleLinkElement = interestStyleSheets[ i ].reference;
-
 			if ( possibleLinkElement ) {
 				if ( possibleLinkElement.media && window.matchMedia( possibleLinkElement.media ).matches ) {
 					lastMediaPathPosition = i;
@@ -356,25 +296,13 @@ class StyleSwitchInternal
 		return lastMediaPathPosition !== null ? lastMediaPathPosition : lastAlternateCloneOfPersistentPosition;
 	}
 
-	/**
-	 * @description Returns number of StyleSheet position by assigned path (array begins with 0)
-	 * @returns {Number}
-	 */
-	static findCurrentSelectionByPath (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {String|null} */ currentlyActivatedPath
-	)
+	/** @type {Classes.StyleSwitchInternal.findCurrentSelectionByPath} */
+	static findCurrentSelectionByPath ( interestStyleSheets, currentlyActivatedPath )
 	{
-
-		/** @type { Number } */
 		const interestStyleSheetsLength = interestStyleSheets.length;
-
 		loopThroughStyleSheetsWithRoles:
 		for ( let i = 0; i < interestStyleSheetsLength; i++ ) {
-
-			/** @type {String} */
 			const currentValue = StyleSwitch.getOriginalHrefAttribute( interestStyleSheets[ i ].reference );
-
 			if ( currentValue === currentlyActivatedPath ) {
 				return i;
 			}
@@ -382,63 +310,40 @@ class StyleSwitchInternal
 		return 0;
 	}
 
-	/** @returns {void} */
-	static setDefaultOnResultElement (
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {HTMLElement} */ rootElement,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets
-	)
+	/** @type {Classes.StyleSwitchInternal.setDefaultOnResultElement} */
+	static setDefaultOnResultElement ( outputFormat, rootElement, interestStyleSheets )
 	{
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
-			StyleSwitch.setCurrentChecked( rootElement, interestStyleSheets );
+			StyleSwitch.setCurrentChecked( rootElement, interestStyleSheets, null );
 		} else { // StyleSwitch.OUTPUT_FORMATS.SELECT and StyleSwitch.OUTPUT_FORMATS.RADIOS
-
-			/** @type { HTMLOptionElement | HTMLInputElement | null } */
 			const defaultSelectionElement = StyleSwitch.findDefaultSelection( rootElement );
-
 			StyleSwitch.setCurrentSelection( defaultSelectionElement );
 		}
 	}
 
-	/** @returns {void} */
-	static preferredColorSchemeChangeListener (
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {String} */ cookieName,
-		/** @type {HTMLElement} */ rootElement,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets
-		/** @type {MediaQueryListEvent} event */
-	)
+	/** @type {Classes.StyleSwitchInternal.preferredColorSchemeChangeListener} */
+	static preferredColorSchemeChangeListener ( outputFormat, cookieName, rootElement, interestStyleSheets, /* event */ )
 	{
 		cookieStore.delete( {
 			name: cookieName,
 		} );
 
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
-			StyleSwitch.setCurrentChecked( rootElement, interestStyleSheets );
+			StyleSwitch.setCurrentChecked( rootElement, interestStyleSheets, null );
 		} else { // StyleSwitch.OUTPUT_FORMATS.SELECT and StyleSwitch.OUTPUT_FORMATS.RADIOS
-
-			/** @type { HTMLOptionElement | HTMLInputElement | null } */
 			const defaultSelectionElement = StyleSwitch.findDefaultSelection( rootElement );
-
 			StyleSwitch.setCurrentSelection( defaultSelectionElement );
 		}
 	}
 
-	static cookieChangeListener (
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {String} */ cookieName,
-		/** @type {HTMLElement} */ rootElement,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {CookieChangeEvent} */ event
-	)
+	/** @type {Classes.StyleSwitchInternal.cookieChangeListener} */
+	static cookieChangeListener ( outputFormat, cookieName, rootElement, interestStyleSheets, event )
 	{
-
-		/** @type {CookieListItem|undefined} */
-		const possibleChangedCookie = event.changed.find( cookie => cookie.name === cookieName );
 
 		/** @type {CookieListItem|true|undefined} */
 		let possibleDeletedCookie = event.deleted.find( cookie => cookie.name === cookieName );
 
+		const possibleChangedCookie = event.changed.find( cookie => cookie.name === cookieName );
 		if ( possibleChangedCookie ) {
 			if ( possibleChangedCookie.value === '' ) { // empty value means same behavior like deleted cookie
 				possibleDeletedCookie = true;
@@ -455,59 +360,30 @@ class StyleSwitchInternal
 		}
 	}
 
-	constructor ( /** @type {String} */ settingsElementId = 'style-switch-settings' )
+	/** @type {Classes.StyleSwitchInternal['constructor']} */
+	constructor ( settingsElementId = 'style-switch-settings' )
 	{
-
-		/**
-		 * @property {HTMLElement|null} rootElement
-		 * @name StyleSwitch#rootElement
-		 * @default null
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'rootElement', {
-			get: this.getRootElement,
-			set: this.setRootElement,
-			configurable: false,
-			enumerable: true,
-		} );
-
-		/**
-		 * @property {Object} settings
-		 * @name StyleSwitch#settings
-		 * @readonly
-		 */
-		Object.defineProperty( this, 'settings', {
-			get: this.getSettings,
-			set: this.setSettings,
-			configurable: true,
-			enumerable: true,
-		} );
-
 		Object.defineProperty( StyleSwitch.prototype, 'getDefaultSettings', {
 			value: () => { return this.#settings },
 			configurable: true,
 			enumerable: true,
 		} );
-
-		/** @type {URLSearchParams} */
 		const searchParams = new URL( import.meta.url ).searchParams;
-
 		if ( searchParams.has( StyleSwitch.SETTINGS_URL_PARAMETER ) ) {
-			const jsonInString = /** @type {String} */ ( searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER ) );
-			this.settings = JSON.parse( jsonInString );
+			const jsonInString = searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER );
+			if ( jsonInString ) {
+				this.settings = JSON.parse( jsonInString );
+			}
 		}
-
-		/** @type {HTMLElement | null} */
 		const settingsElement = document.getElementById( settingsElementId );
-
 		if ( settingsElement && settingsElement instanceof HTMLScriptElement ) {
-			const jsonInElement = /** @type {HTMLScriptElement} */ ( settingsElement );
+			const jsonInElement = settingsElement;
 			this.settings = JSON.parse( jsonInElement.text );
 		}
 	}
 
-	/** @returns {{caption: String, title: String}} */
-	getCaptionAndTitleForSwitch ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
+	/** @type {Classes.StyleSwitchInternal['getCaptionAndTitleForSwitch']} */
+	getCaptionAndTitleForSwitch ( interestStyleSheets )
 	{
 
 		/** @type {Array.<String>} */
@@ -516,18 +392,13 @@ class StyleSwitchInternal
 		/** @type {Array.<String>} */
 		const title = [];
 
-		/** @type {String} */
 		const divider = this.settings.texts.switch.versusDividerForRadio;
-
 		loopThroughStyleSheetsWithRoles:
-		interestStyleSheets.forEach( ( { /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role, /** @type {HTMLLinkElement|null} */ reference } ) =>
+		interestStyleSheets.forEach( ( { role, reference } ) =>
 		{
 			title.push( role );
 			if ( reference ) {
-
-				/** @type {String|null} */
 				const possibleDataTitle = reference.getAttribute( 'data-title' );
-
 				if ( reference.title ) {
 					caption.push( reference.title );
 				} else if ( possibleDataTitle ) {
@@ -548,44 +419,45 @@ class StyleSwitchInternal
 			caption.length = 0;
 			caption.push( this.settings.texts.caption );
 		}
+
 		return { caption: caption.join( divider ), title: title.join( divider ) };
 	}
 
-	/** @returns {String} */
-	getCaptionForStyleSheet ( /** @type {HTMLLinkElement|null} */ possibleLinkElement )
+	/** @type {Classes.StyleSwitchInternal['getCaptionForStyleSheet']} */
+	getCaptionForStyleSheet ( possibleLinkElement )
 	{
 		if ( !possibleLinkElement ) {
 			return this.settings.texts.nakedStyleCaption;
 		}
-		const linkElement = /** @type {HTMLLinkElement} */ ( possibleLinkElement );
+		const linkElement = possibleLinkElement;
 		if ( linkElement.title && linkElement.title !== '' ) {
 			return linkElement.title;
 		}
-
-		/** @type {String|null} */
 		const possibleDataTitle = linkElement.getAttribute( 'data-title' );
-
 		if ( possibleDataTitle ) {
 			return possibleDataTitle;
 		}
 		return '';
 	}
 
-	/** @returns { 'preferred' | 'alternate' | 'alternate (clone of persistent)' | '' } */
-	getTitleForStyleSheet ( /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role )
+	/** @type {Classes.StyleSwitchInternal['getTitleForStyleSheet']} */
+	getTitleForStyleSheet ( role )
 	{
 		if ( this.settings.resultSnippetAppearance.select.useRoleAsOptionTitle ) {
 			return role;
 		}
-		return '';
+		return null;
 	}
+
 }
 
 /**
  * @class
- * @description public exportable part
  * @extends StyleSwitchInternal
- * @version 1.1
+ * @implements {Classes.StyleSwitch}
+ * @version 1.2
+ * @file style-switch.mjs
+ * @license CC-BY-SA-4.0
  * @author ic<ic.czech+style-switch@gmail.com>
  * @see {@link https://github.com/iiic/StyleSwitch|GitHub}
  * @see {@link https://iiic.dev/style-switch#github|homepage}
@@ -594,40 +466,45 @@ class StyleSwitchInternal
 class StyleSwitch extends StyleSwitchInternal
 {
 
+	/** @type { Classes.StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR } */
 	static get PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR ()
 	{
 		return {
-			NEVER: 'never',
-			ALWAYS: 'always',
-			ONLY_WITHOUT_COOKIE: 'onlyWithoutCookie',
+			NEVER: /** @type {'never'} */ ( 'never' ),
+			ALWAYS: /** @type {'always'} */ ( 'always' ),
+			ONLY_WITHOUT_COOKIE: /** @type {'onlyWithoutCookie'} */ ( 'onlyWithoutCookie' ),
 		};
 	}
 
+	/** @type { Classes.StyleSwitch.OUTPUT_FORMATS } */
 	static get OUTPUT_FORMATS ()
 	{
 		return {
-			SWITCH: 'switch',
-			SELECT: 'select',
-			RADIOS: 'radioList',
+			SWITCH: /** @type {'switch'} */ ( 'switch' ),
+			SELECT: /** @type {'select'} */ ( 'select' ),
+			RADIOS: /** @type {'radioList'} */ ( 'radioList' ),
 		};
 	}
 
+	/** @type { Classes.StyleSwitch.ROLE } */
 	static get ROLE ()
 	{
 		return {
-			PERSISTENT: 'persistent',
-			PREFERRED: 'preferred',
-			ALTERNATE: 'alternate',
-			ALTERNATE_CLONE: 'alternate (clone of persistent)',
+			PERSISTENT: /** @type {'persistent'} */ ( 'persistent' ),
+			PREFERRED: /** @type {'preferred'} */ ( 'preferred' ),
+			ALTERNATE: /** @type {'alternate'} */ ( 'alternate' ),
+			ALTERNATE_CLONE: /** @type {'alternate (clone of persistent)'} */ ( 'alternate (clone of persistent)' ),
 		};
 	}
 
+	/** @type {Classes.StyleSwitch.SETTINGS_URL_PARAMETER } */
 	static get SETTINGS_URL_PARAMETER ()
 	{
 		return 'settings';
 	}
 
-	constructor ( /** @type {String} */ settingsElementId = 'style-switch-settings' )
+	/** @type { Classes.StyleSwitch[ 'constructor' ] } */
+	constructor ( settingsElementId = 'style-switch-settings' )
 	{
 		super( ...arguments );
 		if ( this.settings.autoRun ) {
@@ -635,7 +512,7 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 	}
 
-	/** @returns {void} */
+	/** @type { Classes.StyleSwitch[ 'checkRequirements' ] } */
 	checkRequirements ()
 	{
 		if ( !( 'cookieStore' in window ) ) {
@@ -646,11 +523,11 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 	}
 
-	/** @returns {void} */
+	/** @type { Classes.StyleSwitch[ 'prepareRootElement' ] } */
 	prepareRootElement ()
 	{
 
-		/** @type {HTMLDocument|null} */
+		/** @type {?HTMLElement} */
 		const possibleRootElement = document.querySelector( this.settings.rootElementQS );
 
 		if ( possibleRootElement ) {
@@ -660,36 +537,25 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 	}
 
-	/** @returns {Promise.<{currentlyActivatedPath: String|null, byNakedDay: Boolean}>} */
+	/** @type { Classes.StyleSwitch[ 'getCurrentlyActivatedStyleSheetsPath' ] } */
 	async getCurrentlyActivatedStyleSheetsPath ()
 	{
 
-		/** @type {String | null} */
+		/** @type {?String} */
 		let foundPath = null;
 
-		/** @type {Boolean} */
 		let byNakedDay = false;
-
-		/** @type {CookieListItem | null} */
 		const cookie = await cookieStore.get( this.settings.cookie.name );
-
 		if ( cookie && cookie.value ) {
 
-			/** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */
+			/** @type {Types.ResultCookieObject} */
 			const styles = JSON.parse( cookie.value );
 
-			/** @type {Array.<String>} */
 			const paths = Object.keys( styles );
-
 			loopThroughStyleSheetsPaths:
-			for ( /** @type {String} */ const path of paths ) {
-
-				/** @type {Boolean} */
+			for ( const path of paths ) {
 				const isDisabled = styles[ path ].disabled;
-
-				/** @type {Boolean | undefined} */
 				const isSetByNakedDay = styles[ path ].byNakedDay;
-
 				if ( isDisabled === false ) {
 					foundPath = path;
 					if ( isSetByNakedDay ) {
@@ -699,13 +565,11 @@ class StyleSwitch extends StyleSwitchInternal
 				}
 			}
 		}
+
 		return { currentlyActivatedPath: foundPath, byNakedDay: byNakedDay };
 	}
 
-	/**
-	 * @description count of preferred and alternate styles (not persistent), without duplicates (2 link elements, with same path, but different role)
-	 * @returns {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>}
-	 */
+	/** @type {Classes.StyleSwitch['getCleanedStyleSheetsObject']} */
 	getCleanedStyleSheetsObject ()
 	{
 
@@ -715,21 +579,18 @@ class StyleSwitch extends StyleSwitchInternal
 		/** @type {Set.<String>} */
 		const styleSheetPaths = new Set();
 
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */
+		/** @type {Types.ResultArray} */
 		const result = [];
 
 		if ( styleLinks ) {
 			loopThroughLinkElements:
-			styleLinks.forEach( function ( /** @type {HTMLLinkElement} */ styleLink )
+			styleLinks.forEach( function ( styleLink )
 			{
-
-				/** @type { 'persistent' | 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */
 				const role = StyleSwitch.getRoleFrom( styleLink );
-
 				if ( role !== StyleSwitch.ROLE.PERSISTENT && !styleSheetPaths.has( styleLink.href ) ) {
 					styleSheetPaths.add( styleLink.href ); // just to prevent duplicates
 					result.push( {
-						role: /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ ( role ),
+						role: role,
 						reference: styleLink
 					} );
 				}
@@ -737,7 +598,7 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 		if ( this.settings.nakedStyle.use && this.settings.texts.nakedStyleCaption ) {
 			result.push( {
-				role: /** @type { 'alternate' } */ ( StyleSwitch.ROLE.ALTERNATE ),
+				role: StyleSwitch.ROLE.ALTERNATE,
 				reference: null // reference null means naked style document
 			} );
 		}
@@ -747,56 +608,34 @@ class StyleSwitch extends StyleSwitchInternal
 		return result;
 	}
 
-	/** @returns { 'select' | 'radioList' | 'switch' | null } */
-	determineTypeOfOutputElement ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
+	/** @type {Classes.StyleSwitch['determineTypeOfOutputElement']} */
+	determineTypeOfOutputElement ( interestStyleSheets )
 	{
 		if ( interestStyleSheets.length <= 1 ) {
 			return null;
 		}
 
-		if ( interestStyleSheets.length === 2 && this.settings.resultSnippetAppearance.switch.useSwitchIfPossible ) {
-			return /** @type {'switch'} */ ( StyleSwitch.OUTPUT_FORMATS.SWITCH );
-		} else if ( this.settings.resultSnippetAppearance.outputFormat === StyleSwitch.OUTPUT_FORMATS.RADIOS ) {
-			return /** @type {'radioList'} */ ( StyleSwitch.OUTPUT_FORMATS.RADIOS );
+		if ( StyleSwitch.OUTPUT_FORMATS.SWITCH === this.settings.resultSnippetAppearance.outputFormat && interestStyleSheets.length === 2 ) {
+			return StyleSwitch.OUTPUT_FORMATS.SWITCH;
+		} else if ( StyleSwitch.OUTPUT_FORMATS.RADIOS === this.settings.resultSnippetAppearance.outputFormat ) {
+			return StyleSwitch.OUTPUT_FORMATS.RADIOS;
 		} else { // StyleSwitch.OUTPUT_FORMATS.SELECT as default
-			return /** @type {'select'} */ ( StyleSwitch.OUTPUT_FORMATS.SELECT );
+			return StyleSwitch.OUTPUT_FORMATS.SELECT;
 		}
 	}
 
-	/** @returns {void} */
-	createSwitch (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {String|null} */ currentlyActivatedPath = null
-	)
+	/** @type {Classes.StyleSwitch['createSwitch']} */
+	createSwitch ( interestStyleSheets, currentlyActivatedPath = null )
 	{
-
-		/** @type {String} */
 		const id = this.settings.resultSnippetAppearance.idPrefix + Math.random().toString( 36 );
-
-		/** @type {HTMLLabelElement} */
 		const labelElement = document.createElement( 'label' );
-
-		/** @type {HTMLElement} */
 		const captionElement = document.createElement( this.settings.resultSnippetAppearance.switch.captionElementName );
-
-		/** @type {HTMLInputElement} */
 		const inputElement = document.createElement( 'input' );
-
-		/** @type {HTMLSpanElement} */
 		const visualSwitchElement = document.createElement( 'span' );
-
-		/** @type {HTMLSpanElement} */
 		const stateElement = document.createElement( 'span' );
-
-		/** @type {HTMLElement} */
 		const statusOnElement = document.createElement( this.settings.resultSnippetAppearance.switch.statusElementName );
-
-		/** @type {HTMLElement} */
 		const statusOffElement = document.createElement( this.settings.resultSnippetAppearance.switch.statusElementName );
-
-		/** @type {{caption: String, title: String}} */
 		const { caption, title } = this.getCaptionAndTitleForSwitch( interestStyleSheets );
-
 		labelElement.htmlFor = id;
 		labelElement.classList.add( this.settings.resultSnippetAppearance.switch.labelClassName );
 		labelElement.title = title;
@@ -828,55 +667,28 @@ class StyleSwitch extends StyleSwitchInternal
 		StyleSwitch.setCurrentChecked( this.rootElement, interestStyleSheets, currentlyActivatedPath );
 	}
 
-	/** @returns {void} */
-	createRadioList (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {String|null} */ currentlyActivatedPath = null
-	)
+	/** @type {Classes.StyleSwitch['createRadioList']} */
+	createRadioList ( interestStyleSheets, currentlyActivatedPath = null )
 	{
-
-		/** @type {String} */
 		const id = this.settings.resultSnippetAppearance.idPrefix + Math.random().toString( 36 );
-
-		/** @type {HTMLElement} */
 		const captionElement = document.createElement( this.settings.resultSnippetAppearance.radioList.captionElementName );
-
-		/** @type {HTMLUListElement} */
 		const ulElement = document.createElement( 'ul' );
-
-		/** @type {String} */
 		const groupCaption = this.settings.texts.radioList.caption ? this.settings.texts.radioList.caption : this.settings.texts.caption;
-
 		captionElement.id = id;
 		captionElement.appendChild( document.createTextNode( groupCaption ) );
 		ulElement.role = 'radiogroup';
 		ulElement.setAttribute( 'aria-labelledby', id );
 		ulElement.tabIndex = 0;
 		loopThroughStyleSheetsWithRoles:
-		interestStyleSheets.forEach( ( { /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role, /** @type {HTMLLinkElement|null} */ reference } ) =>
+		interestStyleSheets.forEach( ( { role, reference } ) =>
 		{
-
-			/** @type {HTMLLIElement} */
 			const liElement = document.createElement( 'li' );
-
-			/** @type {HTMLLabelElement} */
 			const labelElement = document.createElement( 'label' );
-
-			/** @type {HTMLInputElement} */
 			const radioElement = document.createElement( 'input' );
-
-			/** @type {String} */
 			const currentCaption = this.getCaptionForStyleSheet( reference );
-
-			/** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' | '' } */
 			const currentTitle = this.getTitleForStyleSheet( role );
-
-			/** @type {String} */
 			const currentValue = StyleSwitch.getOriginalHrefAttribute( reference );
-
-			/** @type {Boolean} */
 			const currentIsChecked = currentlyActivatedPath === currentValue ? true : false;
-
 			radioElement.type = 'radio';
 			radioElement.name = id;
 			radioElement.value = currentValue;
@@ -889,41 +701,20 @@ class StyleSwitch extends StyleSwitchInternal
 			labelElement.appendChild( radioElement );
 			labelElement.appendChild( document.createTextNode( currentCaption ) );
 			liElement.appendChild( labelElement );
-			liElement.title = currentTitle;
+			liElement.title = currentTitle ?? '';
 			ulElement.appendChild( liElement );
 		} );
 		this.rootElement.appendChild( captionElement );
 		if ( currentlyActivatedPath === null ) { // in case no cookie exists
-
-			/** @type { HTMLOptionElement | HTMLInputElement | null } */
 			const defaultSelectionElement = StyleSwitch.findDefaultSelection( ulElement );
-
 			StyleSwitch.setCurrentSelection( defaultSelectionElement );
 		}
 		this.rootElement.appendChild( ulElement );
 	}
 
-	/** @returns {void} */
-	createSelect (
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets,
-		/** @type {String|null} */ currentlyActivatedPath = null
-	)
+	/** @type {Classes.StyleSwitch['createSelect']} */
+	createSelect ( interestStyleSheets, currentlyActivatedPath = null )
 	{
-
-		/** @type {String} */
-		const id = this.settings.resultSnippetAppearance.idPrefix + Math.random().toString( 36 );
-
-		/** @type {HTMLLabelElement} */
-		const labelElement = document.createElement( 'label' );
-
-		/** @type {HTMLElement} */
-		const captionElement = document.createElement( this.settings.resultSnippetAppearance.select.captionElementName );
-
-		/** @type {HTMLSelectElement} */
-		const selectElement = document.createElement( 'select' );
-
-		/** @type {String} */
-		const selectCaption = this.settings.texts.select.caption ? this.settings.texts.select.caption : this.settings.texts.caption;
 
 		/** @type {HTMLOptGroupElement|null} */
 		let possibleOptGroupForStyles = null;
@@ -931,6 +722,11 @@ class StyleSwitch extends StyleSwitchInternal
 		/** @type {HTMLOptGroupElement|null} */
 		let possibleOptGroupForNaked = null;
 
+		const id = this.settings.resultSnippetAppearance.idPrefix + Math.random().toString( 36 );
+		const labelElement = document.createElement( 'label' );
+		const captionElement = document.createElement( this.settings.resultSnippetAppearance.select.captionElementName );
+		const selectElement = document.createElement( 'select' );
+		const selectCaption = this.settings.texts.select.caption ? this.settings.texts.select.caption : this.settings.texts.caption;
 		if ( this.settings.texts.select.optGroupLabelForStyles ) {
 			possibleOptGroupForStyles = document.createElement( 'optgroup' );
 			possibleOptGroupForStyles.label = this.settings.texts.select.optGroupLabelForStyles;
@@ -948,26 +744,15 @@ class StyleSwitch extends StyleSwitchInternal
 			passive: true
 		} );
 		loopThroughStyleSheetsWithRoles:
-		interestStyleSheets.forEach( ( { /** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' } */ role, /** @type {HTMLLinkElement|null} */ reference } ) =>
+		interestStyleSheets.forEach( ( { role, reference } ) =>
 		{
-
-			/** @type {HTMLOptionElement} */
 			const optionElement = document.createElement( 'option' );
-
-			/** @type {String} */
 			const currentCaption = this.getCaptionForStyleSheet( reference );
-
-			/** @type { 'preferred' | 'alternate' | 'alternate (clone of persistent)' | '' } */
 			const currentTitle = this.getTitleForStyleSheet( role );
-
-			/** @type {String} */
 			const currentValue = StyleSwitch.getOriginalHrefAttribute( reference );
-
-			/** @type {Boolean} */
 			const currentIsSelected = currentlyActivatedPath === currentValue ? true : false;
-
 			optionElement.selected = currentIsSelected;
-			optionElement.title = currentTitle;
+			optionElement.title = currentTitle ?? '';
 			optionElement.value = currentValue;
 			optionElement.appendChild( document.createTextNode( currentCaption ) );
 			if ( possibleOptGroupForStyles && reference ) {
@@ -987,41 +772,25 @@ class StyleSwitch extends StyleSwitchInternal
 		labelElement.appendChild( captionElement );
 		labelElement.appendChild( selectElement );
 		if ( currentlyActivatedPath === null ) { // in case no cookie exists
-
-			/** @type { HTMLOptionElement | HTMLInputElement | null } */
 			const defaultSelectionElement = StyleSwitch.findDefaultSelection( labelElement );
-
 			StyleSwitch.setCurrentSelection( defaultSelectionElement );
 		}
 		this.rootElement.appendChild( labelElement );
 	}
 
-	/**
-	 * @description automatically set naked style if it's Css Naked Day
-	 * @returns {void}
-	 */
-	celebrateNakedDay ( /** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets )
+	/** @type {Classes.StyleSwitch['celebrateNakedDay']} */
+	celebrateNakedDay ( interestStyleSheets )
 	{
-
-		/** @type {Date} */
 		const today = new Date();
-
-		/** @type {Number} */
 		const currentMonth = today.getMonth();
-
-		/** @type {Number} */
 		const currentDay = today.getDate();
-
 		if (
 			this.settings.nakedStyle.use &&
 			this.settings.nakedStyle.celebrateNakedDay.switchAutomatically &&
 			currentMonth === this.settings.nakedStyle.celebrateNakedDay.monthNumber &&
 			currentDay === this.settings.nakedStyle.celebrateNakedDay.dayNumber
 		) {
-
-			/** @type {Event} */
 			const fakeChangeEvent = new Event( 'change' );
-
 			Object.defineProperty( fakeChangeEvent, 'target', {
 				value: {
 					value: '', // empty string in target.value means naked style
@@ -1034,20 +803,13 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 	}
 
-	/** @returns {void} */
-	cancelNakedDay ( /** @type {Boolean} */ byNakedDay )
+	/** @type {Classes.StyleSwitch['cancelNakedDay']} */
+	cancelNakedDay ( byNakedDay )
 	{
 		if ( byNakedDay ) {
-
-			/** @type {Date} */
 			const today = new Date();
-
-			/** @type {Number} */
 			const currentMonth = today.getMonth();
-
-			/** @type {Number} */
 			const currentDay = today.getDate();
-
 			if (
 				currentMonth !== this.settings.nakedStyle.celebrateNakedDay.monthNumber ||
 				currentDay !== this.settings.nakedStyle.celebrateNakedDay.dayNumber
@@ -1059,25 +821,14 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 	}
 
-	/**
-	 * @description : on change or delete cookie with styles… it changes selected value on root element
-	 * @returns {void}
-	 */
-	swapSelectionOnCookieChange (
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets
-	)
+	/** @type {Classes.StyleSwitch['swapSelectionOnCookieChange']} */
+	swapSelectionOnCookieChange ( outputFormat, interestStyleSheets )
 	{
 		if ( !this.rootElement ) {
 			return;
 		}
-
-		/** @type {String} */
 		const cookieName = this.settings.cookie.name;
-
-		/** @type {HTMLElement} */
 		const rootElement = this.rootElement;
-
 		cookieStore.addEventListener( 'change', StyleSwitch.cookieChangeListener.bind( null, outputFormat, cookieName, rootElement, interestStyleSheets ), {
 			capture: false,
 			once: false,
@@ -1085,12 +836,8 @@ class StyleSwitch extends StyleSwitchInternal
 		} );
 	}
 
-	/** @returns {void} */
-	swapSelectionOnPreferredColorSchemeChange (
-		/** @type { 'select' | 'radioList' | 'switch' | null } */ outputFormat,
-		/** @type {String|null} */ currentlyActivatedPath,
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */ interestStyleSheets
-	)
+	/** @type {Classes.StyleSwitch['swapSelectionOnPreferredColorSchemeChange']} */
+	swapSelectionOnPreferredColorSchemeChange ( outputFormat, currentlyActivatedPath, interestStyleSheets )
 	{
 		if ( this.settings.resultSnippetAppearance.preferredColorSchemeChangeBehavior === StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.NEVER ) {
 			return;
@@ -1101,13 +848,8 @@ class StyleSwitch extends StyleSwitchInternal
 		) {
 			return;
 		}
-
-		/** @type {String} */
 		const cookieName = this.settings.cookie.name;
-
-		/** @type {HTMLElement} */
 		const rootElement = this.rootElement;
-
 		window.matchMedia( '(prefers-color-scheme: dark)' ).addEventListener( 'change', StyleSwitch.preferredColorSchemeChangeListener.bind( null, outputFormat, cookieName, rootElement, interestStyleSheets ), {
 			capture: false,
 			once: false,
@@ -1115,24 +857,16 @@ class StyleSwitch extends StyleSwitchInternal
 		} );
 	}
 
-	/** @returns {Promise.<HTMLDivElement|null>} */
+	/** @type {Classes.StyleSwitch['run']} */
 	async run ()
 	{
 		this.checkRequirements();
 		this.prepareRootElement();
-
-		/** @type {{currentlyActivatedPath: String|null, byNakedDay: Boolean}} */
 		const { currentlyActivatedPath, byNakedDay } = await this.getCurrentlyActivatedStyleSheetsPath();
-
-		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */
 		const interestStyleSheets = this.getCleanedStyleSheetsObject(); // without duplicates and persistent styleSheets
-
 		this.celebrateNakedDay( interestStyleSheets );
 		this.cancelNakedDay( byNakedDay );
-
-		/** @type { 'select' | 'radioList' | 'switch' | null } */
 		const outputFormat = this.determineTypeOfOutputElement( interestStyleSheets );
-
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
 			this.createSwitch( interestStyleSheets, currentlyActivatedPath );
 		} else if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.RADIOS ) {
@@ -1148,6 +882,7 @@ class StyleSwitch extends StyleSwitchInternal
 	}
 };
 
+/** @type {Classes.StyleSwitch.DEFAULT_SETTINGS} */
 Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 	get: function ()
 	{
@@ -1159,7 +894,7 @@ Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 				timeBeforeExpire: 365 * 24 * 60 * 60 * 1000, // year
 				partitioned: true,
 				path: '/',
-				sameSite: 'strict', // CookieSameSite (means one of 'strict' | 'lax' | 'none')
+				sameSite: /** @type {'strict'} */ ( 'strict' ),
 			},
 			texts: {
 				caption: 'Style switch',
@@ -1195,13 +930,12 @@ Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 				preferredColorSchemeChangeBehavior: StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.ONLY_WITHOUT_COOKIE,
 				reverseOrder: false, // order of style sheets, should be reversed?
 				switch: {
-					useSwitchIfPossible: false, // if there are only 2 possible css styleSheets create input type=checkbox styled as switch
 					useRolesAsTitle: true,
 					labelClassName: 'switch',
-					captionElementName: 'strong', // only line elements supported, no block elements here
+					captionElementName: /** @type {'strong'} */ ( 'strong' ), // only line elements supported, no block elements here
 					visualSwitchClassName: 'visual',
 					stateClassName: 'state',
-					statusElementName: 'small', // only line elements supported, no block elements here
+					statusElementName: /** @type {'small'} */ ( 'small' ), // only line elements supported, no block elements here
 				},
 				select: {
 					useRoleAsOptionTitle: true,
