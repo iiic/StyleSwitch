@@ -1,11 +1,80 @@
 /**
  * @file style-switch.globals.d.ts
  * @description TypeScript global declarations for StyleSwitch.
- * @version 1.2
+ * @version 1.3
  * @license CC-BY-SA-4.0
  */
 
 declare global {
+
+	namespace Enums {
+
+		/** Possible output formats of StyleSwitch */
+		type OutputFormats = string & {
+			readonly oneOf: 'select' | 'radioList' | 'switch';
+		};
+
+		/** Default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR */
+		type PreferredColorSchemeChangeBehavior = string & {
+			readonly oneOf: 'never' | 'always' | 'onlyWithoutCookie'
+		};
+
+		/** Role of CSS stylesheet file */
+		type Roles = string & {
+			readonly oneOf: 'persistent' | 'preferred' | 'alternate' | 'alternate (clone of persistent)'
+		};
+
+	}
+
+	namespace Constants {
+
+		/** Options for setting how to behave when changing the color theme in the operating system. */
+		const PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR = {
+
+			/** Never change the CSS style of a document based on user action, color scheme changes in their operating system. */
+			NEVER: 'never' as Enums.PreferredColorSchemeChangeBehavior,
+
+			/** Always change the css style of the document based on the color scheme change in the operating system. */
+			ALWAYS: 'always' as Enums.PreferredColorSchemeChangeBehavior,
+
+			/** Change the document's css style when changing the windows color scheme, only if the user has not already chosen a color style. */
+			ONLY_WITHOUT_COOKIE: 'onlyWithoutCookie' as Enums.PreferredColorSchemeChangeBehavior,
+
+		};
+
+		/** Options for selecting the type of output element. */
+		const OUTPUT_FORMATS = {
+
+			/** Switch realized by semantically described input type checkbox. */
+			SWITCH: 'switch' as Enums.OutputFormats,
+
+			/** One select with available css styles as options. */
+			SELECT: 'select' as Enums.OutputFormats,
+
+			/** Change the document's css style when changing the windows color scheme, only if the user has not already chosen a color style. */
+			RADIOS: 'radioList' as Enums.OutputFormats,
+
+		};
+
+		/** Possible roles of Css stylesheet file included into document */
+		const ROLE = {
+
+			/** (has rel="stylesheet" attribute, no title attribute) always applies to the document. */
+			PERSISTENT: 'persistent' as Enums.Roles,
+
+			/** (has rel="stylesheet", with title="…" specified): applied by default, but disabled if an alternate stylesheet is selected. There can only be one preferred stylesheet, so providing stylesheets with different title attributes will cause some of them to be ignored. */
+			PREFERRED: 'preferred' as Enums.Roles,
+
+			/** (rel="alternate stylesheet", with title="…" specified): disabled by default, can be selected. */
+			ALTERNATE: 'alternate' as Enums.Roles,
+
+			/** Same href value as persistent stylesheet but set with title and rel="alternate stylesheet" attributes. This will allow to change css stylesheet to this file by widget. */
+			ALTERNATE_CLONE: 'alternate (clone of persistent)' as Enums.Roles,
+
+		};
+
+	}
+
 	namespace Types {
 
 		/** Names of block html elements (element 'a' can be both, block or inline depends on its content) */
@@ -17,23 +86,17 @@ declare global {
 		/** Names of special html elements (all other elements that are neither block nor inline) */
 		type SpecialHTMLElements = 'html' | 'base' | 'head' | 'link' | 'meta' | 'script' | 'style' | 'title' | 'svg' | 'math' | 'caption' | 'col' | 'colgroup' | 'tbody' | 'td' | 'tfoot' | 'th' | 'thead' | 'tr' | 'datalist' | 'fieldset' | 'legend' | 'optgroup' | 'option' | 'selectedcontent' | 'slot' | 'summary' | 'template' | 'geolocation';
 
+		/** Names of static methods of the regular console object (in window) */
+		type ConsoleStaticMethods = 'assert' | 'clear' | 'count' | 'countReset' | 'debug' | 'dir' | 'dirxml' | 'error' | 'group' | 'groupCollapsed' | 'groupEnd' | 'info' | 'log' | 'table' | 'time' | 'timeEnd' | 'timeLog' | 'timeStamp' | 'trace' | 'warn';
+
 		/** Settings for output cookie of StyleSwitch */
 		type CookieSettings = { name: string, timeBeforeExpire: number, partitioned: boolean, path: string, sameSite: CookieSameSite };
 
 		/** Array as result of this function… will be used for cookie content, later */
-		type ResultArray = Array<{ role: Types.Roles; reference: ?HTMLLinkElement }>;
+		type ResultArray = Array<{ role: Enums.Roles; reference: ?HTMLLinkElement }>;
 
 		/** Result Object… will be set as a content of cookie, later */
 		type ResultCookieObject = { [x: string]: { disabled: boolean; byNakedDay?: boolean } };
-
-		/** Role of CSS stylesheet file */
-		type Roles = 'persistent' | 'preferred' | 'alternate' | 'alternate (clone of persistent)';
-
-		/** Possible output formats of StyleSwitch */
-		type OutputFormats = 'select' | 'radioList' | 'switch';
-
-		/** Default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR */
-		type PreferredColorSchemeChangeBehavior = 'never' | 'always' | 'onlyWithoutCookie';
 
 		/** Output element of StyleSwitch can be those types of HTMLElement or null */
 		type PossibleOutputElement = HTMLOptionElement | HTMLInputElement | null;
@@ -150,10 +213,10 @@ declare global {
 				defaultResultSnippetElement: string;
 
 				/** List of possible form controls that the script will create as output. This list can be obtained from the static read-only method StyleSwitch.OUTPUT_FORMATS */
-				outputFormat: Types.OutputFormats;
+				outputFormat: Enums.OutputFormats;
 
 				/** Default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR . */
-				preferredColorSchemeChangeBehavior: PreferredColorSchemeChangeBehavior;
+				preferredColorSchemeChangeBehavior: Enums.PreferredColorSchemeChangeBehavior;
 
 				/** Output the styles found in the document head in reverse order? */
 				reverseOrder: boolean; // order of style sheets, should be reversed?
@@ -209,57 +272,18 @@ declare global {
 
 		};
 
-		namespace Getters {
+		/** This returns string possible to place into url get parameter to set settings */
+		type SETTINGS_URL_PARAMETER = 'settings';
 
-			/** Options for setting how to behave when changing the color theme in the operating system. */
-			type PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR = {
+		/** Options for selecting the type of output element. */
+		type OutputFormats = typeof Constants.OUTPUT_FORMATS;
 
-				/** Never change the CSS style of a document based on user action, color scheme changes in their operating system. */
-				NEVER: 'never';
+		/** Options for setting how to behave when changing the color theme in the operating system. */
+		type PreferredColorSchemeChangeBehavior = typeof Constants.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR;
 
-				/** Always change the css style of the document based on the color scheme change in the operating system. */
-				ALWAYS: 'always';
+		/** Possible roles of Css stylesheet file included into document */
+		type Roles = typeof Constants.ROLE;
 
-				/** Change the document's css style when changing the windows color scheme, only if the user has not already chosen a color style. */
-				ONLY_WITHOUT_COOKIE: 'onlyWithoutCookie';
-
-			};
-
-			/** Options for selecting the type of output element. */
-			type OUTPUT_FORMATS = {
-
-				/** Switch realized by semantically described input type checkbox. */
-				SWITCH: 'switch';
-
-				/** One select with available css styles as options. */
-				SELECT: 'select';
-
-				/** Change the document's css style when changing the windows color scheme, only if the user has not already chosen a color style. */
-				RADIOS: 'radioList';
-
-			};
-
-			/** Possible roles of Css stylesheet file included into document */
-			type ROLE = {
-
-				/** (has rel="stylesheet" attribute, no title attribute) always applies to the document. */
-				PERSISTENT: 'persistent';
-
-				/** (has rel="stylesheet", with title="…" specified): applied by default, but disabled if an alternate stylesheet is selected. There can only be one preferred stylesheet, so providing stylesheets with different title attributes will cause some of them to be ignored. */
-				PREFERRED: 'preferred';
-
-				/** (rel="alternate stylesheet", with title="…" specified): disabled by default, can be selected. */
-				ALTERNATE: 'alternate';
-
-				/** Same href value as persistent stylesheet but set with title and rel="alternate stylesheet" attributes. This will allow to change css stylesheet to this file by widget. */
-				ALTERNATE_CLONE: 'alternate (clone of persistent)';
-
-			};
-
-			/** This returns string possible to place into url get parameter to set settings */
-			type SETTINGS_URL_PARAMETER = 'settings';
-
-		};
 	};
 
 	namespace Classes {
@@ -280,19 +304,19 @@ declare global {
 			set rootElement( rootElement: HTMLElement );
 
 			/** Gets determined role from stylesheet HTMLLinkElement */
-			static getRoleFrom( styleLink: HTMLLinkElement ): Types.Roles;
+			static getRoleFrom( styleLink: HTMLLinkElement ): Enums.Roles;
 
 			/** Returns the original href / value from a stylesheet or form control */
 			static getOriginalHrefAttribute( possibleElement: HTMLLinkElement | HTMLOptionElement | HTMLInputElement | null ): string;
 
 			/** Get path of css stylesheet file currently selected by StyleSwitch's widget element */
-			static getSelectedPath( interestStyleSheets: Array.<{ role: Types.Roles, reference: ?HTMLLinkElement }>, transferredEvent: Event ): ?string;
+			static getSelectedPath( interestStyleSheets: Array.<{ role: Enums.Roles, reference: ?HTMLLinkElement }>, transferredEvent: Event ): ?string;
 
 			/** Sets cookie as result of StyleSwitch */
 			static async switchStyleEvent( interestStyleSheets: Types.ResultArray, cookieSettings: Types.CookieSettings, event: Event ): Promise<void>;
 
 			/** Set selected item in result element (it does not matter the specific type of output element) */
-			static setValueOnResultElementBy( cookieObject: Types.ResultCookieObject, outputFormat: ?Types.OutputFormats, rootElement: HTMLElement ): void;
+			static setValueOnResultElementBy( cookieObject: Types.ResultCookieObject, outputFormat: ?Enums.OutputFormats, rootElement: HTMLElement ): void;
 
 			/** Set input[type=checkbox] checked or not checked by currentlyActivatedPath (if presented) or to default style */
 			static setCurrentChecked( rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, currentlyActivatedPath: ?string ): void;
@@ -310,13 +334,13 @@ declare global {
 			static findCurrentSelectionByPath( interestStyleSheets: Types.ResultArray, currentlyActivatedPath: ?string ): number;
 
 			/** Sets currently activated style checked in output format */
-			static setDefaultOnResultElement( outputFormat: ?Types.OutputFormats, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray ): void;
+			static setDefaultOnResultElement( outputFormat: ?Enums.OutputFormats, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray ): void;
 
 			/** Listener waiting to change color scheme in operation system (and then color scheme in browser) */
-			static preferredColorSchemeChangeListener( outputFormat: ?Types.OutputFormats, cookieName: string, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, /* event: MediaQueryListEvent */ ): void;
+			static preferredColorSchemeChangeListener( outputFormat: ?Enums.OutputFormats, cookieName: string, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, /* event: MediaQueryListEvent */ ): void;
 
 			/** Listener waiting to change StyleSwitch cookie */
-			static cookieChangeListener( outputFormat: ?Types.OutputFormats, cookieName: String, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, event: CookieChangeEvent ): void;
+			static cookieChangeListener( outputFormat: ?Enums.OutputFormats, cookieName: String, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, event: CookieChangeEvent ): void;
 
 			/** Constructor for StyleSwitchInternal */
 			constructor ( settingsElementId: string ): StyleSwitchInternal;
@@ -328,7 +352,7 @@ declare global {
 			getCaptionForStyleSheet( possibleLinkElement: HTMLLinkElement | null ): string;
 
 			/** Gets a title for stylesheet from role */
-			getTitleForStyleSheet( role: Types.Roles ): ?string;
+			getTitleForStyleSheet( role: Enums.Roles ): ?string;
 
 		}
 
@@ -336,16 +360,16 @@ declare global {
 		class StyleSwitch extends StyleSwitchInternal {
 
 			/** Get list of possibilities for behavior when color scheme in OS changes. */
-			static get PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR(): Types.Getters.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR;
+			static get PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR(): Types.PreferredColorSchemeChangeBehavior;
 
 			/** Get list of possible output formats for widget */
-			static get OUTPUT_FORMATS(): Types.Getters.OUTPUT_FORMATS;
+			static get OUTPUT_FORMATS(): Types.OutputFormats;
 
 			/** Get list of possible roles of CSS style sheet file */
-			static get ROLE(): Types.Getters.ROLE;
+			static get ROLE(): Types.Roles;
 
 			/** Returns name of settings get http parameter */
-			static get SETTINGS_URL_PARAMETER(): Types.Getters.SETTINGS_URL_PARAMETER;
+			static get SETTINGS_URL_PARAMETER(): Types.SETTINGS_URL_PARAMETER;
 
 			/** Constructor for StyleSwitch */
 			constructor ( settingsElementId: string ): StyleSwitch;
@@ -363,7 +387,7 @@ declare global {
 			getCleanedStyleSheetsObject(): Types.ResultArray;
 
 			/** Get currently used output format (by settings) */
-			determineTypeOfOutputElement( interestStyleSheets: Types.ResultArray ): ?Types.OutputFormats
+			determineTypeOfOutputElement( interestStyleSheets: Types.ResultArray ): ?Enums.OutputFormats
 
 			/** Create output element switch */
 			createSwitch( interestStyleSheets: Types.ResultArray, currentlyActivatedPath: ?string ): void;
@@ -381,12 +405,12 @@ declare global {
 			cancelNakedDay( byNakedDay: boolean ): void;
 
 			/** On change or delete cookie with styles… it changes selected value on root element */
-			swapSelectionOnCookieChange( outputFormat: ?Types.OutputFormats, interestStyleSheets: Types.ResultArray ): void;
+			swapSelectionOnCookieChange( outputFormat: ?Enums.OutputFormats, interestStyleSheets: Types.ResultArray ): void;
 
 			/** Change document's cs stylesheet depends on change default color scheme in OS */
-			swapSelectionOnPreferredColorSchemeChange( outputFormat: ?Types.OutputFormats, currentlyActivatedPath: ?String, interestStyleSheets: Types.ResultArray );
+			swapSelectionOnPreferredColorSchemeChange( outputFormat: ?Enums.OutputFormats, currentlyActivatedPath: ?String, interestStyleSheets: Types.ResultArray );
 
-			/** Runs whole StyleSwitch */
+			/** Runs whole StyleSwitch and returns result */
 			async run(): Promise<HTMLElement | null>;
 
 			/** Returns default settings for StyleSwitch */

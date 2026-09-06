@@ -1,5 +1,9 @@
 # StyleSwitch
 
+- version: `1.3`
+- important file: `style-switch.mjs`
+- integrity check sha256: `Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=`
+
 A switch for different CSS styles on web pages.
 
 There are plenty of light/dark theme style switchers, so why make another one?
@@ -9,7 +13,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
 
 This already does the core work:
@@ -115,8 +119,11 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
+
+Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...
+
 ... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.
 
 I mentioned cookies, so let's describe it:
@@ -182,7 +189,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.2" type="module" crossorigin="anonymous" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" crossorigin="anonymous" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -195,7 +202,7 @@ The important return value is stored in the `result` variable. That variable is 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -282,7 +289,7 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
@@ -341,6 +348,11 @@ Also included are:
 - `modules/importWithIntegrity.mjs`, a script that enables dynamic import of modules with file integrity checking. It is also used only by `content-type-checker.js`.
 - folder `readme-screenshots`, screenshots, mostly from the browser console.
 - folder `example-css`, CSS styles used by `example-usage.html`. Based on [MVP.css](https://andybrewer.github.io/mvp/)
+- `style-switch.spec.mjs`, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.
+- `modules/ictest.mjs`, Tests runtime. Used **only** for the above mentioned unit test file. Not needed for the script itself.
+- `tests-runner.html` HTML file used for run tests in Browser. It is also not needed for the script itself.
+- `package.json` command for NPM ( [npm.js](https://www.npmjs.com/) ) catalog.
+- `AGENTS.md` commands for AI agents, description how to work with this repository. Something like Readme for AI.
 - `README.md` library description in Markdown
 - `README.html` the same description in HTML format
 

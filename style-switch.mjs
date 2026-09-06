@@ -363,11 +363,6 @@ class StyleSwitchInternal
 	/** @type {Classes.StyleSwitchInternal['constructor']} */
 	constructor ( settingsElementId = 'style-switch-settings' )
 	{
-		Object.defineProperty( StyleSwitch.prototype, 'getDefaultSettings', {
-			value: () => { return this.#settings },
-			configurable: true,
-			enumerable: true,
-		} );
 		const searchParams = new URL( import.meta.url ).searchParams;
 		if ( searchParams.has( StyleSwitch.SETTINGS_URL_PARAMETER ) ) {
 			const jsonInString = searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER );
@@ -455,7 +450,7 @@ class StyleSwitchInternal
  * @class
  * @extends StyleSwitchInternal
  * @implements {Classes.StyleSwitch}
- * @version 1.2
+ * @version 1.3
  * @file style-switch.mjs
  * @license CC-BY-SA-4.0
  * @author ic<ic.czech+style-switch@gmail.com>
@@ -470,9 +465,9 @@ class StyleSwitch extends StyleSwitchInternal
 	static get PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR ()
 	{
 		return {
-			NEVER: /** @type {'never'} */ ( 'never' ),
-			ALWAYS: /** @type {'always'} */ ( 'always' ),
-			ONLY_WITHOUT_COOKIE: /** @type {'onlyWithoutCookie'} */ ( 'onlyWithoutCookie' ),
+			NEVER: /** @type {Enums.PreferredColorSchemeChangeBehavior} */ ( 'never' ),
+			ALWAYS: /** @type {Enums.PreferredColorSchemeChangeBehavior} */ ( 'always' ),
+			ONLY_WITHOUT_COOKIE: /** @type {Enums.PreferredColorSchemeChangeBehavior} */ ( 'onlyWithoutCookie' ),
 		};
 	}
 
@@ -480,9 +475,9 @@ class StyleSwitch extends StyleSwitchInternal
 	static get OUTPUT_FORMATS ()
 	{
 		return {
-			SWITCH: /** @type {'switch'} */ ( 'switch' ),
-			SELECT: /** @type {'select'} */ ( 'select' ),
-			RADIOS: /** @type {'radioList'} */ ( 'radioList' ),
+			SWITCH: /** @type {Enums.OutputFormats} */ ( 'switch' ),
+			SELECT: /** @type {Enums.OutputFormats} */ ( 'select' ),
+			RADIOS: /** @type {Enums.OutputFormats} */ ( 'radioList' ),
 		};
 	}
 
@@ -490,10 +485,10 @@ class StyleSwitch extends StyleSwitchInternal
 	static get ROLE ()
 	{
 		return {
-			PERSISTENT: /** @type {'persistent'} */ ( 'persistent' ),
-			PREFERRED: /** @type {'preferred'} */ ( 'preferred' ),
-			ALTERNATE: /** @type {'alternate'} */ ( 'alternate' ),
-			ALTERNATE_CLONE: /** @type {'alternate (clone of persistent)'} */ ( 'alternate (clone of persistent)' ),
+			PERSISTENT: /** @type {Enums.Roles} */ ( 'persistent' ),
+			PREFERRED: /** @type {Enums.Roles} */ ( 'preferred' ),
+			ALTERNATE: /** @type {Enums.Roles} */ ( 'alternate' ),
+			ALTERNATE_CLONE: /** @type {Enums.Roles} */ ( 'alternate (clone of persistent)' ),
 		};
 	}
 
@@ -956,7 +951,7 @@ Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 /** @type {StyleSwitch.prototype} */
 const ss = new StyleSwitch();
 
-/** @returns {HTMLElement|null} */
-const result = await ss.rootElement;
+/** @returns {?HTMLElement} */
+const result = ss.settings.autoRun ? await ss.rootElement : null;
 
 export { StyleSwitch, result };

@@ -1,5 +1,9 @@
 # StyleSwitch
 
+- verze: `1.3`
+- podstatný soubor: `style-switch.mjs`
+- integrity check sha256: `Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=`
+
 Přepínač různých CSS stylů na webových stránkách.
 
 Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dělat další?
@@ -9,7 +13,7 @@ Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dě
 Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:
 
 ```html
-<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
 
 To už stačí pro základní funkčnost:
@@ -114,8 +118,11 @@ Script schopný:
 
 Minimální funkční použití:
 ```html
-<script src="./style-switch.mjs?v=1.2" type="module" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
+
+Pouze čistý javascript s TypeScript anotacemi, žádné další závislosti, knihovny, frameworky nebo něco takového. TypeScript co? Ten se týká pouze anotací, různé automatické nástroje a analyzátory kódu mohou tuto knihovnu označit jako TypeScript projekt, ale není tomu tak, jde o selhání autodetekce, sám script je skutečně čistý javascript, pouze anotace, rozhraní, typy proměnných … jsou popsány v TypeScriptu.
+
 … a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.
 
 
@@ -182,7 +189,7 @@ příklad:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.2" type="module" crossorigin="anonymous" integrity="sha256-CgwuxG1FPPs5kvdymZ59LlOn9crcys0AlDMwyG706zg="></script>
+<script src="./style-switch.mjs?v=1.3" type="module" crossorigin="anonymous" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
 ```
 (V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z `StyleSwitch.DEFAULT_SETTINGS`)
 
@@ -195,7 +202,7 @@ Důležitá je návratová hodnota v proměnné `result`. V této proměnné je 
 příklad:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -282,7 +289,7 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.2&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,

@@ -1,6 +1,6 @@
 {
 	"name": "style-switch",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"description": "StyleSwitch library for switching between document style sheets.",
 	"keywords": [
 		"front-end",
@@ -10,9 +10,14 @@
 		"ecmascript",
 		"js",
 		"dom",
-		"mjs"
+		"mjs",
+		"styles",
+		"color-scheme",
+		"color",
+		"css",
+		"css styles"
 	],
-	"homepage": "https://iiic.dev/styles-witch#npmjs",
+	"homepage": "https://iiic.dev/style-switch#npmjs",
 	"bugs": {
 		"url": "https://github.com/iiic/StyleSwitch/issues"
 	},
