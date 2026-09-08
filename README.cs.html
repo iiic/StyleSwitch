@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="cs">
 
 <head>
 	<meta charset="UTF-8">
@@ -255,15 +255,15 @@
 	<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
 	<h1 id="styleswitch">StyleSwitch</h1>
 	<ul>
-		<li>verze: <code>1.3</code></li>
+		<li>verze: <code>1.4</code></li>
 		<li>podstatný soubor: <code>style-switch.mjs</code></li>
-		<li>integrity check sha256: <code>Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=</code></li>
+		<li>integrity check: <code>sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=</code></li>
 	</ul>
 	<p>Přepínač různých CSS stylů na webových stránkách.</p>
 	<p>Přepínačů stylů stránky typu &quot;světlý / tmavý vzhled&quot; je plno, proč dělat další?</p>
 	<h2 id="rychly-start">Rychlý start</h2>
 	<p>Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>To už stačí pro základní funkčnost:</p>
 	<ul>
@@ -343,7 +343,7 @@
 		<li>Volitelný listener na příslušnou cookie umožňující živě přepnout styl na zvolený. (Je v samostatném javascriptu, není nutné to použít, pokud preferujete řešení pomocí backend strany a nějakého serverového scriptu)</li>
 	</ol>
 	<p>Minimální funkční použití:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>… a to je všechno, tenhle jeden řádek stačí k plnohodnotné funkci, script si najde styly použité na stránce a sestaví z nich přepínač. Jen tedy přepínač pouze uloží příslušnou cookie, na její zpracování je potřeba něco navíc, ať už server side zpracování, či javascript.</p>
 	<p>Pouze čistý javascript s TypeScript anotacemi, žádné další závislosti, knihovny, frameworky nebo něco takového. TypeScript co? Ten se týká pouze anotací, různé automatické nástroje a analyzátory kódu mohou tuto knihovnu označit jako TypeScript projekt, ale není tomu tak, jde o selhání autodetekce, sám script je skutečně čistý javascript, pouze anotace, rozhraní, typy proměnných … jsou popsány v TypeScriptu.</p>
@@ -391,7 +391,7 @@
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z <code>StyleSwitch.DEFAULT_SETTINGS</code>)</p>
 	<h4 id="2-inject-nastavení-skrz-http-get-parametr">2. Inject nastavení skrz http GET parametr.</h4>
@@ -399,7 +399,7 @@
 	<p>Důležitá je návratová hodnota v proměnné <code>result</code>. V této proměnné je buďto <code>null</code> (pokud se nevytvořil widget… například když stránka neobsahuje žádné styly), nebo <code>HTMLElement</code>, ten je pak možné vložit do libovolné části stránky, jak ukazuje příklad níže. Funkce je asynchronní, takže si na result musíte počkat, buďto <code>await</code> ( <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await</a> ) nebo <code>Promise</code> ( <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise</a> )</p>
 	<p>příklad:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.3&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
 		},
@@ -495,7 +495,7 @@
 	<p>Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomocí vlastního sestavení, může vypadat například takto:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
 
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.3&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">autoRun</span>: <span class="hljs-literal">false</span>,
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
@@ -546,6 +546,11 @@
 		<li><code>modules/importWithIntegrity.mjs</code> script umožňující dynamický <code>import</code> modulů spolu s kontrolou integrity souboru. Taktéž využívá pouze <code>content-type-checker.js</code>.</li>
 		<li>složka <code>readme-screenshots</code>, screenshoty, většinou z konzole prohlížeče.</li>
 		<li>složka <code>example-css</code> css styly použité pro <code>example-usage.html</code>. Vychází z <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
+		<li><code>style-switch.spec.mjs</code>, Unit testy pro hlavní knihovnu. Není to potřeba pro funkci scriptu samotného. Při smazání tohoto souboru se nic nestane, všechno bude fungovat i nadále. Slouží pro programátory či AI agenty, pokud mají v plánu dělat nějaké změny v tomto scriptu, toto jim pomůže zkontrolovat jest se něco nerozbilo.</li>
+		<li><code>modules/ictest.mjs</code>, Spouštěč testů. Slouží **pouze** pro (výše zmíněný) soubor s unit testy. Není potřeba pro knihovnu samotnou.</li>
+		<li><code>tests-runner.html</code> HTML soubor sloužící pro možnost spuštění unit testů i z prohlížeče. Není potřeba pro knihovnu samotnou.</li>
+		<li><code>package.json</code> příkazy a nastavení pro NPM ( [npm.js](https://www.npmjs.com/) ) katalog.</li>
+		<li><code>AGENTS.md</code> příkazy pro AI agenta, popis toho jak pracovat s tímto repositářem. Něco jako readme pro AI.</li>
 		<li><code>README.md</code> popis knihovny, v <code>Markdown</code>u</li>
 		<li><code>README.html</code> ten samý popis ale v HTML formátu</li>
 	</ul>

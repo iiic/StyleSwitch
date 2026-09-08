@@ -6,7 +6,8 @@
  * @typedef {String & { interpolate: (data: Object<string,string>) => string }} InterpolatedString
  */
 
-import { importWithIntegrity } from './modules/importWithIntegrity.mjs';
+import { importWithIntegrity } from 'importWithIntegrity';
+// or with relative path: import { importWithIntegrity } from './modules/importWithIntegrity.mjs';
 
 /**
  * @class

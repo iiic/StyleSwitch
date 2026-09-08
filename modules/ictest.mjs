@@ -10,9 +10,10 @@
 class ictestInternal
 {
 
-	process = {
-		exitCode: 0
-	};
+	/** @type {{exitCode: number}} */
+	process = /** @type {{exitCode: number}} */ ( typeof globalThis.process === 'object' && globalThis.process !== null
+		? globalThis.process
+		: { exitCode: 0 } );
 
 	/** @type {any} */
 	asserted;
@@ -132,7 +133,7 @@ class ictest extends ictestInternal
 			this.openCurrentGroupOnError();
 			console.error( `✗ ${ description }` );
 			console.error( `${ err.message }` );
-			this.process.exitCode++;
+			this.process.exitCode = Number.isInteger( this.process.exitCode ) ? this.process.exitCode + 1 : 1;
 		} finally {
 			for ( const hook of afterEachHooks ) {
 				await hook();
@@ -158,7 +159,7 @@ class ictest extends ictestInternal
 		( group ? group.afterEachHooks : this.afterEachHooks ).push( fn );
 	}
 
-	equal = ( /** @type {any} */ expected, /** @type {String} */ possibleErrorText ) =>
+	equal = ( /** @type {any} */ expected, /** @type {?String} */ possibleErrorText = null ) =>
 	{
 		if ( this.setPossibleNull && this.asserted === null ) {
 			return;
@@ -169,7 +170,7 @@ class ictest extends ictestInternal
 		throw new Error( possibleErrorText ?? `Expected ${ expected }, but got ${ this.asserted }` );
 	}
 
-	toBeDefined = ( /** @type {String} */ possibleErrorText ) =>
+	toBeDefined = ( /** @type {?String} */ possibleErrorText = null ) =>
 	{
 		if ( this.setPossibleNull && this.asserted === null ) {
 			return;
@@ -180,7 +181,7 @@ class ictest extends ictestInternal
 		throw new Error( possibleErrorText ?? `opsík` );
 	}
 
-	toBeInstanceOf = ( /** @type {any} */ instance, /** @type {String} */ possibleErrorText ) =>
+	toBeInstanceOf = ( /** @type {any} */ instance, /** @type {?String} */ possibleErrorText = null ) =>
 	{
 		if ( this.setPossibleNull && this.asserted === null ) {
 			return;
@@ -299,8 +300,8 @@ class ictest extends ictestInternal
 
 const ict = new ictest();
 
-const { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, equal, toBeDefined, toBeInstanceOf } = ict;
-export { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, equal, toBeDefined, toBeInstanceOf };
+const { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, toBeNullOr, equal, toBeDefined, toBeInstanceOf } = ict;
+export { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, toBeNullOr, equal, toBeDefined, toBeInstanceOf };
 
 
 /** @example

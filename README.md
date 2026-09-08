@@ -1,8 +1,8 @@
 # StyleSwitch
 
-- version: `1.3`
+- version: `1.4`
 - important file: `style-switch.mjs`
-- integrity check sha256: `Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=`
+- integrity check: `sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=`
 
 A switch for different CSS styles on web pages.
 
@@ -13,7 +13,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 
 This already does the core work:
@@ -119,7 +119,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 
 Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...
@@ -189,7 +189,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.3" type="module" crossorigin="anonymous" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" crossorigin="anonymous" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -202,7 +202,7 @@ The important return value is stored in the `result` variable. That variable is 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -213,7 +213,7 @@ Example:
 			outputFormat: 'select',
 			reverseOrder: true
 		}
-	} ) );
+	} ) ) );
 
 	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
@@ -289,12 +289,12 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
 		},
-	} ) );
+	} ) ) );
 
 	const s = new StyleSwitch();
 

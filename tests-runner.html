@@ -1,7 +1,27 @@
 <!DOCTYPE html>
-<script type="module">
-	await import( './modules/consoleFilter.mjs?v=1.0&settings=' + JSON.stringify( {
-		appendConsoleIntoBody: true
-	} ) );
-</script>
-<script src="./style-switch.spec.mjs?v=1.0" type="module" integrity="sha256-BgUaQv5d3VVi4K3LHHYYHgMOytB3Ltsnh5AahtYgffo=" crossorigin="anonymous"></script>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Tests runner</title>
+	<script type="importmap">
+		{
+			"imports": {
+				"importWithIntegrity": "./modules/importWithIntegrity.mjs",
+				"contentTypeChecker": "./content-type-checker.js?v=0.1",
+				"consoleFilter": "./modules/consoleFilter.mjs?v=1.0&settings={%22appendConsoleIntoBody%22:true}",
+				"styleSwitchSpec": "./style-switch.spec.mjs?v=1.1"
+			},
+			"integrity": {
+				"./modules/importWithIntegrity.mjs": "sha256-cfOxrPKw+HRch/o1HAGTjzeo5g+8Ho2VW5Ki75Y6DII=",
+				"./content-type-checker.js?v=0.1": "sha256-SZN8aHgz4seFS2YCemAKVqbfhsab0Pnwsh+6Y3jHDKI=",
+				"./modules/consoleFilter.mjs?v=1.0&settings={%22appendConsoleIntoBody%22:true}": "sha256-WT17SAvKbL34KCcNxmPy0Nr09uH8xa0tfbpgv+P+7hw=",
+				"./style-switch.spec.mjs?v=1.1": "sha256-Snc6GjReAxiKNz/AzsEARhJGuXl2ws4D3olRryzjse0="
+			}
+		}
+	</script>
+	<script type="module">
+		import 'importWithIntegrity';
+		import 'consoleFilter';
+		import 'styleSwitchSpec';
+	</script>

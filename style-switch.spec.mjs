@@ -1,15 +1,82 @@
-const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
+if ( typeof process !== 'undefined' && process.versions?.node ) { // If this is an npm console command
+	const { JSDOM } = await import( 'jsdom' );
+	const { default: cssEscape } = await import( 'css.escape' );
+	const dom = new JSDOM( '<!doctype html><html><head></head><body></body></html>', {
+		url: 'http://localhost/'
+	} );
+	const browserGlobals = [
+		'window',
+		'document',
+		'HTMLElement',
+		'HTMLLinkElement',
+		'HTMLOptionElement',
+		'HTMLInputElement',
+		'HTMLSelectElement',
+		'HTMLUListElement',
+		'HTMLScriptElement',
+		'Event',
+		'Node'
+	];
+	const globalObject = /** @type {Record<string, unknown>} */ ( globalThis );
+	const windowObject = /** @type {Record<string, unknown>} */ ( dom.window );
+	for ( const globalName of browserGlobals ) {
+		globalObject[ globalName ] = windowObject[ globalName ];
+	}
+	globalThis.CSS = /** @type {typeof CSS} */ ( { escape: cssEscape } );
+	dom.window.CSS = globalThis.CSS;
+
+	const cookies = new Map();
+	const cookieStore = {
+		onchange: null,
+		async get ( /** @type {string | {name: string}} */ name )
+		{
+			const value = cookies.get( typeof name === 'string' ? name : name.name );
+			return value ? { name: value.name, value: value.value } : null;
+		},
+		async getAll ()
+		{
+			return [ ...cookies.values() ];
+		},
+		async set ( /** @type {{name: string, value: string}} */ cookie )
+		{
+			cookies.set( cookie.name, cookie );
+		},
+		async delete ( /** @type {string | {name: string}} */ cookie )
+		{
+			cookies.delete( typeof cookie === 'string' ? cookie : cookie.name );
+		},
+		addEventListener () { },
+		removeEventListener () { },
+		dispatchEvent () { return true; }
+	};
+	globalThis.cookieStore = /** @type {typeof globalThis.cookieStore} */ ( /** @type {unknown} */ ( cookieStore ) );
+	Object.defineProperty( dom.window, 'cookieStore', {
+		configurable: true,
+		value: cookieStore,
+		writable: true,
+	} );
+	dom.window.matchMedia = ( query ) => ( {
+		media: query,
+		matches: false,
+		onchange: null,
+		addListener () { },
+		removeListener () { },
+		addEventListener () { },
+		removeEventListener () { },
+		dispatchEvent () { return true; }
+	} );
+}
+
+const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
 	autoRun: false,
-} ) );
-const { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, toBeNullOr, equal, toBeDefined, toBeInstanceOf } = await import( './modules/ictest.mjs?v=0.1&settings=' + JSON.stringify( {
+} ) ) );
+const { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, toBeNullOr, equal, toBeDefined, toBeInstanceOf } = /** @type {typeof import('./modules/ictest.mjs')} */ ( await import( './modules/ictest.mjs?v=1.0&settings=' + JSON.stringify( {
 	nastaveni: {
 		a: true,
 	},
-} ) );
+} ) ) );
 
-const JSON_SETTINGS_ID = 'style-switch-settings';
-
-await group( 'Statické testy', async () =>
+await group( 'Static tests', async () =>
 {
 
 	await it( 'StyleSheet should have DEFAULT_SETTINGS defined as Object', async () =>
@@ -38,17 +105,22 @@ await group( 'Statické testy', async () =>
 	await it( 'It\'s possible to add new static property, and new property should not be readonly', async () =>
 	{
 		const propertyName = 'nonExistingProperty';
+
+		// @ts-ignore
 		StyleSwitch[ propertyName ] = propertyName;
+
 		assert( StyleSwitch ).not.hasReadOnlyProperty( propertyName );
+
+		// @ts-ignore
 		assert( StyleSwitch[ propertyName ] ).equal( propertyName );
 	} );
 
 } );
 
-await group( 'Dynamické testy', async () =>
+await group( 'Dynamic tests', async () =>
 {
 
-	await it( 'bez css stylů v hlavičce, mělo v result by vrátit null', async () =>
+	await it( 'Without css stylesheet links in document\'s head … result should be null', async () =>
 	{
 		const ss = new StyleSwitch();
 		const result = await ss.run();
@@ -80,12 +152,18 @@ await group( 'Dynamické testy', async () =>
 	{
 		const ss = new StyleSwitch();
 		const propertyName = 'nonExistingProperty';
+
+		// @ts-ignore
 		ss[ propertyName ] = propertyName;
+
 		assert( ss ).not.hasReadOnlyProperty( propertyName );
+
+		//@ts-ignore
 		assert( ss[ propertyName ] ).equal( propertyName );
+
 	} );
 
-	await group( 'testy s nějakými css styly… tedy už to bude něco dělat', async () =>
+	await group( 'Test with some css link StyleSheet elements presented.', async () =>
 	{
 
 		beforeEach( () =>
@@ -105,7 +183,7 @@ await group( 'Dynamické testy', async () =>
 			document.head.querySelectorAll( '[data-ictest="true"]' ).forEach( link => link.remove() );
 		} );
 
-		await it( 'result of StyleSwitch should be some HTMLElement or null', async () =>
+		await it( 'Result of StyleSwitch should be some HTMLElement or null', async () =>
 		{
 			const ss = new StyleSwitch();
 			const result = await ss.run();
@@ -179,6 +257,114 @@ await group( 'Dynamické testy', async () =>
 				const possibleSelect = result.querySelector( 'input[type=checkbox][role=switch]' );
 				assert( possibleSelect ).toBeInstanceOf( HTMLInputElement );
 			}
+		} );
+
+	} );
+
+	await group( 'Regression tests for stylesheet paths and cookies', async () =>
+	{
+		beforeEach( () =>
+		{
+			document.head.querySelectorAll( '[data-regression-style="true"]' ).forEach( link => link.remove() );
+		} );
+
+		afterEach( async () =>
+		{
+			document.head.querySelectorAll( '[data-regression-style="true"]' ).forEach( link => link.remove() );
+			await cookieStore.delete( { name: 'stylesheets' } );
+		} );
+
+		await it( 'Handles stylesheet URLs with special characters', async () =>
+		{
+			const persistentLink = document.createElement( 'link' );
+			persistentLink.setAttribute( 'data-regression-style', 'true' );
+			persistentLink.rel = 'stylesheet';
+			persistentLink.setAttribute( 'href', './theme[dark]".css' );
+			persistentLink.disabled = true;
+			const alternateLink = document.createElement( 'link' );
+			alternateLink.setAttribute( 'data-regression-style', 'true' );
+			alternateLink.rel = 'alternate stylesheet';
+			alternateLink.setAttribute( 'href', './theme[dark]".css' );
+			alternateLink.title = 'Dark theme';
+			alternateLink.disabled = true;
+			document.head.append( persistentLink, alternateLink );
+
+			assert( StyleSwitch.getRoleFrom( alternateLink ) ).equal( StyleSwitch.ROLE.ALTERNATE_CLONE );
+		} );
+
+		await it( 'Ignores and removes a damaged cookie', async () =>
+		{
+			await cookieStore.set( {
+				name: 'stylesheets',
+				value: '{damaged json'
+			} );
+			const styleLink = document.createElement( 'link' );
+			styleLink.setAttribute( 'data-regression-style', 'true' );
+			styleLink.rel = 'alternate stylesheet';
+			styleLink.href = './regression.css';
+			styleLink.title = 'Regression style';
+			styleLink.disabled = true;
+			document.head.append( styleLink );
+
+			const ss = new StyleSwitch();
+			const result = await ss.run();
+			const cookie = await cookieStore.get( 'stylesheets' );
+			assert( result ).equal( null );
+			assert( cookie ).equal( null );
+		} );
+
+		await it( 'Creates a switch for one stylesheet and the naked style', async () =>
+		{
+			const styleLink = document.createElement( 'link' );
+			styleLink.setAttribute( 'data-regression-style', 'true' );
+			styleLink.rel = 'alternate stylesheet';
+			styleLink.href = './regression.css';
+			styleLink.title = 'Regression style';
+			styleLink.disabled = true;
+			document.head.append( styleLink );
+
+			const ss = new StyleSwitch();
+			ss.settings.nakedStyle.use = true;
+			ss.settings.resultSnippetAppearance.outputFormat = StyleSwitch.OUTPUT_FORMATS.SWITCH;
+			const result = await ss.run();
+			const checkbox = result?.querySelector( 'input[type=checkbox][role=switch]' );
+			assert( checkbox ).toBeInstanceOf( HTMLInputElement );
+			if ( checkbox && checkbox instanceof HTMLInputElement ) {
+				assert( checkbox.checked ).equal( false );
+			}
+		} );
+
+		await it( 'Selects the exact stylesheet when URLs share a prefix', async () =>
+		{
+			const shortPath = './styles/theme.css';
+			const longPath = './styles/theme.css?dark';
+			const shortLink = document.createElement( 'link' );
+			shortLink.setAttribute( 'data-regression-style', 'true' );
+			shortLink.rel = 'alternate stylesheet';
+			shortLink.setAttribute( 'href', shortPath );
+			shortLink.title = 'Light theme';
+			shortLink.disabled = true;
+			const longLink = document.createElement( 'link' );
+			longLink.setAttribute( 'data-regression-style', 'true' );
+			longLink.rel = 'alternate stylesheet';
+			longLink.setAttribute( 'href', longPath );
+			longLink.title = 'Dark theme';
+			longLink.disabled = true;
+			document.head.append( shortLink, longLink );
+
+			const rootElement = document.createElement( 'div' );
+			const optionShort = document.createElement( 'option' );
+			optionShort.value = shortPath;
+			const optionLong = document.createElement( 'option' );
+			optionLong.value = longPath;
+			rootElement.append( optionShort, optionLong );
+			StyleSwitch.setValueOnResultElementBy( {
+				[ shortPath ]: { disabled: true },
+				[ longPath ]: { disabled: false }
+			}, StyleSwitch.OUTPUT_FORMATS.SELECT, rootElement );
+
+			assert( optionShort.selected ).equal( false );
+			assert( optionLong.selected ).equal( true );
 		} );
 
 	} );

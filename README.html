@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 	<meta charset="UTF-8">
@@ -255,15 +255,15 @@
 	<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
 	<h1 id="styleswitch">StyleSwitch</h1>
 	<ul>
-		<li>version: <code>1.3</code></li>
+		<li>version: <code>1.4</code></li>
 		<li>important file: <code>style-switch.mjs</code></li>
-		<li>integrity check sha256: <code>Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=</code></li>
+		<li>integrity check: <code>sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=</code></li>
 	</ul>
 	<p>A switch for different CSS styles on web pages.</p>
 	<p>There are plenty of light/dark theme style switchers, so why make another one?</p>
 	<h2 id="quick-start">Quick start</h2>
 	<p>If you want the fastest possible setup, add a container for the widget and include the module:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>This already does the core work:</p>
 	<ul>
@@ -344,7 +344,7 @@
 		<li>Optional listener for the appropriate cookie allowing live switching to the chosen style (this is in a separate JavaScript file and is not required if you prefer a backend solution with a server-side script)</li>
 	</ol>
 	<p>Minimal working usage:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...</p>
 	<p>... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.</p>
@@ -392,7 +392,7 @@
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in <code>StyleSwitch.DEFAULT_SETTINGS</code>.)</p>
 	<h4 id="2-inject-settings-via-an-http-get-parameter">2. Inject settings via an HTTP GET parameter.</h4>
@@ -400,7 +400,7 @@
 	<p>The important return value is stored in the <code>result</code> variable. That variable is either <code>null</code> (if the widget was not created, for example when the page contains no styles) or an <code>HTMLElement</code>, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using <code>await</code> or <code>Promise</code>.</p>
 	<p>Example:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.3&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
 		},
@@ -496,7 +496,7 @@
 	<p>If you want to make more extensive modifications to the class, it is possible using a custom assembly, which can look like this:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
 
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.3&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">autoRun</span>: <span class="hljs-literal">false</span>,
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
@@ -547,6 +547,11 @@
 		<li><code>modules/importWithIntegrity.mjs</code>, a script that enables dynamic import of modules with file integrity checking. It is also used only by <code>content-type-checker.js</code>.</li>
 		<li>folder <code>readme-screenshots</code>, screenshots, mostly from the browser console.</li>
 		<li>folder <code>example-css</code>, CSS styles used by <code>example-usage.html</code>. Based on <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
+		<li><code>style-switch.spec.mjs</code>, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.</li>
+		<li><code>modules/ictest.mjs</code>, Tests runtime. Used **only** for the above mentioned unit test file. Not needed for the script itself.</li>
+		<li><code>tests-runner.html</code> HTML file used for run tests in Browser. It is also not needed for the script itself.</li>
+		<li><code>package.json</code> command for NPM ( [npm.js](https://www.npmjs.com/) ) catalog.</li>
+		<li><code>AGENTS.md</code> commands for AI agents, description how to work with this repository. Something like Readme for AI.</li>
 		<li><code>README.md</code> library description in Markdown</li>
 		<li><code>README.html</code> the same description in HTML format</li>
 	</ul>

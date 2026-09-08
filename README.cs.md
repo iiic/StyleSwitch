@@ -1,8 +1,8 @@
 # StyleSwitch
 
-- verze: `1.3`
+- verze: `1.4`
 - podstatný soubor: `style-switch.mjs`
-- integrity check sha256: `Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg=`
+- integrity check: `sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=`
 
 Přepínač různých CSS stylů na webových stránkách.
 
@@ -13,7 +13,7 @@ Přepínačů stylů stránky typu "světlý / tmavý vzhled" je plno, proč dě
 Pokud chceš nejrychlejší možný začátek, přidej na stránku kontejner pro widget a vlož modul:
 
 ```html
-<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 
 To už stačí pro základní funkčnost:
@@ -118,7 +118,7 @@ Script schopný:
 
 Minimální funkční použití:
 ```html
-<script src="./style-switch.mjs?v=1.3" type="module" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 
 Pouze čistý javascript s TypeScript anotacemi, žádné další závislosti, knihovny, frameworky nebo něco takového. TypeScript co? Ten se týká pouze anotací, různé automatické nástroje a analyzátory kódu mohou tuto knihovnu označit jako TypeScript projekt, ale není tomu tak, jde o selhání autodetekce, sám script je skutečně čistý javascript, pouze anotace, rozhraní, typy proměnných … jsou popsány v TypeScriptu.
@@ -189,7 +189,7 @@ příklad:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.3" type="module" crossorigin="anonymous" integrity="sha256-Rpa2BKQqJqlPjk3P8BRONSt36Bb+B4IAlK5aWV1u/xg="></script>
+<script src="./style-switch.mjs?v=1.4" type="module" crossorigin="anonymous" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
 ```
 (V tomto případu umožňuji stránku bez css jako jeden z možných stylů, a přepisuji nadpis widgetu, ostatní nastavení zůstane v defaultu, tak jak je patrné z `StyleSwitch.DEFAULT_SETTINGS`)
 
@@ -202,7 +202,7 @@ Důležitá je návratová hodnota v proměnné `result`. V této proměnné je 
 příklad:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -213,7 +213,7 @@ příklad:
 			outputFormat: 'select',
 			reverseOrder: true
 		}
-	} ) );
+	} ) ) );
 
 	/** @type {?HTMLElement} */
 	const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
@@ -289,12 +289,12 @@ Pokud chcete dělat nějaké rozsáhlejší úpravy třídy, je to možné pomoc
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = await import( './style-switch.mjs?v=1.3&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
 		},
-	} ) );
+	} ) ) );
 
 	const s = new StyleSwitch();
 
@@ -347,6 +347,11 @@ Dále jsou tam:
 - `modules/importWithIntegrity.mjs` script umožňující dynamický `import` modulů spolu s kontrolou integrity souboru. Taktéž využívá pouze `content-type-checker.js`.
 - složka `readme-screenshots`, screenshoty, většinou z konzole prohlížeče.
 - složka `example-css` css styly použité pro `example-usage.html`. Vychází z [MVP.css](https://andybrewer.github.io/mvp/)
+- `style-switch.spec.mjs`, Unit testy pro hlavní knihovnu. Není to potřeba pro funkci scriptu samotného. Při smazání tohoto souboru se nic nestane, všechno bude fungovat i nadále. Slouží pro programátory či AI agenty, pokud mají v plánu dělat nějaké změny v tomto scriptu, toto jim pomůže zkontrolovat jest se něco nerozbilo.
+- `modules/ictest.mjs`, Spouštěč testů. Slouží **pouze** pro (výše zmíněný) soubor s unit testy. Není potřeba pro knihovnu samotnou.
+- `tests-runner.html` HTML soubor sloužící pro možnost spuštění unit testů i z prohlížeče. Není potřeba pro knihovnu samotnou.
+- `package.json` příkazy a nastavení pro NPM ( [npm.js](https://www.npmjs.com/) ) katalog.
+- `AGENTS.md` příkazy pro AI agenta, popis toho jak pracovat s tímto repositářem. Něco jako readme pro AI.
 - `README.md` popis knihovny, v `Markdown`u
 - `README.html` ten samý popis ale v HTML formátu
 

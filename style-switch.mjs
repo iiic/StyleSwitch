@@ -75,12 +75,15 @@ class StyleSwitchInternal
 	/** @type {Classes.StyleSwitchInternal.getRoleFrom} */
 	static getRoleFrom ( styleLink )
 	{
-		const rel = styleLink.rel.split( ' ' );
-		const hasAlternate = rel.includes( StyleSwitch.ROLE.ALTERNATE ) || styleLink.hasAttribute( 'data-' + StyleSwitch.ROLE.ALTERNATE );
-		const hasTitle = ( ( 'title' in styleLink ) && styleLink.title !== '' ) || ( styleLink.hasAttribute( 'data-title' ) && styleLink.getAttribute( 'data-title' ) !== '' );
+		const hasAlternate = styleLink.relList.contains( StyleSwitch.ROLE.ALTERNATE )
+			|| styleLink.hasAttribute( 'data-' + StyleSwitch.ROLE.ALTERNATE );
+		const hasTitle = ( ( 'title' in styleLink ) && styleLink.title !== '' )
+			|| ( styleLink.hasAttribute( 'data-title' ) && styleLink.getAttribute( 'data-title' ) !== '' );
 
 		if ( hasAlternate && hasTitle ) {
-			const possibleCloneOfPersistent = document.querySelector( `link[rel=stylesheet][href*="${ StyleSwitch.getOriginalHrefAttribute( styleLink ) }"]:not([title])` );
+			const possibleCloneOfPersistent = document.querySelector(
+				`link[rel=stylesheet][href*="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( styleLink ) ) }"]:not([title])`
+			);
 			return possibleCloneOfPersistent ? StyleSwitch.ROLE.ALTERNATE_CLONE : StyleSwitch.ROLE.ALTERNATE;
 		} else if ( !hasAlternate && hasTitle ) {
 			return StyleSwitch.ROLE.PREFERRED;
@@ -192,7 +195,7 @@ class StyleSwitchInternal
 			if ( isDisabled === false ) {
 
 				/** @type { Types.PossibleOutputElement } */
-				const possibleElement = rootElement.querySelector( `[value*="${ path }"]` );
+				const possibleElement = rootElement.querySelector( `[value*="${ CSS.escape( path ) }"]` );
 
 				StyleSwitch.setCurrentSelection( possibleElement );
 			}
@@ -211,7 +214,7 @@ class StyleSwitchInternal
 		}
 		if ( interestStyleSheets.length === 1 ) { // one stylesheet and naked style
 			if ( interestStyleSheets[ 0 ].reference ) {
-				inputCheckboxElement.checked === true;
+				inputCheckboxElement.checked = true;
 			}
 			return;
 		}
@@ -254,7 +257,7 @@ class StyleSwitchInternal
 		{
 
 			/** @type { ?HTMLLinkElement } */
-			const possibleLinkElement = document.querySelector( `link[rel~=stylesheet][href*="${ StyleSwitch.getOriginalHrefAttribute( element ) }"][title]` );
+			const possibleLinkElement = document.querySelector( `link[rel~=stylesheet][href*="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( element ) ) }"][title]` );
 
 			if ( possibleLinkElement ) {
 				if ( possibleLinkElement.media && window.matchMedia( possibleLinkElement.media ).matches ) {
@@ -348,11 +351,14 @@ class StyleSwitchInternal
 			if ( possibleChangedCookie.value === '' ) { // empty value means same behavior like deleted cookie
 				possibleDeletedCookie = true;
 			} else if ( possibleChangedCookie.value ) {
+				try {
+					/** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */
+					const cookieObject = JSON.parse( possibleChangedCookie.value );
 
-				/** @type {Object.<string, {disabled: boolean, byNakedDay?: boolean}>} */
-				const cookieObject = JSON.parse( possibleChangedCookie.value );
-
-				StyleSwitch.setValueOnResultElementBy( cookieObject, outputFormat, rootElement );
+					StyleSwitch.setValueOnResultElementBy( cookieObject, outputFormat, rootElement );
+				} catch {
+					possibleDeletedCookie = true;
+				}
 			}
 		}
 		if ( possibleDeletedCookie ) {
@@ -450,7 +456,8 @@ class StyleSwitchInternal
  * @class
  * @extends StyleSwitchInternal
  * @implements {Classes.StyleSwitch}
- * @version 1.3
+ * @version 1.4
+ * @since Q4 2026
  * @file style-switch.mjs
  * @license CC-BY-SA-4.0
  * @author ic<ic.czech+style-switch@gmail.com>
@@ -542,22 +549,27 @@ class StyleSwitch extends StyleSwitchInternal
 		let byNakedDay = false;
 		const cookie = await cookieStore.get( this.settings.cookie.name );
 		if ( cookie && cookie.value ) {
+			try {
+				/** @type {Types.ResultCookieObject} */
+				const styles = JSON.parse( cookie.value );
 
-			/** @type {Types.ResultCookieObject} */
-			const styles = JSON.parse( cookie.value );
-
-			const paths = Object.keys( styles );
-			loopThroughStyleSheetsPaths:
-			for ( const path of paths ) {
-				const isDisabled = styles[ path ].disabled;
-				const isSetByNakedDay = styles[ path ].byNakedDay;
-				if ( isDisabled === false ) {
-					foundPath = path;
-					if ( isSetByNakedDay ) {
-						byNakedDay = true;
+				const paths = Object.keys( styles );
+				loopThroughStyleSheetsPaths:
+				for ( const path of paths ) {
+					const isDisabled = styles[ path ].disabled;
+					const isSetByNakedDay = styles[ path ].byNakedDay;
+					if ( isDisabled === false ) {
+						foundPath = path;
+						if ( isSetByNakedDay ) {
+							byNakedDay = true;
+						}
+						break;
 					}
-					break;
 				}
+			} catch {
+				await cookieStore.delete( {
+					name: this.settings.cookie.name,
+				} );
 			}
 		}
 
