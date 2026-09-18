@@ -4,8 +4,6 @@
 Make native `console.log()` (and other console methods) proxied and filtered by text string.
 
 ## Architecture & Key Paths
-- `consoleFilter.globals.d.ts`, interface with all types and annotations for script. This will help your editor (or your AI agent) to understand the script, know what each method does, what the input parameters are, what data types the variables have, ... However, it is not needed for the script to function properly. If you delete the file, everything will work as before (just your IDE or AI agent may not work as well as it could).
-- `consoleFilter.spec.mjs`, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.
 - `modules/ictest.mjs`, Tests runtime. Used **only** for the above mentioned unit test file. Not needed for the script itself.
 - `tests-runner.html` HTML file used for run tests in Browser. It is also not needed for the script itself.
 - `package.json` command for NPM ( [npm.js](https://www.npmjs.com/) ) catalog.

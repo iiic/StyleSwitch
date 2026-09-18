@@ -26,16 +26,16 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"importWithIntegrity": "./modules/importWithIntegrity.mjs",
-				"contentTypeChecker": "./content-type-checker.js?v=0.1",
+				"interpolate": "./modules/string/interpolate.mjs",
+				"contentTypeChecker": "./content-type-checker.js?v=0.2",
 				"styleSwitchCookieListenerExample": "./style-switch-cookie-listener-example.js?v=1.0",
-				"styleSwitch": "./style-switch.mjs?v=1.4"
+				"styleSwitch": "./style-switch.mjs?v=1.4.1"
 			},
 			"integrity": {
-				"./modules/importWithIntegrity.mjs": "sha256-cfOxrPKw+HRch/o1HAGTjzeo5g+8Ho2VW5Ki75Y6DII=",
-				"./content-type-checker.js?v=0.1": "sha256-SZN8aHgz4seFS2YCemAKVqbfhsab0Pnwsh+6Y3jHDKI=",
+				"./modules/string/interpolate.mjs": "sha256-Aitn7qM8Ml8BV4dtcQUksJfFzdU9NQ745axG1nK9y44=",
+				"./content-type-checker.js?v=0.2": "sha256-xM+TUyVYAty2bkG9LmlZM18VQnXi9+ijV7I3JtxPJxE=",
 				"./style-switch-cookie-listener-example.js?v=1.0": "sha256-CJNHv370jlgrCgbvYufk258TKe7tXWU1fBGBBgQXqrE=",
-				"./style-switch.mjs?v=1.4": "sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="
+				"./style-switch.mjs?v=1.4.1": "sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="
 			}
 		}
 	</script>
@@ -50,7 +50,7 @@
 	<link rel="alternate stylesheet" href="./example-css/light.css" title="Light style" crossorigin="anonymous"><!-- alternate -->
 	<link rel="alternate stylesheet" href="./example-css/alternate.css" title="Alternate style" fetchpriority="low" crossorigin="anonymous"><!-- alternate -->
 	<!-- Possible StyleSwitch settings using method 1: JSON in an element identified by id -->
-	<!-- <script type="application/json" id="style-switch-settings">
+	<script type="application/json" id="styleSwitchSettings">
 	{
 		"nakedStyle": {
 			"use": true
@@ -59,27 +59,24 @@
 			"caption": "Chose a style for website"
 		}
 	}
-	</script> -->
-	<!-- <script src="./style-switch.mjs?v=1.4" type="module" crossorigin="anonymous" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script><!-- default usage, with default settings -->
-
-	<script type="module">
+	</script>
+	<script src="./style-switch.mjs?v=1.4.1" type="module" crossorigin="anonymous"></script><!-- default usage, with default settings -->
+	<!-- <script type="module">
 
 		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter */
 
-		const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
+		const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.1&styleSwitchSettings=' + JSON.stringify( {
 			nakedStyle: {
 				use: true,
 			},
 			texts: {
-				caption: 'StyleSwitch caption',
+				caption: 'New and special StyleSwitch caption',
 			},
 			resultSnippetAppearance: {
 				outputFormat: 'select',
 				reverseOrder: true,
 			}
 		} ) ) );
-
-		window.StyleSwitch = StyleSwitch;
 
 		/** @type {?HTMLElement} */
 		const customStyleSwitchElement = document.getElementById( 'custom-style-switch' );
@@ -89,18 +86,19 @@
 			customStyleSwitchElement.appendChild( result );
 		}
 
-	</script>
-
+	</script> -->
 	<!-- <script type="module">
 
-		/* Possible usage of StyleSwitch 2. method: dynamic import with settings injection by http get parameter, but without 'autorun' and with custom build of script */
+		/* Possible usage of StyleSwitch 3. variable in window object and custom build of run() function */
 
-		const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
+		window[ 'styleSwitchSettings' ] = {
 			autoRun: false,
 			nakedStyle: {
 				use: true,
 			},
-		} ) ) );
+		};
+
+		const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ await import( 'styleSwitch' );
 
 		const s = new StyleSwitch();
 
@@ -111,7 +109,7 @@
 		const { currentlyActivatedPath, byNakedDay } = await s.getCurrentlyActivatedStyleSheetsPath();
 
 		/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */
-		const interestStyleSheets = s.getCleanedStyleSheetsObject(); // without duplicates and persistent styleSheets
+		const interestStyleSheets = s.getCleanedStyleSheetsObject();
 
 		s.celebrateNakedDay( interestStyleSheets );
 		s.cancelNakedDay( byNakedDay );
@@ -127,6 +125,7 @@
 		{
 			customStyleSwitchElement.appendChild( customResult );
 		}
+
 	</script> -->
 </head>
 
@@ -208,7 +207,7 @@
 				<p>The script supports many types of configuration and customization to meet a wide range of requirements. If you do not need customization, the basic script only requires inserting one line of JavaScript into the document:</p>
 				<pre>
 					<code>
-&lt;script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="&gt;&lt;/script&gt;
+&lt;script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="&gt;&lt;/script&gt;
 					</code>
 				</pre>
 			</details>
@@ -232,8 +231,7 @@
 				<ul>
 					<li><code>example-usage.html</code> an example of using StyleSwitch.</li>
 					<li><code>content-type-checker.js</code>, checks server configuration to ensure all file extensions have the correct MIME type. A common problem is the .mjs extension missing the correct MIME type <code>'text/javascript'</code>. If this happens, you can either rename the extension from .mjs to .js (and update file paths, such as in <code>example-usage.html</code>) or configure the web server to assign the MIME type <code>'text/javascript'</code> to .mjs files.</li>
-					<li><code>modules/string/interpolate.mjs</code>, used only by <code>content-type-checker.js</code>, it allows inserting variables into text strings and outputting them.</li>
-					<li><code>modules/importWithIntegrity.mjs</code>, a script enabling dynamic module <code>import</code> with file integrity checking. It is also used only by <code>content-type-checker.js</code>.</li>
+					<li><code>modules/string/interpolate.mjs</code>, used only by <code>content-type-checker.js</code>, it allows inserting variables into text strings and outputting them. Dynamic module loading is done via native <code>fetch()</code> with integrity checking and importmap-based module resolution.</li>
 					<li><code>readme-screenshots</code> folder, screenshots mostly from the browser console.</li>
 					<li><code>example-css</code> folder, CSS styles used for <code>example-usage.html</code>. Based on <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
 					<li><code>README.md</code> library description in <code>Markdown</code></li>

@@ -6,9 +6,6 @@
  * @typedef {String & { interpolate: (data: Object<string,string>) => string }} InterpolatedString
  */
 
-import { importWithIntegrity } from 'importWithIntegrity';
-// or with relative path: import { importWithIntegrity } from './modules/importWithIntegrity.mjs';
-
 /**
  * @class
  * @description internal class, not accessible from outside the script
@@ -394,25 +391,45 @@ const ContentTypeCheckerInternal = class
 		return testingFileExtensionsObject;
 	}
 
-	static async loadExternalFunctions ( /** @type {String} */ modulesImportPath = '' )
+	static async loadExternalFunctions ()
 	{
+		/** @type {(moduleName: string) => {path: string, integrity: string}} */
+		const resolveFromImportmap = ( /** @type {string} */ moduleName ) =>
+		{
+			/** @type {NodeListOf<HTMLScriptElement>} */
+			const importmapScripts = document.querySelectorAll( 'script[type="importmap"]' );
+			for ( /** @type {HTMLScriptElement} */ const script of importmapScripts ) {
+				try {
+					/** @type {{ imports?: Record<string, string>, integrity?: Record<string, string> }} */
+					const importmap = JSON.parse( script.text );
+					if ( importmap.imports && moduleName in importmap.imports ) {
+						/** @type {String} */
+						const filePath = importmap.imports[ moduleName ];
+						/** @type {String} */
+						const integrity = ( importmap.integrity && filePath in importmap.integrity )
+							? importmap.integrity[ filePath ]
+							: '';
+						return { path: filePath, integrity: integrity };
+					}
+				} catch { /* ignore parse errors */ }
+			}
+			return { path: moduleName, integrity: '' };
+		};
+
 		return Promise.all( [
-			{
-				name: 'interpolate',
-				appendInto: String,
-				path: modulesImportPath + '/string/interpolate.mjs',
-				integrity: 'sha256-Aitn7qM8Ml8BV4dtcQUksJfFzdU9NQ745axG1nK9y44='
-			},
-		].map( async ( { name, appendInto, path, integrity } ) =>
+			{ name: 'interpolate', appendInto: String },
+		].map( async ( { name, appendInto } ) =>
 		{
 			if ( !appendInto.hasOwnProperty( name ) ) {
-				return importWithIntegrity(
-					/** @type {String} */ path,
-					/** @type {String} */ integrity
-				).then( ( /** @type {module} */ module ) =>
-				{
-					return new module.append( appendInto );
-				} );
+				const { path, integrity } = resolveFromImportmap( /** @type {string} */ name );
+				const response = await fetch( path, { integrity } );
+				if ( !response.ok ) {
+					throw new Error( 'Integrity check failed for ' + name );
+				}
+				const text = await response.text();
+				const blob = new Blob( [ text ], { type: 'application/javascript' } );
+				const module = await import( URL.createObjectURL( blob ) );
+				return new module.append( appendInto );
 			}
 		} ) );
 	}
@@ -433,7 +450,7 @@ const ContentTypeCheckerInternal = class
 	{
 		this.checkRequirements();
 		this.updatePathByBase();
-		await ContentTypeChecker.loadExternalFunctions( this.settings.modulesImportPath );
+		await ContentTypeChecker.loadExternalFunctions();
 
 		/** @type {Array<{fileExtension: string, path: string, reportingType: 'alert' | 'warning' | 'object', contentType: string}>} */
 		const testingObject = this.prepareTestingObject();
@@ -450,8 +467,13 @@ const ContentTypeCheckerInternal = class
 
 /**
  * @class
- * @description accessible from Window object
+ * @description Checks if (some important) files by extension have corresponding mime types
  * @extends ContentTypeCheckerInternal
+ * @version 0.2
+ * @since Q4 2026
+ * @file content-type-checker.js
+ * @license CC-BY-SA-4.0
+ * @author ic<ic.czech+content-type-checker@gmail.com>
  * @returns {void|Array.<{ fileExtension: string, path: string; contentType: string; }>}
  */
 class ContentTypeChecker extends ContentTypeCheckerInternal

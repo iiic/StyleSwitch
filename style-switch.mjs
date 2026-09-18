@@ -367,19 +367,27 @@ class StyleSwitchInternal
 	}
 
 	/** @type {Classes.StyleSwitchInternal['constructor']} */
-	constructor ( settingsElementId = 'style-switch-settings' )
+	constructor ()
 	{
-		const searchParams = new URL( import.meta.url ).searchParams;
-		if ( searchParams.has( StyleSwitch.SETTINGS_URL_PARAMETER ) ) {
-			const jsonInString = searchParams.get( StyleSwitch.SETTINGS_URL_PARAMETER );
-			if ( jsonInString ) {
-				this.settings = JSON.parse( jsonInString );
+		const settingsIdentifier = this.settings.settingsIdentifier;
+		if ( settingsIdentifier in window ) {
+			const settingsFromWindow = /** @type {{ [key: string]: any }} */ ( window )[ settingsIdentifier ];
+			if ( settingsFromWindow && typeof settingsFromWindow === 'object' ) {
+				this.settings = settingsFromWindow.nodeType === Node.ELEMENT_NODE ? JSON.parse( settingsFromWindow.text ) : settingsFromWindow;
 			}
-		}
-		const settingsElement = document.getElementById( settingsElementId );
-		if ( settingsElement && settingsElement instanceof HTMLScriptElement ) {
-			const jsonInElement = settingsElement;
-			this.settings = JSON.parse( jsonInElement.text );
+		} else {
+			const settingsElement = document.getElementById( settingsIdentifier );
+			if ( settingsElement && settingsElement instanceof HTMLScriptElement ) {
+				this.settings = JSON.parse( settingsElement.text );
+			} else {
+				const searchParams = new URL( import.meta.url ).searchParams;
+				if ( searchParams.has( settingsIdentifier ) ) {
+					const jsonInString = searchParams.get( settingsIdentifier );
+					if ( jsonInString ) {
+						this.settings = JSON.parse( jsonInString );
+					}
+				}
+			}
 		}
 	}
 
@@ -456,7 +464,7 @@ class StyleSwitchInternal
  * @class
  * @extends StyleSwitchInternal
  * @implements {Classes.StyleSwitch}
- * @version 1.4
+ * @version 1.4.1
  * @since Q4 2026
  * @file style-switch.mjs
  * @license CC-BY-SA-4.0
@@ -499,16 +507,25 @@ class StyleSwitch extends StyleSwitchInternal
 		};
 	}
 
-	/** @type {Classes.StyleSwitch.SETTINGS_URL_PARAMETER } */
-	static get SETTINGS_URL_PARAMETER ()
+	/** @type { Classes.StyleSwitch.RESERVED_ELEMENT_NAMES } */
+	static get RESERVED_ELEMENT_NAMES ()
 	{
-		return 'settings';
+		return {
+			ANNOTATION_XML: /** @type {Enums.ReservedElementNames} */ ( 'annotation-xml' ),
+			COLOR_PROFILE: /** @type {Enums.ReservedElementNames} */ ( 'color-profile' ),
+			FONT_FACE: /** @type {Enums.ReservedElementNames} */ ( 'font-face' ),
+			FONT_FACE_SRC: /** @type {Enums.ReservedElementNames} */ ( 'font-face-src' ),
+			FONT_FACE_URI: /** @type {Enums.ReservedElementNames} */( 'font-face-uri' ),
+			FONT_FACE_FORMAT: /** @type {Enums.ReservedElementNames} */ ( 'font-face-format' ),
+			FONT_FACE_NAME: /** @type {Enums.ReservedElementNames} */ ( 'font-face-name' ),
+			MISSING_GLYPH: /** @type {Enums.ReservedElementNames} */ ( 'missing-glyph' ),
+		};
 	}
 
 	/** @type { Classes.StyleSwitch[ 'constructor' ] } */
-	constructor ( settingsElementId = 'style-switch-settings' )
+	constructor ()
 	{
-		super( ...arguments );
+		super();
 		if ( this.settings.autoRun ) {
 			this.run();
 		}
@@ -523,6 +540,13 @@ class StyleSwitch extends StyleSwitchInternal
 		if ( !this.settings ) {
 			throw new Error( 'Settings object is missing' );
 		}
+		if ( this.settings.customElementName ) {
+			const name = this.settings.customElementName;
+			if ( name !== name.toLowerCase() || !name.includes( '-' ) || Object.values( StyleSwitch.RESERVED_ELEMENT_NAMES ).some( reservedName => reservedName === name ) ) {
+				console.warn( 'Invalid customElementName: "' + name + '". Custom element name must be lowercase, contain at least one hyphen, and must not be a reserved name. This setting was reset to empty string.' );
+				this.settings.customElementName = '';
+			}
+		}
 	}
 
 	/** @type { Classes.StyleSwitch[ 'prepareRootElement' ] } */
@@ -534,6 +558,16 @@ class StyleSwitch extends StyleSwitchInternal
 
 		if ( possibleRootElement ) {
 			this.rootElement = possibleRootElement;
+		} else if ( this.settings.customElementName ) {
+
+			/** @type {?HTMLElement} */
+			const possibleCustomElements = document.querySelector( this.settings.customElementName );
+
+			if ( possibleCustomElements ) {
+				this.rootElement = possibleCustomElements;
+			} else {
+				this.rootElement = document.createElement( this.settings.resultSnippetAppearance.defaultResultSnippetElement );
+			}
 		} else {
 			this.rootElement = document.createElement( this.settings.resultSnippetAppearance.defaultResultSnippetElement );
 		}
@@ -894,11 +928,13 @@ Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 	get: function ()
 	{
 		return {
+			settingsIdentifier: 'styleSwitchSettings', // three possible uses (as variable in window object, script type "application/json" with this "id" or http get parameter).
+			customElementName: 'style-switch',
 			styleLinksQSA: 'link[rel~=stylesheet]', // match rel="stylesheet" and also rel="alternate stylesheet"
 			rootElementQS: '#style-switch',
 			cookie: {
 				name: 'stylesheets',
-				timeBeforeExpire: 365 * 24 * 60 * 60 * 1000, // year
+				timeBeforeExpire: 365 * 24 * 60 * 60 * 1000, // 1 year
 				partitioned: true,
 				path: '/',
 				sameSite: /** @type {'strict'} */ ( 'strict' ),

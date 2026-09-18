@@ -255,15 +255,20 @@
 	<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
 	<h1 id="styleswitch">StyleSwitch</h1>
 	<ul>
-		<li>version: <code>1.4</code></li>
+		<li>version: <code>1.4.1</code></li>
 		<li>important file: <code>style-switch.mjs</code></li>
-		<li>integrity check: <code>sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=</code></li>
+		<li>integrity check: <code>sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=</code></li>
 	</ul>
 	<p>A switch for different CSS styles on web pages.</p>
 	<p>There are plenty of light/dark theme style switchers, so why make another one?</p>
+	<h2 id="whats-new">What's new?</h2>
+	<h3 id="version-141">1.4.1</h3>
+	<ul>
+		<li><code>consoleFilter.js</code> is now available as an npm package (<code>console-filter-js</code>) and loaded via npm dependency with importmap resolution instead of a direct file reference.</li>
+	</ul>
 	<h2 id="quick-start">Quick start</h2>
 	<p>If you want the fastest possible setup, add a container for the widget and include the module:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>This already does the core work:</p>
 	<ul>
@@ -344,7 +349,7 @@
 		<li>Optional listener for the appropriate cookie allowing live switching to the chosen style (this is in a separate JavaScript file and is not required if you prefer a backend solution with a server-side script)</li>
 	</ol>
 	<p>Minimal working usage:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...</p>
 	<p>... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.</p>
@@ -380,9 +385,9 @@
 	<p>There are 2 options, and for both the same applies: you only fill in the parts of the settings you want to change; if you do not mention them, the default settings are used. You can find the default settings from the static read-only method <code>StyleSwitch.DEFAULT_SETTINGS</code>. For clarity, that variable contains the default settings, not the current instance settings.</p>
 	<h4 id="1-configure-via-a-json-element">1. Configure via a JSON element.</h4>
 	<p>What JSON element? This is a simplified term for <code>script type=&quot;application/json&quot;</code>, or <code>script type=&quot;text/json&quot;</code> (even though this syntax is deprecated, it still works). It is important to know that <code>script type=&quot;application/json&quot;</code> is treated by the browser as ordinary text, not as executable script! That means it does not block page rendering while the script runs; on the contrary, it has no effect on page rendering.</p>
-	<p>The important attribute here is <code>id</code> with the value <code>style-switch-settings</code>. The script looks for the element with that <code>id</code>. Since the script itself is a module (<code>type=&quot;module&quot;</code>), it does not matter where in the page the JSON element is placed, whether in the header or at the end of the body.</p>
+	<p>The important attribute here is <code>id</code> with the value <code>styleSwitchSettings</code>. The script looks for the element with that <code>id</code>. Since the script itself is a module (<code>type=&quot;module&quot;</code>), it does not matter where in the page the JSON element is placed, whether in the header or at the end of the body.</p>
 	<p>Example:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/json&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;style-switch-settings&quot;</span>&gt;</span><span class="language-javascript">
+	<pre><code class="language-html">	<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/json&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;styleSwitchSettings&quot;</span>&gt;</span><span class="language-javascript">
 {
 	<span class="hljs-string">&quot;nakedStyle&quot;</span>: {
 		<span class="hljs-string">&quot;use&quot;</span>: <span class="hljs-literal">true</span>
@@ -392,15 +397,15 @@
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in <code>StyleSwitch.DEFAULT_SETTINGS</code>.)</p>
 	<h4 id="2-inject-settings-via-an-http-get-parameter">2. Inject settings via an HTTP GET parameter.</h4>
-	<p>The second option is to place them in the HTTP GET parameter named <code>settings</code>. (You can find the parameter name from the static read-only method <code>StyleSwitch.SETTINGS_URL_PARAMETER</code>.) The value must be JSON-escaped, for example with <code>JSON.stringify()</code>.</p>
+	<p>The second option is to place them in the HTTP GET parameter named <code>styleSwitchSettings</code> (the value of <code>settingsIdentifier</code>). The value must be JSON-escaped, for example with <code>JSON.stringify()</code>.</p>
 	<p>The important return value is stored in the <code>result</code> variable. That variable is either <code>null</code> (if the widget was not created, for example when the page contains no styles) or an <code>HTMLElement</code>, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using <code>await</code> or <code>Promise</code>.</p>
 	<p>Example:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
 		},
@@ -427,6 +432,8 @@
 	<h3 id="detailed-possible-settings">Detailed possible settings:</h3>
 	<h4 id="stylelinksqsa"><code>styleLinksQSA</code></h4>
 	<p>(<code>string</code>) The value for <code>document.querySelectorAll()</code> used to load styles. You probably will not need to change the default.</p>
+	<h4 id="customelementname"><code>customElementName</code></h4>
+	<p>(<code>string</code>) Name of the custom element that will be searched for in the document as the widget container when no element matching <code>rootElementQS</code> is found. If found, the first matching element is used. If not found, a default element (<code>defaultResultSnippetElement</code>) is created instead. Default is <code>style-switch</code>. Must be lowercase, contain at least one hyphen, and must not be a reserved HTML/SVG element name (e.g., <code>annotation-xml</code>, <code>color-profile</code>, <code>font-face</code>). Invalid values are cleared by <code>checkRequirements()</code> with a <code>console.warn()</code> message.</p>
 	<h4 id="rootelementqs"><code>rootElementQS</code></h4>
 	<p>(<code>string</code>) The value for <code>document.querySelector()</code> returning the element into which the widget created by this script will be inserted.</p>
 	<h4 id="cookie"><code>cookie</code></h4>
@@ -496,7 +503,7 @@
 	<p>If you want to make more extensive modifications to the class, it is possible using a custom assembly, which can look like this:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
 
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">autoRun</span>: <span class="hljs-literal">false</span>,
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
@@ -543,8 +550,7 @@
 	<ul>
 		<li><code>example-usage.html</code> example usage of StyleSwitch.</li>
 		<li><code>content-type-checker.js</code>, checks the server configuration to see if all file extensions have the appropriate MIME type. A typical problem is the .mjs extension, which does not usually have the corresponding MIME type <code>'text/javascript'</code>. If this problem occurs, it can be solved in two different ways. Either rename the file extension from .mjs to .js (and also update the file paths, for example in <code>example-usage.html</code> where this file is referenced), or the second way is to change your web server configuration and assign the <code>.mjs</code> extension the MIME type <code>'text/javascript'</code>.</li>
-		<li><code>modules/string/interpolate.mjs</code>, used only by <code>content-type-checker.js</code>, enables inserting variables into text strings and printing them.</li>
-		<li><code>modules/importWithIntegrity.mjs</code>, a script that enables dynamic import of modules with file integrity checking. It is also used only by <code>content-type-checker.js</code>.</li>
+		<li><code>modules/string/interpolate.mjs</code>, used only by <code>content-type-checker.js</code>, enables inserting variables into text strings and printing them. Dynamic module loading is done via native <code>fetch()</code> with integrity checking and importmap-based module resolution.</li>
 		<li>folder <code>readme-screenshots</code>, screenshots, mostly from the browser console.</li>
 		<li>folder <code>example-css</code>, CSS styles used by <code>example-usage.html</code>. Based on <a href="https://andybrewer.github.io/mvp/">MVP.css</a></li>
 		<li><code>style-switch.spec.mjs</code>, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.</li>
@@ -562,6 +568,13 @@
 		<li>The <code>.mjs</code> file must be served with a JavaScript MIME type. If imports fail, check your server configuration.</li>
 		<li>If the page contains no stylesheet links, the widget will not be created.</li>
 	</ul>
+	<h3 id="running-tests">Running tests</h3>
+	<p>Unit tests are run via Node.js:</p>
+	<pre><code class="language-bash">npm test</code></pre>
+	<p>This executes <code>node --test style-switch.spec.mjs</code>.</p>
+	<p>Tests can also be run in a browser by opening <code>tests-runner.html</code>.</p>
+	<p>To install StyleSwitch without tests and testing tools (for production use):</p>
+	<pre><code class="language-bash">npm install --omit=dev</code></pre>
 	<h3 id="used-technologies">Used technologies:</h3>
 	<p>Alternative style sheets (<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/alternate_stylesheet</a>) (<a href="https://html.spec.whatwg.org/multipage/links.html#rel-alternate">https://html.spec.whatwg.org/multipage/links.html#rel-alternate</a>)</p>
 	<p>Cookie Store API <a href="https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent">https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent</a></p>

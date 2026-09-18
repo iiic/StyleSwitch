@@ -1,19 +1,25 @@
 # StyleSwitch
 
-- version: `1.4`
+- version: `1.4.1`
 - important file: `style-switch.mjs`
-- integrity check: `sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs=`
+- integrity check: `sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=`
 
 A switch for different CSS styles on web pages.
 
 There are plenty of light/dark theme style switchers, so why make another one?
+
+## What's new?
+
+### 1.4.1
+
+- `consoleFilter.js` is now available as an npm package (`console-filter-js`) and loaded via npm dependency with importmap resolution instead of a direct file reference.
 
 ## Quick start
 
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
 ```
 
 This already does the core work:
@@ -119,7 +125,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.4" type="module" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
 ```
 
 Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...
@@ -175,11 +181,11 @@ There are 2 options, and for both the same applies: you only fill in the parts o
 
 What JSON element? This is a simplified term for `script type="application/json"`, or `script type="text/json"` (even though this syntax is deprecated, it still works). It is important to know that `script type="application/json"` is treated by the browser as ordinary text, not as executable script! That means it does not block page rendering while the script runs; on the contrary, it has no effect on page rendering.
 
-The important attribute here is `id` with the value `style-switch-settings`. The script looks for the element with that `id`. Since the script itself is a module (`type="module"`), it does not matter where in the page the JSON element is placed, whether in the header or at the end of the body.
+The important attribute here is `id` with the value `styleSwitchSettings`. The script looks for the element with that `id`. Since the script itself is a module (`type="module"`), it does not matter where in the page the JSON element is placed, whether in the header or at the end of the body.
 
 Example:
 ```html
-<script type="application/json" id="style-switch-settings">
+<script type="application/json" id="styleSwitchSettings">
 {
 	"nakedStyle": {
 		"use": true
@@ -189,20 +195,20 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.4" type="module" crossorigin="anonymous" integrity="sha256-kIX6hmHLNZTmECrWgDksGlR7JKf9X4ymAaezikCBRGs="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" crossorigin="anonymous" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
 #### 2. Inject settings via an HTTP GET parameter.
 
-The second option is to place them in the HTTP GET parameter named `settings`. (You can find the parameter name from the static read-only method `StyleSwitch.SETTINGS_URL_PARAMETER`.) The value must be JSON-escaped, for example with `JSON.stringify()`.
+The second option is to place them in the HTTP GET parameter named `styleSwitchSettings` (the value of `settingsIdentifier`). The value must be JSON-escaped, for example with `JSON.stringify()`.
 
 The important return value is stored in the `result` variable. That variable is either `null` (if the widget was not created, for example when the page contains no styles) or an `HTMLElement`, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using `await` or `Promise`.
 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.1&styleSwitchSettings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -232,6 +238,9 @@ Option 1 is slightly less resource-intensive, but the difference is minimal. The
 
 #### `styleLinksQSA`
 (`string`) The value for `document.querySelectorAll()` used to load styles. You probably will not need to change the default.
+
+#### `customElementName`
+(`string`) Name of the custom element that will be searched for in the document as the widget container when no element matching `rootElementQS` is found. If found, the first matching element is used. If not found, a default element (`defaultResultSnippetElement`) is created instead. Default is `style-switch`. Must be lowercase, contain at least one hyphen, and must not be a reserved HTML/SVG element name (e.g., `annotation-xml`, `color-profile`, `font-face`). Invalid values are cleared by `checkRequirements()` with a `console.warn()` message.
 
 #### `rootElementQS`
 (`string`) The value for `document.querySelector()` returning the element into which the widget created by this script will be inserted.
@@ -289,7 +298,7 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.1&styleSwitchSettings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,
@@ -344,8 +353,7 @@ The already mentioned `style-switch-cookie-listener-example.js` is clear. A list
 Also included are:
 - `example-usage.html` example usage of StyleSwitch.
 - `content-type-checker.js`, checks the server configuration to see if all file extensions have the appropriate MIME type. A typical problem is the .mjs extension, which does not usually have the corresponding MIME type `'text/javascript'`. If this problem occurs, it can be solved in two different ways. Either rename the file extension from .mjs to .js (and also update the file paths, for example in `example-usage.html` where this file is referenced), or the second way is to change your web server configuration and assign the `.mjs` extension the MIME type `'text/javascript'`.
-- `modules/string/interpolate.mjs`, used only by `content-type-checker.js`, enables inserting variables into text strings and printing them.
-- `modules/importWithIntegrity.mjs`, a script that enables dynamic import of modules with file integrity checking. It is also used only by `content-type-checker.js`.
+- `modules/string/interpolate.mjs`, used only by `content-type-checker.js`, enables inserting variables into text strings and printing them. Dynamic module loading is done via native `fetch()` with integrity checking and importmap-based module resolution.
 - folder `readme-screenshots`, screenshots, mostly from the browser console.
 - folder `example-css`, CSS styles used by `example-usage.html`. Based on [MVP.css](https://andybrewer.github.io/mvp/)
 - `style-switch.spec.mjs`, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.
@@ -362,6 +370,24 @@ Also included are:
 - The cookie listener is optional for the widget itself, but it is required if you want the selected style to be applied automatically after page reloads or on other pages.
 - The `.mjs` file must be served with a JavaScript MIME type. If imports fail, check your server configuration.
 - If the page contains no stylesheet links, the widget will not be created.
+
+### Running tests
+
+Unit tests are run via Node.js:
+
+```bash
+npm test
+```
+
+This executes `node --test style-switch.spec.mjs`.
+
+Tests can also be run in a browser by opening `tests-runner.html`.
+
+To install StyleSwitch without tests and testing tools (for production use):
+
+```bash
+npm install --omit=dev
+```
 
 ### Services:
 

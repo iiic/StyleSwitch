@@ -1,7 +1,7 @@
 /**
  * @file style-switch.globals.d.ts
  * @description TypeScript global declarations for StyleSwitch.
- * @version 1.4
+ * @version 1.4.1
  * @license CC-BY-SA-4.0
  */
 
@@ -12,6 +12,11 @@ declare global {
 		/** Possible output formats of StyleSwitch */
 		type OutputFormats = string & {
 			readonly oneOf: 'select' | 'radioList' | 'switch';
+		};
+
+		/** Names of reserved SVG element names that cannot be used as customElementName */
+		type ReservedElementNames = string & {
+			readonly oneOf: 'annotation-xml' | 'color-profile' | 'font-face' | 'font-face-src' | 'font-face-uri' | 'font-face-format' | 'font-face-name' | 'missing-glyph';
 		};
 
 		/** Default behavior of the widget when the operating system color scheme changes. The widget can dynamically change the page style immediately when the OS value changes, if that is desirable. For example, if the user has already chosen a site style, they likely do not want it to change. Therefore the default behavior is to change dynamically only when there is no cookie and the user has not yet chosen the page style. All options can be obtained from the static read-only method StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR */
@@ -73,6 +78,35 @@ declare global {
 
 		};
 
+		/** Reserved SVG element names that cannot be used as customElementName */
+		const RESERVED_ELEMENT_NAMES = {
+
+			/** Reserved name */
+			ANNOTATION_XML: 'annotation-xml' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			COLOR_PROFILE: 'color-profile' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			FONT_FACE: 'font-face' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			FONT_FACE_SRC: 'font-face-src' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			FONT_FACE_URI: 'font-face-uri' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			FONT_FACE_FORMAT: 'font-face-format' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			FONT_FACE_NAME: 'font-face-name' as Enums.ReservedElementNames,
+
+			/** Reserved name */
+			MISSING_GLYPH: 'missing-glyph' as Enums.ReservedElementNames,
+
+		};
+
 	}
 
 	namespace Types {
@@ -103,6 +137,12 @@ declare global {
 
 		/** Settings for StyleSwitch */
 		type Settings = {
+
+			/** Identifier of settings for StyleSwitch. Three possible uses (as variable in window object, script type "application/json" with this "id" or http get parameter). */
+			settingsIdentifier: string;
+
+			/** Name of the custom element that will be created as the widget container when no element matching `rootElementQS` is found in the document. */
+			customElementName: string;
 
 			/** The value for document.querySelectorAll() used to load styles. You probably will not need to change the default. */
 			styleLinksQSA: string;
@@ -272,11 +312,11 @@ declare global {
 
 		};
 
-		/** This returns string possible to place into url get parameter to set settings */
-		type SETTINGS_URL_PARAMETER = 'settings';
-
 		/** Options for selecting the type of output element. */
 		type OutputFormats = typeof Constants.OUTPUT_FORMATS;
+
+		/** Names of reserved SVG element names that cannot be used as customElementName */
+		type ReservedElementNames = typeof Constants.RESERVED_ELEMENT_NAMES;
 
 		/** Options for setting how to behave when changing the color theme in the operating system. */
 		type PreferredColorSchemeChangeBehavior = typeof Constants.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR;
@@ -343,7 +383,7 @@ declare global {
 			static cookieChangeListener( outputFormat: ?Enums.OutputFormats, cookieName: String, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, event: CookieChangeEvent ): void;
 
 			/** Constructor for StyleSwitchInternal */
-			constructor ( settingsElementId: string ): StyleSwitchInternal;
+			constructor (): StyleSwitchInternal;
 
 			/** Gets caption and title only if output element is switch  */
 			getCaptionAndTitleForSwitch( interestStyleSheets: Types.ResultArray ): { caption: string; title: string; };
@@ -368,11 +408,11 @@ declare global {
 			/** Get list of possible roles of CSS style sheet file */
 			static get ROLE(): Types.Roles;
 
-			/** Returns name of settings get http parameter */
-			static get SETTINGS_URL_PARAMETER(): Types.SETTINGS_URL_PARAMETER;
+			/** Names of reserved SVG element names that cannot be used as customElementName */
+			static get RESERVED_ELEMENT_NAMES(): Types.ReservedElementNames;
 
 			/** Constructor for StyleSwitch */
-			constructor ( settingsElementId: string ): StyleSwitch;
+			constructor (): StyleSwitch;
 
 			/** Checks if everything is OK for start, throws error if isn't */
 			checkRequirements(): void;

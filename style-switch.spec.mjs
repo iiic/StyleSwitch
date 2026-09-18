@@ -369,4 +369,166 @@ await group( 'Dynamic tests', async () =>
 
 	} );
 
+	await group( 'Settings loading from different sources', async () =>
+	{
+
+		await it( 'DEFAULT_SETTINGS should have settingsIdentifier set to styleSwitchSettings', async () =>
+		{
+			assert( StyleSwitch.DEFAULT_SETTINGS.settingsIdentifier ).equal( 'styleSwitchSettings' );
+		} );
+
+		await it( 'Load settings from window variable', async () =>
+		{
+			/** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ] = {
+				nakedStyle: {
+					use: true,
+				},
+				autoRun: false,
+			};
+			const ss = new StyleSwitch();
+			assert( ss.settings.nakedStyle.use ).equal( true );
+			delete /** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ];
+		} );
+
+		await it( 'Load settings from script element', async () =>
+		{
+			applySettings( 'styleSwitchSettings', {
+				nakedStyle: {
+					use: true,
+				},
+				autoRun: false,
+			} );
+			const ss = new StyleSwitch();
+			assert( ss.settings.nakedStyle.use ).equal( true );
+			clearSettings( 'styleSwitchSettings' );
+		} );
+
+		await it( 'Window variable should have priority over script element', async () =>
+		{
+			/** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ] = JSON.stringify( {
+			nakedStyle: {
+				use: false,
+			},
+			autoRun: false,
+		} );
+			applySettings( 'styleSwitchSettings', {
+				nakedStyle: {
+					use: true,
+				},
+				autoRun: false,
+			} );
+			const ss = new StyleSwitch();
+			assert( ss.settings.nakedStyle.use ).equal( false );
+			delete /** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ];
+			clearSettings( 'styleSwitchSettings' );
+		} );
+
+		await it( 'Script element should have priority over GET parameter', async () =>
+		{
+			applySettings( 'styleSwitchSettings', {
+				nakedStyle: {
+					use: true,
+				},
+				autoRun: false,
+			} );
+			const ss = new StyleSwitch();
+			assert( ss.settings.nakedStyle.use ).equal( true );
+			clearSettings( 'styleSwitchSettings' );
+		} );
+
+		await it( 'Settings from window are merged with defaults', async () =>
+		{
+			/** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ] = {
+				nakedStyle: {
+					use: true,
+				},
+			};
+			const ss = new StyleSwitch();
+			assert( ss.settings.nakedStyle.use ).equal( true );
+			assert( ss.settings.cookie.name ).equal( 'stylesheets' );
+			delete /** @type {{ [key: string]: any }} */ ( window )[ 'styleSwitchSettings' ];
+		} );
+
+	} );
+
+	await group( 'Custom element name', async () =>
+	{
+
+		beforeEach( () =>
+		{
+			document.querySelectorAll( '[data-ictest-style-switch]' ).forEach( el => el.remove() );
+		} );
+
+		afterEach( () =>
+		{
+			document.querySelectorAll( '[data-ictest-style-switch]' ).forEach( el => el.remove() );
+		} );
+
+		await it( 'DEFAULT_SETTINGS should have customElementName', async () =>
+		{
+			assert( StyleSwitch.DEFAULT_SETTINGS.customElementName ).equal( 'style-switch' );
+		} );
+
+		await it( 'Should not create custom element but use existing one from document', async () =>
+		{
+			const customElement = document.createElement( 'my-custom-widget' );
+			customElement.setAttribute( 'data-ictest-style-switch', 'true' );
+			document.body.appendChild( customElement );
+
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'my-custom-widget';
+			ss.prepareRootElement();
+			assert( ss.rootElement ).equal( customElement );
+		} );
+
+		await it( 'Should create default div when no #style-switch and no matching customElementName in document', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'my-custom-widget';
+			ss.prepareRootElement();
+			assert( ss.rootElement.tagName ).equal( 'DIV' );
+		} );
+
+		await it( 'Uppercase customElementName should be reset', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'My-Custom';
+			ss.checkRequirements();
+			assert( ss.settings.customElementName ).equal( '' );
+		} );
+
+		await it( 'CustomElementName without hyphen should be reset', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'mycustom';
+			ss.checkRequirements();
+			assert( ss.settings.customElementName ).equal( '' );
+		} );
+
+		await it( 'Reserved customElementName should be reset', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'font-face';
+			ss.checkRequirements();
+			assert( ss.settings.customElementName ).equal( '' );
+		} );
+
+		await it( 'Valid customElementName should not be reset', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = 'my-custom';
+			ss.checkRequirements();
+			assert( ss.settings.customElementName ).equal( 'my-custom' );
+		} );
+
+		await it( 'Empty customElementName should not be reset', async () =>
+		{
+			const ss = new StyleSwitch();
+			ss.settings.customElementName = '';
+			ss.checkRequirements();
+			assert( ss.settings.customElementName ).equal( '' );
+		} );
+
+	} );
+
 } );
