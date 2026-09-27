@@ -1,7 +1,7 @@
 /**
  * @file style-switch.globals.d.ts
  * @description TypeScript global declarations for StyleSwitch.
- * @version 1.4.1
+ * @version 1.4.2
  * @license CC-BY-SA-4.0
  */
 

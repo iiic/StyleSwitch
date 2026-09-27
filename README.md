@@ -1,14 +1,18 @@
 # StyleSwitch
 
-- version: `1.4.1`
+- version: `1.4.2`
 - important file: `style-switch.mjs`
-- integrity check: `sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=`
+- integrity check: `sha256-T4UH0d5j4kg0b+hupVOIW4aWRjJPwija0MTlrzXWqgk=`
 
 A switch for different CSS styles on web pages.
 
 There are plenty of light/dark theme style switchers, so why make another one?
 
 ## What's new?
+
+### 1.4.2
+
+- Bug fixes: the cookie is now really deleted also when it is partitioned (default), stylesheet paths are matched exactly, naked style selected in another tab is shown in the widget, `texts.switch.title`, `switch.useRolesAsTitle` and `radioList.useRoleAsItemTitle` settings work, exported `result` is `null` when no widget is created.
 
 ### 1.4.1
 
@@ -19,7 +23,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
+<script src="./style-switch.mjs?v=1.4.2" type="module" integrity="sha256-T4UH0d5j4kg0b+hupVOIW4aWRjJPwija0MTlrzXWqgk="></script>
 ```
 
 This already does the core work:
@@ -125,7 +129,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
+<script src="./style-switch.mjs?v=1.4.2" type="module" integrity="sha256-T4UH0d5j4kg0b+hupVOIW4aWRjJPwija0MTlrzXWqgk="></script>
 ```
 
 Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...
@@ -195,7 +199,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.4.1" type="module" crossorigin="anonymous" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
+<script src="./style-switch.mjs?v=1.4.2" type="module" crossorigin="anonymous" integrity="sha256-T4UH0d5j4kg0b+hupVOIW4aWRjJPwija0MTlrzXWqgk="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -208,7 +212,7 @@ The important return value is stored in the `result` variable. That variable is 
 Example:
 ```html
 <script type="module">
-	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.1&styleSwitchSettings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.2&styleSwitchSettings=' + JSON.stringify( {
 		nakedStyle: {
 			use: true,
 		},
@@ -298,7 +302,7 @@ If you want to make more extensive modifications to the class, it is possible us
 ```html
 <script type="module">
 
-	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.1&styleSwitchSettings=' + JSON.stringify( {
+	const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4.2&styleSwitchSettings=' + JSON.stringify( {
 		autoRun: false,
 		nakedStyle: {
 			use: true,

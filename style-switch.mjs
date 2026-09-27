@@ -484,7 +484,7 @@ class StyleSwitchInternal
  * @class
  * @extends StyleSwitchInternal
  * @implements {Classes.StyleSwitch}
- * @version 1.4.1
+ * @version 1.4.2
  * @since Q4 2026
  * @file style-switch.mjs
  * @license CC-BY-SA-4.0
