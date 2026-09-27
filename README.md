@@ -359,6 +359,8 @@ Also included are:
 - `style-switch.spec.mjs`, Unit tests for main script. It is not needed for the script's functionality itself. If you delete this file, nothing will happen, everything will work. For programmers or AI agents, however, unit tests will help to find out if their changes broke something.
 - `modules/ictest.mjs`, Tests runtime. Used **only** for the above mentioned unit test file. Not needed for the script itself.
 - `tests-runner.html` HTML file used for run tests in Browser. It is also not needed for the script itself.
+- folder `.github`, automatic checks for GitHub Actions ( workflow in `.github/workflows/checks.yml`, scripts in `.github/scripts` ). Not needed for the script itself.
+- folder `.githooks`, optional local git hook which runs fast checks before every commit. Not needed for the script itself.
 - `package.json` command for NPM ( [npm.js](https://www.npmjs.com/) ) catalog.
 - `AGENTS.md` commands for AI agents, description how to work with this repository. Something like Readme for AI.
 - `README.md` library description in Markdown
@@ -381,7 +383,25 @@ npm test
 
 This executes `node --test style-switch.spec.mjs`.
 
-Tests can also be run in a browser by opening `tests-runner.html`.
+Tests can also be run in a browser by opening `tests-runner.html`, or automatically in headless Chromium:
+
+```bash
+npx playwright install chromium
+npm run test:browser
+```
+
+Integrity hashes ( `sha256-…` ) written in HTML and Markdown files, and version numbers, can be checked with:
+
+```bash
+npm run check:integrity
+```
+
+All of these checks run automatically on GitHub after every push and in every pull request ( `.github/workflows/checks.yml` ).
+To run fast checks locally before every commit, enable the git hook once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 To install StyleSwitch without tests and testing tools (for production use):
 

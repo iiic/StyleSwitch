@@ -6,9 +6,15 @@ Make native `console.log()` (and other console methods) proxied and filtered by 
 ## Architecture & Key Paths
 - `modules/ictest.mjs`, Tests runtime. Used **only** for the above mentioned unit test file. Not needed for the script itself.
 - `tests-runner.html` HTML file used for run tests in Browser. It is also not needed for the script itself.
+- `.github/workflows/checks.yml` GitHub Actions: unit tests ( Node 22, 24 ), browser tests ( Chromium ), syntax check, integrity hashes and versions check.
+- `.github/scripts/` scripts used by the workflow, run them locally with `npm run test:browser` and `npm run check:integrity`.
+- `.githooks/pre-commit` optional local hook, enable with `git config core.hooksPath .githooks`.
 - `package.json` command for NPM ( [npm.js](https://www.npmjs.com/) ) catalog.
 - `ADENTS.md` commands for AI agents, description how to work with this repository. Something like Readme for AI.
 - `README.md` class description in Markdown.
+
+## Before commit
+Run `npm test` and `npm run check:integrity`. When a file with an integrity hash changes, update every `sha256-…` referencing it.
 
 ## Full Offline support:
 This project has all files here in repository, and not communicate with any another online servers / files / urls,

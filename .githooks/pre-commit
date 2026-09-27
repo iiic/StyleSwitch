@@ -1,0 +1,13 @@
+#!/bin/sh
+# Local git hook, runs fast checks before every commit.
+# Enable once per clone: git config core.hooksPath .githooks
+# Skip once: git commit --no-verify
+
+set -e
+
+for file in $( git ls-files '*.js' '*.mjs' ); do
+	node --input-type=module --check < "$file" || { echo "Syntax error in $file"; exit 1; }
+done
+
+npm test --silent
+npm run check:integrity --silent
