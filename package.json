@@ -31,11 +31,14 @@
 	"main": "style-switch.mjs",
 	"types": "style-switch.globals.d.ts",
 	"scripts": {
-		"test": "node --test style-switch.spec.mjs"
+		"test": "node --test style-switch.spec.mjs",
+		"test:browser": "node .github/scripts/browser-tests.mjs",
+		"check:integrity": "node .github/scripts/check-integrity.mjs"
 	},
 	"devDependencies": {
 		"console-filter-js": "1.0.0",
 		"css.escape": "^1.5.1",
-		"jsdom": "^30.0.1"
+		"jsdom": "^30.0.1",
+		"playwright": "^1.63.0"
 	}
 }
