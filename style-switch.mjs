@@ -82,7 +82,7 @@ class StyleSwitchInternal
 
 		if ( hasAlternate && hasTitle ) {
 			const possibleCloneOfPersistent = document.querySelector(
-				`link[rel=stylesheet][href*="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( styleLink ) ) }"]:not([title])`
+				`link[rel=stylesheet][href="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( styleLink ) ) }"]:not([title])`
 			);
 			return possibleCloneOfPersistent ? StyleSwitch.ROLE.ALTERNATE_CLONE : StyleSwitch.ROLE.ALTERNATE;
 		} else if ( !hasAlternate && hasTitle ) {
@@ -127,6 +127,17 @@ class StyleSwitchInternal
 		} else { // select or radioList
 			return eventTarget.value;
 		}
+	}
+
+	/** @type {Classes.StyleSwitchInternal.deleteCookie} */
+	static async deleteCookie ( cookieSettings )
+	{
+		const deleteOptions = {
+			name: cookieSettings.name,
+			path: cookieSettings.path,
+		};
+		await cookieStore.delete( { ...deleteOptions, partitioned: true } ); // partitioned cookie is deleted only this way
+		return await cookieStore.delete( deleteOptions ); // cookie set without partitioned attribute
 	}
 
 	/** @type {Classes.StyleSwitchInternal.switchStyleEvent} */
@@ -195,7 +206,7 @@ class StyleSwitchInternal
 			if ( isDisabled === false ) {
 
 				/** @type { Types.PossibleOutputElement } */
-				const possibleElement = rootElement.querySelector( `[value*="${ CSS.escape( path ) }"]` );
+				const possibleElement = rootElement.querySelector( `[value="${ CSS.escape( path ) }"]` );
 
 				StyleSwitch.setCurrentSelection( possibleElement );
 			}
@@ -257,7 +268,7 @@ class StyleSwitchInternal
 		{
 
 			/** @type { ?HTMLLinkElement } */
-			const possibleLinkElement = document.querySelector( `link[rel~=stylesheet][href*="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( element ) ) }"][title]` );
+			const possibleLinkElement = document.querySelector( `link[rel~=stylesheet][href="${ CSS.escape( StyleSwitch.getOriginalHrefAttribute( element ) ) }"][title]` );
 
 			if ( possibleLinkElement ) {
 				if ( possibleLinkElement.media && window.matchMedia( possibleLinkElement.media ).matches ) {
@@ -325,11 +336,15 @@ class StyleSwitchInternal
 	}
 
 	/** @type {Classes.StyleSwitchInternal.preferredColorSchemeChangeListener} */
-	static preferredColorSchemeChangeListener ( outputFormat, cookieName, rootElement, interestStyleSheets, /* event */ )
+	static async preferredColorSchemeChangeListener ( outputFormat, cookieSettings, changeBehavior, rootElement, interestStyleSheets, /* event */ )
 	{
-		cookieStore.delete( {
-			name: cookieName,
-		} );
+		if ( changeBehavior === StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.ONLY_WITHOUT_COOKIE ) {
+			const cookie = await cookieStore.get( cookieSettings.name );
+			if ( cookie && cookie.value ) { // user has chosen a style after page load, keep it
+				return;
+			}
+		}
+		await StyleSwitch.deleteCookie( cookieSettings );
 
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
 			StyleSwitch.setCurrentChecked( rootElement, interestStyleSheets, null );
@@ -405,7 +420,9 @@ class StyleSwitchInternal
 		loopThroughStyleSheetsWithRoles:
 		interestStyleSheets.forEach( ( { role, reference } ) =>
 		{
-			title.push( role );
+			if ( this.settings.resultSnippetAppearance.switch.useRolesAsTitle ) {
+				title.push( role );
+			}
 			if ( reference ) {
 				const possibleDataTitle = reference.getAttribute( 'data-title' );
 				if ( reference.title ) {
@@ -420,13 +437,13 @@ class StyleSwitchInternal
 		if ( this.settings.texts.switch.caption ) {
 			caption.length = 0;
 			caption.push( this.settings.texts.switch.caption );
-		}
-		if ( this.settings.texts.switch.title ) {
-			caption.length = 0;
-			caption.push( this.settings.texts.switch.title );
 		} else if ( this.settings.texts.caption ) {
 			caption.length = 0;
 			caption.push( this.settings.texts.caption );
+		}
+		if ( this.settings.texts.switch.title ) {
+			title.length = 0;
+			title.push( this.settings.texts.switch.title );
 		}
 
 		return { caption: caption.join( divider ), title: title.join( divider ) };
@@ -450,9 +467,12 @@ class StyleSwitchInternal
 	}
 
 	/** @type {Classes.StyleSwitchInternal['getTitleForStyleSheet']} */
-	getTitleForStyleSheet ( role )
+	getTitleForStyleSheet ( role, outputFormat )
 	{
-		if ( this.settings.resultSnippetAppearance.select.useRoleAsOptionTitle ) {
+		const useRole = outputFormat === StyleSwitch.OUTPUT_FORMATS.RADIOS
+			? this.settings.resultSnippetAppearance.radioList.useRoleAsItemTitle
+			: this.settings.resultSnippetAppearance.select.useRoleAsOptionTitle;
+		if ( useRole ) {
 			return role;
 		}
 		return null;
@@ -464,7 +484,7 @@ class StyleSwitchInternal
  * @class
  * @extends StyleSwitchInternal
  * @implements {Classes.StyleSwitch}
- * @version 1.4.1
+ * @version 1.4.2
  * @since Q4 2026
  * @file style-switch.mjs
  * @license CC-BY-SA-4.0
@@ -522,12 +542,21 @@ class StyleSwitch extends StyleSwitchInternal
 		};
 	}
 
+	/** @type {Promise<?HTMLElement>} */
+	#autoRunResult = Promise.resolve( null );
+
+	/** @type { Classes.StyleSwitch[ 'autoRunResult' ] } */
+	get autoRunResult ()
+	{
+		return this.#autoRunResult;
+	}
+
 	/** @type { Classes.StyleSwitch[ 'constructor' ] } */
 	constructor ()
 	{
 		super();
 		if ( this.settings.autoRun ) {
-			this.run();
+			this.#autoRunResult = this.run();
 		}
 	}
 
@@ -601,9 +630,7 @@ class StyleSwitch extends StyleSwitchInternal
 					}
 				}
 			} catch {
-				await cookieStore.delete( {
-					name: this.settings.cookie.name,
-				} );
+				await StyleSwitch.deleteCookie( this.settings.cookie );
 			}
 		}
 
@@ -727,7 +754,7 @@ class StyleSwitch extends StyleSwitchInternal
 			const labelElement = document.createElement( 'label' );
 			const radioElement = document.createElement( 'input' );
 			const currentCaption = this.getCaptionForStyleSheet( reference );
-			const currentTitle = this.getTitleForStyleSheet( role );
+			const currentTitle = this.getTitleForStyleSheet( role, StyleSwitch.OUTPUT_FORMATS.RADIOS );
 			const currentValue = StyleSwitch.getOriginalHrefAttribute( reference );
 			const currentIsChecked = currentlyActivatedPath === currentValue ? true : false;
 			radioElement.type = 'radio';
@@ -789,7 +816,7 @@ class StyleSwitch extends StyleSwitchInternal
 		{
 			const optionElement = document.createElement( 'option' );
 			const currentCaption = this.getCaptionForStyleSheet( reference );
-			const currentTitle = this.getTitleForStyleSheet( role );
+			const currentTitle = this.getTitleForStyleSheet( role, StyleSwitch.OUTPUT_FORMATS.SELECT );
 			const currentValue = StyleSwitch.getOriginalHrefAttribute( reference );
 			const currentIsSelected = currentlyActivatedPath === currentValue ? true : false;
 			optionElement.selected = currentIsSelected;
@@ -820,7 +847,7 @@ class StyleSwitch extends StyleSwitchInternal
 	}
 
 	/** @type {Classes.StyleSwitch['celebrateNakedDay']} */
-	celebrateNakedDay ( interestStyleSheets )
+	async celebrateNakedDay ( interestStyleSheets )
 	{
 		const today = new Date();
 		const currentMonth = today.getMonth();
@@ -840,12 +867,14 @@ class StyleSwitch extends StyleSwitchInternal
 				enumerable: false,
 				writable: true,
 			} );
-			StyleSwitch.switchStyleEvent( interestStyleSheets, this.settings.cookie, fakeChangeEvent );
+			await StyleSwitch.switchStyleEvent( interestStyleSheets, this.settings.cookie, fakeChangeEvent );
+			return true;
 		}
+		return false;
 	}
 
 	/** @type {Classes.StyleSwitch['cancelNakedDay']} */
-	cancelNakedDay ( byNakedDay )
+	async cancelNakedDay ( byNakedDay )
 	{
 		if ( byNakedDay ) {
 			const today = new Date();
@@ -855,11 +884,11 @@ class StyleSwitch extends StyleSwitchInternal
 				currentMonth !== this.settings.nakedStyle.celebrateNakedDay.monthNumber ||
 				currentDay !== this.settings.nakedStyle.celebrateNakedDay.dayNumber
 			) {
-				cookieStore.delete( {
-					name: this.settings.cookie.name,
-				} );
+				await StyleSwitch.deleteCookie( this.settings.cookie );
+				return true;
 			}
 		}
+		return false;
 	}
 
 	/** @type {Classes.StyleSwitch['swapSelectionOnCookieChange']} */
@@ -885,13 +914,14 @@ class StyleSwitch extends StyleSwitchInternal
 		}
 		if (
 			this.settings.resultSnippetAppearance.preferredColorSchemeChangeBehavior === StyleSwitch.PREFERRED_COLOR_SCHEME_CHANGE_BEHAVIOR.ONLY_WITHOUT_COOKIE &&
-			currentlyActivatedPath
+			currentlyActivatedPath !== null // empty string is naked style, also chosen by user
 		) {
 			return;
 		}
-		const cookieName = this.settings.cookie.name;
+		const cookieSettings = this.settings.cookie;
+		const changeBehavior = this.settings.resultSnippetAppearance.preferredColorSchemeChangeBehavior;
 		const rootElement = this.rootElement;
-		window.matchMedia( '(prefers-color-scheme: dark)' ).addEventListener( 'change', StyleSwitch.preferredColorSchemeChangeListener.bind( null, outputFormat, cookieName, rootElement, interestStyleSheets ), {
+		window.matchMedia( '(prefers-color-scheme: dark)' ).addEventListener( 'change', StyleSwitch.preferredColorSchemeChangeListener.bind( null, outputFormat, cookieSettings, changeBehavior, rootElement, interestStyleSheets ), {
 			capture: false,
 			once: false,
 			passive: true
@@ -903,10 +933,14 @@ class StyleSwitch extends StyleSwitchInternal
 	{
 		this.checkRequirements();
 		this.prepareRootElement();
-		const { currentlyActivatedPath, byNakedDay } = await this.getCurrentlyActivatedStyleSheetsPath();
+		let { currentlyActivatedPath, byNakedDay } = await this.getCurrentlyActivatedStyleSheetsPath();
 		const interestStyleSheets = this.getCleanedStyleSheetsObject(); // without duplicates and persistent styleSheets
-		this.celebrateNakedDay( interestStyleSheets );
-		this.cancelNakedDay( byNakedDay );
+		if ( await this.celebrateNakedDay( interestStyleSheets ) ) {
+			currentlyActivatedPath = ''; // empty string means naked style
+		}
+		if ( await this.cancelNakedDay( byNakedDay ) ) {
+			currentlyActivatedPath = null; // cookie was deleted, use default style
+		}
 		const outputFormat = this.determineTypeOfOutputElement( interestStyleSheets );
 		if ( outputFormat === StyleSwitch.OUTPUT_FORMATS.SWITCH ) {
 			this.createSwitch( interestStyleSheets, currentlyActivatedPath );
@@ -999,7 +1033,12 @@ Object.defineProperty( StyleSwitch, 'DEFAULT_SETTINGS', {
 /** @type {StyleSwitch.prototype} */
 const ss = new StyleSwitch();
 
-/** @returns {?HTMLElement} */
-const result = ss.settings.autoRun ? await ss.rootElement : null;
+/** @type {?HTMLElement} */
+let result = null;
+try {
+	result = await ss.autoRunResult;
+} catch ( error ) {
+	console.error( error );
+}
 
 export { StyleSwitch, result };
