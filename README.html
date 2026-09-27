@@ -257,7 +257,7 @@
 	<ul>
 		<li>version: <code>1.4.1</code></li>
 		<li>important file: <code>style-switch.mjs</code></li>
-		<li>integrity check: <code>sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=</code></li>
+		<li>integrity check: <code>sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=</code></li>
 	</ul>
 	<p>A switch for different CSS styles on web pages.</p>
 	<p>There are plenty of light/dark theme style switchers, so why make another one?</p>
@@ -268,7 +268,7 @@
 	</ul>
 	<h2 id="quick-start">Quick start</h2>
 	<p>If you want the fastest possible setup, add a container for the widget and include the module:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>This already does the core work:</p>
 	<ul>
@@ -349,7 +349,7 @@
 		<li>Optional listener for the appropriate cookie allowing live switching to the chosen style (this is in a separate JavaScript file and is not required if you prefer a backend solution with a server-side script)</li>
 	</ol>
 	<p>Minimal working usage:</p>
-	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...</p>
 	<p>... and that is all; this one line is enough for full functionality, the script finds the styles used on the page and builds a switch from them. Note that the switch only stores the appropriate cookie, and additional processing is needed for that cookie, whether server-side or JavaScript.</p>
@@ -397,7 +397,7 @@
 	}
 }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./style-switch.mjs?v=1.4.1&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">&quot;anonymous&quot;</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">&quot;sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 	<p>(In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in <code>StyleSwitch.DEFAULT_SETTINGS</code>.)</p>
 	<h4 id="2-inject-settings-via-an-http-get-parameter">2. Inject settings via an HTTP GET parameter.</h4>
@@ -405,7 +405,7 @@
 	<p>The important return value is stored in the <code>result</code> variable. That variable is either <code>null</code> (if the widget was not created, for example when the page contains no styles) or an <code>HTMLElement</code>, which can then be inserted into any part of the page, as shown below. The function is asynchronous, so you must wait for the result using <code>await</code> or <code>Promise</code>.</p>
 	<p>Example:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;styleSwitchSettings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
 		},
@@ -484,7 +484,7 @@
 		</li>
 		<li>(<code>object</code>) <code>select</code> all settings for the 'select' widget
 			<ul>
-				<li>(<code>bool</code>) <code>useRolesAsTitle</code> use the detected style role as the <code>title</code> attribute for the <code>option</code> inside the <code>select</code>?</li>
+				<li>(<code>bool</code>) <code>useRoleAsOptionTitle</code> use the detected style role as the <code>title</code> attribute for the <code>option</code> inside the <code>select</code>?</li>
 				<li>(<code>string</code>) <code>captionElementName</code> element name for the title of the resulting select widget.</li>
 			</ul>
 		</li>
@@ -503,7 +503,7 @@
 	<p>If you want to make more extensive modifications to the class, it is possible using a custom assembly, which can look like this:</p>
 	<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
 
-	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;settings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
+	<span class="hljs-keyword">const</span> { <span class="hljs-title class_">StyleSwitch</span>, result } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>( <span class="hljs-string">&#x27;./style-switch.mjs?v=1.4.1&amp;styleSwitchSettings=&#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>( {
 		<span class="hljs-attr">autoRun</span>: <span class="hljs-literal">false</span>,
 		<span class="hljs-attr">nakedStyle</span>: {
 			<span class="hljs-attr">use</span>: <span class="hljs-literal">true</span>,
@@ -516,13 +516,17 @@
 	s.<span class="hljs-title function_">prepareRootElement</span>();
 
 	<span class="hljs-comment">/** <span class="hljs-doctag">@type</span> {<span class="hljs-type">{currentlyActivatedPath: String|null, byNakedDay: Boolean</span>}} */</span>
-	<span class="hljs-keyword">const</span> { currentlyActivatedPath, byNakedDay } = <span class="hljs-keyword">await</span> s.<span class="hljs-title function_">getCurrentlyActivatedStyleSheetsPath</span>();
+	<span class="hljs-keyword">let</span> { currentlyActivatedPath, byNakedDay } = <span class="hljs-keyword">await</span> s.<span class="hljs-title function_">getCurrentlyActivatedStyleSheetsPath</span>();
 
 	<span class="hljs-comment">/** <span class="hljs-doctag">@type</span> {<span class="hljs-type">Array.&lt;{role: &#x27;preferred&#x27; | &#x27;alternate&#x27; | &#x27;alternate (clone of persistent)&#x27;, reference: ?HTMLLinkElement</span>}&gt;} */</span>
 	<span class="hljs-keyword">const</span> interestStyleSheets = s.<span class="hljs-title function_">getCleanedStyleSheetsObject</span>(); <span class="hljs-comment">// without duplicates and persistent styleSheets</span>
 
-	s.<span class="hljs-title function_">celebrateNakedDay</span>( interestStyleSheets );
-	s.<span class="hljs-title function_">cancelNakedDay</span>( byNakedDay );
+	<span class="hljs-keyword">if</span> ( <span class="hljs-keyword">await</span> s.<span class="hljs-title function_">celebrateNakedDay</span>( interestStyleSheets ) ) {
+		currentlyActivatedPath = <span class="hljs-string">&#x27;&#x27;</span>; <span class="hljs-comment">// empty string means naked style</span>
+	}
+	<span class="hljs-keyword">if</span> ( <span class="hljs-keyword">await</span> s.<span class="hljs-title function_">cancelNakedDay</span>( byNakedDay ) ) {
+		currentlyActivatedPath = <span class="hljs-literal">null</span>; <span class="hljs-comment">// cookie was deleted, use default style</span>
+	}
 	s.<span class="hljs-title function_">createSelect</span>( interestStyleSheets, currentlyActivatedPath );
 
 	<span class="hljs-comment">/** <span class="hljs-doctag">@type</span> {<span class="hljs-type">HTMLElement|null</span>} */</span>

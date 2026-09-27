@@ -352,6 +352,9 @@ declare global {
 			/** Get path of css stylesheet file currently selected by StyleSwitch's widget element */
 			static getSelectedPath( interestStyleSheets: Array.<{ role: Enums.Roles, reference: ?HTMLLinkElement }>, transferredEvent: Event ): ?string;
 
+			/** Deletes StyleSwitch cookie on its path, both partitioned and not partitioned variant */
+			static async deleteCookie( cookieSettings: Types.CookieSettings ): Promise<void>;
+
 			/** Sets cookie as result of StyleSwitch */
 			static async switchStyleEvent( interestStyleSheets: Types.ResultArray, cookieSettings: Types.CookieSettings, event: Event ): Promise<void>;
 
@@ -377,7 +380,7 @@ declare global {
 			static setDefaultOnResultElement( outputFormat: ?Enums.OutputFormats, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray ): void;
 
 			/** Listener waiting to change color scheme in operation system (and then color scheme in browser) */
-			static preferredColorSchemeChangeListener( outputFormat: ?Enums.OutputFormats, cookieName: string, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, /* event: MediaQueryListEvent */ ): void;
+			static async preferredColorSchemeChangeListener( outputFormat: ?Enums.OutputFormats, cookieSettings: Types.CookieSettings, changeBehavior: Enums.PreferredColorSchemeChangeBehavior, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, /* event: MediaQueryListEvent */ ): Promise<void>;
 
 			/** Listener waiting to change StyleSwitch cookie */
 			static cookieChangeListener( outputFormat: ?Enums.OutputFormats, cookieName: String, rootElement: HTMLElement, interestStyleSheets: Types.ResultArray, event: CookieChangeEvent ): void;
@@ -391,8 +394,8 @@ declare global {
 			/** Gets a caption for stylesheet found by style link element */
 			getCaptionForStyleSheet( possibleLinkElement: HTMLLinkElement | null ): string;
 
-			/** Gets a title for stylesheet from role */
-			getTitleForStyleSheet( role: Enums.Roles ): ?string;
+			/** Gets a title for stylesheet from role ( by settings for given output format ) */
+			getTitleForStyleSheet( role: Enums.Roles, outputFormat: Enums.OutputFormats ): ?string;
 
 		}
 
@@ -410,6 +413,9 @@ declare global {
 
 			/** Names of reserved SVG element names that cannot be used as customElementName */
 			static get RESERVED_ELEMENT_NAMES(): Types.ReservedElementNames;
+
+			/** Result of run() started by constructor when autoRun is set, otherwise resolves to null */
+			get autoRunResult(): Promise<HTMLElement | null>;
 
 			/** Constructor for StyleSwitch */
 			constructor (): StyleSwitch;
@@ -438,11 +444,11 @@ declare global {
 			/** Create output element select */
 			createSelect( interestStyleSheets: Types.ResultArray, currentlyActivatedPath: ?String ): void;
 
-			/** Automatically set naked style if it's Css Naked Day */
-			celebrateNakedDay( interestStyleSheets: Types.ResultArray ): void;
+			/** Automatically set naked style if it's Css Naked Day, resolves to true when naked style was set */
+			async celebrateNakedDay( interestStyleSheets: Types.ResultArray ): Promise<boolean>;
 
-			/** Returns document's stylesheet back to normal after naked day ends */
-			cancelNakedDay( byNakedDay: boolean ): void;
+			/** Returns document's stylesheet back to normal after naked day ends, resolves to true when cookie was deleted */
+			async cancelNakedDay( byNakedDay: boolean ): Promise<boolean>;
 
 			/** On change or delete cookie with styles… it changes selected value on root element */
 			swapSelectionOnCookieChange( outputFormat: ?Enums.OutputFormats, interestStyleSheets: Types.ResultArray ): void;

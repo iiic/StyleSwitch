@@ -67,7 +67,7 @@ if ( typeof process !== 'undefined' && process.versions?.node ) { // If this is 
 	} );
 }
 
-const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&settings=' + JSON.stringify( {
+const { StyleSwitch, result } = /** @type {typeof import('./style-switch.mjs')} */ ( await import( './style-switch.mjs?v=1.4&styleSwitchSettings=' + JSON.stringify( {
 	autoRun: false,
 } ) ) );
 const { applySettings, clearSettings, group, groupClosed, it, assert, beforeEach, afterEach, not, toBeNullOr, equal, toBeDefined, toBeInstanceOf } = /** @type {typeof import('./modules/ictest.mjs')} */ ( await import( './modules/ictest.mjs?v=1.0&settings=' + JSON.stringify( {
@@ -365,6 +365,118 @@ await group( 'Dynamic tests', async () =>
 
 			assert( optionShort.selected ).equal( false );
 			assert( optionLong.selected ).equal( true );
+		} );
+
+		await it( 'Selects the exact stylesheet when the longer URL is listed first', async () =>
+		{
+			const shortPath = './styles/theme.css';
+			const longPath = './styles/theme.css?dark';
+			const rootElement = document.createElement( 'div' );
+			const optionLong = document.createElement( 'option' );
+			optionLong.value = longPath;
+			const optionShort = document.createElement( 'option' );
+			optionShort.value = shortPath;
+			rootElement.append( optionLong, optionShort );
+			StyleSwitch.setValueOnResultElementBy( {
+				[ longPath ]: { disabled: true },
+				[ shortPath ]: { disabled: false }
+			}, StyleSwitch.OUTPUT_FORMATS.SELECT, rootElement );
+
+			assert( optionLong.selected ).equal( false );
+			assert( optionShort.selected ).equal( true );
+		} );
+
+		await it( 'Selects the naked style when the cookie says so', async () =>
+		{
+			const rootElement = document.createElement( 'div' );
+			const optionStyle = document.createElement( 'input' );
+			optionStyle.type = 'radio';
+			optionStyle.name = 'regression';
+			optionStyle.value = './styles/theme.css';
+			optionStyle.checked = true;
+			const optionNaked = document.createElement( 'input' );
+			optionNaked.type = 'radio';
+			optionNaked.name = 'regression';
+			optionNaked.value = '';
+			rootElement.append( optionStyle, optionNaked );
+			StyleSwitch.setValueOnResultElementBy( {
+				'./styles/theme.css': { disabled: true },
+				'': { disabled: false }
+			}, StyleSwitch.OUTPUT_FORMATS.RADIOS, rootElement );
+
+			assert( optionNaked.checked ).equal( true );
+		} );
+
+		await it( 'Deletes both partitioned and not partitioned cookie with the path it was set with', async () =>
+		{
+			const originalDelete = cookieStore.delete;
+
+			/** @type {Array<unknown>} */
+			const deleteCalls = [];
+
+			cookieStore.delete = async ( /** @type {unknown} */ options ) =>
+			{
+				deleteCalls.push( options );
+			};
+			try {
+				await StyleSwitch.deleteCookie( { ...StyleSwitch.DEFAULT_SETTINGS.cookie, path: '/blog/' } );
+			} finally {
+				cookieStore.delete = originalDelete;
+			}
+			assert( JSON.stringify( deleteCalls ) ).equal( JSON.stringify( [
+				{ name: 'stylesheets', path: '/blog/', partitioned: true },
+				{ name: 'stylesheets', path: '/blog/' },
+			] ) );
+		} );
+
+		await it( 'Radio list uses its own useRoleAsItemTitle setting', async () =>
+		{
+			const styleLinks = [ './regression-a.css', './regression-b.css' ].map( ( path ) =>
+			{
+				const styleLink = document.createElement( 'link' );
+				styleLink.setAttribute( 'data-regression-style', 'true' );
+				styleLink.rel = 'alternate stylesheet';
+				styleLink.setAttribute( 'href', path );
+				styleLink.title = path;
+				styleLink.disabled = true;
+				return styleLink;
+			} );
+			document.head.append( ...styleLinks );
+
+			const ss = new StyleSwitch();
+			ss.settings.resultSnippetAppearance.outputFormat = StyleSwitch.OUTPUT_FORMATS.RADIOS;
+			ss.settings.resultSnippetAppearance.select.useRoleAsOptionTitle = false;
+			ss.settings.resultSnippetAppearance.radioList.useRoleAsItemTitle = true;
+			const result = await ss.run();
+			const listItem = result?.querySelector( 'li' );
+			assert( listItem?.title ).equal( StyleSwitch.ROLE.ALTERNATE );
+		} );
+
+		await it( 'Switch uses texts.switch.title as title, not as caption', async () =>
+		{
+			const styleLink = document.createElement( 'link' );
+			styleLink.setAttribute( 'data-regression-style', 'true' );
+			styleLink.rel = 'alternate stylesheet';
+			styleLink.href = './regression.css';
+			styleLink.title = 'Regression style';
+			styleLink.disabled = true;
+			document.head.append( styleLink );
+
+			const ss = new StyleSwitch();
+			ss.settings.nakedStyle.use = true;
+			ss.settings.resultSnippetAppearance.outputFormat = StyleSwitch.OUTPUT_FORMATS.SWITCH;
+			ss.settings.texts.switch.title = 'Switch title';
+			const result = await ss.run();
+			const label = result?.querySelector( 'label' );
+			assert( label?.title ).equal( 'Switch title' );
+			assert( label?.querySelector( 'strong' )?.textContent ).equal( 'Style switch' );
+		} );
+
+		await it( 'Exported result is null when autoRun is disabled', async () =>
+		{
+			const ss = new StyleSwitch();
+			assert( await ss.autoRunResult ).equal( null );
+			assert( result ).equal( null );
 		} );
 
 	} );

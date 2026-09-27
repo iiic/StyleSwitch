@@ -2,7 +2,7 @@
 
 - version: `1.4.1`
 - important file: `style-switch.mjs`
-- integrity check: `sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y=`
+- integrity check: `sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44=`
 
 A switch for different CSS styles on web pages.
 
@@ -19,7 +19,7 @@ There are plenty of light/dark theme style switchers, so why make another one?
 If you want the fastest possible setup, add a container for the widget and include the module:
 
 ```html
-<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
 ```
 
 This already does the core work:
@@ -125,7 +125,7 @@ A script capable of:
 
 Minimal working usage:
 ```html
-<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
 ```
 
 Only pure javascript with TypeScript annotations, no other dependencies, libraries, frameworks or anything like that. TypeScript what? It's only about annotations, automatic tools can mark this class as a TypeScript library, but it's not true, just an autodetection failure, the script itself is pure javascript, only the annotations, interfaces, variable types described by TypeScript, ...
@@ -195,7 +195,7 @@ Example:
 	}
 }
 </script>
-<script src="./style-switch.mjs?v=1.4.1" type="module" crossorigin="anonymous" integrity="sha256-vU5lbWsuPR7fkgJ/dG2MvQOiLZHF1SJc3C/L9LwSc3Y="></script>
+<script src="./style-switch.mjs?v=1.4.1" type="module" crossorigin="anonymous" integrity="sha256-+WeYf0xjfG6papTiOKcHEUkxlWHr2Rvon3Yyl9fVX44="></script>
 ```
 (In this example I allow the page to have no CSS as one of the possible styles, and I overwrite the widget caption. The other settings remain default as shown in `StyleSwitch.DEFAULT_SETTINGS`.)
 
@@ -280,7 +280,7 @@ Option 1 is slightly less resource-intensive, but the difference is minimal. The
   - (`string`) `stateClassName` class name attribute for the element displaying the switch state (default "on" / "off" ... can be changed to any text)
   - (`string`) `statusElementName` element name for the element displaying the switch state. Only inline elements are supported, **not** block elements!
 - (`object`) `select` all settings for the 'select' widget
-  - (`bool`) `useRolesAsTitle` use the detected style role as the `title` attribute for the `option` inside the `select`?
+  - (`bool`) `useRoleAsOptionTitle` use the detected style role as the `title` attribute for the `option` inside the `select`?
   - (`string`) `captionElementName` element name for the title of the resulting select widget.
 - (`object`) `radioList` all settings for the 'radioList' widget
   - (`bool`) `useRoleAsItemTitle` use the detected style role as the `title` attribute for the `input`?
@@ -311,13 +311,17 @@ If you want to make more extensive modifications to the class, it is possible us
 	s.prepareRootElement();
 
 	/** @type {{currentlyActivatedPath: String|null, byNakedDay: Boolean}} */
-	const { currentlyActivatedPath, byNakedDay } = await s.getCurrentlyActivatedStyleSheetsPath();
+	let { currentlyActivatedPath, byNakedDay } = await s.getCurrentlyActivatedStyleSheetsPath();
 
 	/** @type {Array.<{role: 'preferred' | 'alternate' | 'alternate (clone of persistent)', reference: ?HTMLLinkElement}>} */
 	const interestStyleSheets = s.getCleanedStyleSheetsObject(); // without duplicates and persistent styleSheets
 
-	s.celebrateNakedDay( interestStyleSheets );
-	s.cancelNakedDay( byNakedDay );
+	if ( await s.celebrateNakedDay( interestStyleSheets ) ) {
+		currentlyActivatedPath = ''; // empty string means naked style
+	}
+	if ( await s.cancelNakedDay( byNakedDay ) ) {
+		currentlyActivatedPath = null; // cookie was deleted, use default style
+	}
 	s.createSelect( interestStyleSheets, currentlyActivatedPath );
 
 	/** @type {?HTMLElement} */
