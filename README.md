@@ -360,6 +360,7 @@ The already mentioned `style-switch-cookie-listener-example.js` is clear. A list
 
 Also included are:
 - `example-usage.html` example usage of StyleSwitch.
+- `example-usage.php` example of a server-side ( PHP ) solution instead of `style-switch-cookie-listener-example.js`. It reads the cookie with the chosen style and renders the page with style sheets already switched to it, so there is no flash of the default style after page load. It changes the `link` elements the same way as the JS listener, so both can be used together.
 - `content-type-checker.js`, checks the server configuration to see if all file extensions have the appropriate MIME type. A typical problem is the .mjs extension, which does not usually have the corresponding MIME type `'text/javascript'`. If this problem occurs, it can be solved in two different ways. Either rename the file extension from .mjs to .js (and also update the file paths, for example in `example-usage.html` where this file is referenced), or the second way is to change your web server configuration and assign the `.mjs` extension the MIME type `'text/javascript'`.
 - `modules/string/interpolate.mjs`, used only by `content-type-checker.js`, enables inserting variables into text strings and printing them. Dynamic module loading is done via native `fetch()` with integrity checking and importmap-based module resolution.
 - folder `readme-screenshots`, screenshots, mostly from the browser console.
