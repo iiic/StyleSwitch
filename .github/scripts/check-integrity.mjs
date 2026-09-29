@@ -4,7 +4,7 @@
 
 /**
  * @file check-integrity.mjs
- * @description CI check: every `sha256-…` / `sha384-…` / `sha512-…` hash written in HTML and Markdown files must match
+ * @description CI check: every `sha256-…` / `sha384-…` / `sha512-…` hash written in HTML, Markdown and PHP files must match
  * the current content of the file referenced on the same line ( importmap `integrity` or `integrity=""` attribute ).
  * Also checks that version in package.json matches `@version` in style-switch.mjs and version line in README.md.
  * Usage: `node .github/scripts/check-integrity.mjs` ( run `npm ci` first, some hashes point into node_modules )
@@ -16,7 +16,7 @@ import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join( dirname( fileURLToPath( import.meta.url ) ), '..', '..' )
-const CHECKED_EXTENSIONS = [ '.html', '.md' ]
+const CHECKED_EXTENSIONS = [ '.html', '.md', '.php' ]
 const HASH_ALGORITHMS = [ 'sha256', 'sha384', 'sha512' ]
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 const PATH_END_CHARS = [ '?', '#', '"', '\'', '&', ' ', '`', '<', ')' ]
